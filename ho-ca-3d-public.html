@@ -72,7 +72,10 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 @keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.05)}}
 .rarity{display:inline-block;padding:5px 14px;border-radius:999px;font-weight:800}
 .drop{position:absolute;width:46px;height:46px;margin-left:-23px;border-radius:50%;border:none;background:rgba(255,255,255,.25);font-size:27px;z-index:5;padding:0;line-height:46px}
+.drop.gold{width:92px;height:92px;margin-left:-46px;font-size:54px;line-height:92px;background:radial-gradient(circle at 32% 30%, #fff4b8, #ffd23a 46%, #f0a000 80%)}
+.drop.gold .drop-ico{display:inline-block;filter:sepia(1) saturate(7) hue-rotate(2deg) brightness(1.08)}
 .drop-key{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:900;line-height:1;color:#12303f;pointer-events:none;text-shadow:0 0 3px #fff,0 0 3px #fff,0 1px 0 #fff}
+.drop.gold .drop-key{font-size:24px}
 .floater{position:absolute;transform:translate(-50%,0);font-weight:900;color:#fde68a;text-shadow:0 2px 6px rgba(0,0,0,.5);animation:rise 1.1s forwards;pointer-events:none;z-index:5;font-size:18px}
 @keyframes rise{to{transform:translate(-50%,-46px);opacity:0}}
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#12303f;color:#fff;padding:12px 20px;border-radius:999px;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:92vw;text-align:center}
@@ -1426,7 +1429,7 @@ function rollDropLetter(){
 function renderDrop(d){
   var layer = $("dropLayer");
   var b = document.createElement("button");
-  b.className = "drop"; b.setAttribute("data-drop", d.id); b.setAttribute("data-key", d.letter);
+  b.className = "drop" + (d.kind==="gold" ? " gold" : ""); b.setAttribute("data-drop", d.id); b.setAttribute("data-key", d.letter);
   b.style.left = d.x + "%"; b.style.top = d.y + "%";
   var ico = document.createElement("span");
   ico.className = "drop-ico";
@@ -1483,12 +1486,18 @@ $("shopBtn").onclick = function(){ renderShop("fish"); $("shopOverlay").classLis
 $("shopClose").onclick = function(){ $("shopOverlay").classList.remove("on"); };
 $("decoBtn").onclick = function(){ renderDecoMenu(); $("decoOverlay").classList.add("on"); };
 $("decoClose").onclick = function(){ $("decoOverlay").classList.remove("on"); };
+["shopOverlay","decoOverlay","gradeOverlay","deleteOverlay"].forEach(function(id){
+  var overlay = $(id);
+  overlay.addEventListener("click", function(e){
+    if (e.target === overlay) overlay.classList.remove("on");
+  });
+});
 function setArranging(on){
   tankState.arranging = on;
   $("arrangeBar").style.display = on ? "block" : "none";
   $("arrangeBtn").textContent = on ? "✓ Xong sắp xếp" : "🧲 Sắp xếp";
   $("fsArrangeBtn").textContent = on ? "✓ Xong" : "🧲 Sắp xếp";
-  $("tankHint").textContent = on ? "Kéo một món đồ trong hồ để dời chỗ nhé!" : "Chạm vào xu vàng 🪙 và kim cương 💎 rơi xuống để nhặt nhé!";
+  $("tankHint").textContent = on ? "Kéo một món đồ trong hồ để dời chỗ nhé!" : "Bấm chữ a–z ở giữa 🪙 💎, hoặc chạm, để nhặt nhé!";
   if (on) refreshArrangeSelect();
 }
 $("arrangeBtn").onclick = function(){ setArranging(!tankState.arranging); };
