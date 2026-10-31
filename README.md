@@ -1,6 +1,6 @@
 # Đảo Học Vui
 
-Game web tĩnh: đảo 3D, hồ cá, quiz Toán lớp 1 và lớp 6. Một file `ho-ca-3d-public.html` cùng folder `assets/`.
+Game web tĩnh: đảo 3D, hồ cá, quiz Toán lớp 1 và lớp 6. Một file `home.html` cùng folder `assets/`.
 
 Đảo dùng một map mặc định, **Đảo yên bình xưa** (`assets/map-peace.glb`). Nếu file map không tải được, game giữ đảo thủ tục **Đảo Học Vui gốc**.
 
@@ -12,7 +12,7 @@ Game web tĩnh: đảo 3D, hồ cá, quiz Toán lớp 1 và lớp 6. Một file 
 bash run.sh
 ```
 
-Rồi mở http://localhost:8000/ho-ca-3d-public.html
+Rồi mở http://localhost:8000/home.html
 
 Cần mạng để tải Three.js và lưu hồ sơ lên Supabase. Mỗi trình duyệt có một hồ sơ riêng.
 
