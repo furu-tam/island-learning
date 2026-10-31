@@ -71,7 +71,8 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 .giftbox{font-size:110px;text-align:center;animation:bob 1.2s ease-in-out 3;background:none;border:none;width:100%}
 @keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.05)}}
 .rarity{display:inline-block;padding:5px 14px;border-radius:999px;font-weight:800}
-.drop{position:absolute;width:46px;height:46px;margin-left:-23px;border-radius:50%;border:none;background:rgba(255,255,255,.25);font-size:27px;z-index:5}
+.drop{position:absolute;width:46px;height:46px;margin-left:-23px;border-radius:50%;border:none;background:rgba(255,255,255,.25);font-size:27px;z-index:5;padding:0;line-height:46px}
+.drop-key{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:900;line-height:1;color:#12303f;pointer-events:none;text-shadow:0 0 3px #fff,0 0 3px #fff,0 1px 0 #fff}
 .floater{position:absolute;transform:translate(-50%,0);font-weight:900;color:#fde68a;text-shadow:0 2px 6px rgba(0,0,0,.5);animation:rise 1.1s forwards;pointer-events:none;z-index:5;font-size:18px}
 @keyframes rise{to{transform:translate(-50%,-46px);opacity:0}}
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#12303f;color:#fff;padding:12px 20px;border-radius:999px;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:92vw;text-align:center}
@@ -169,7 +170,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <button class="place-card" data-place="pet"><div class="emo">🐾</div><div class="nm">Thú cưng</div><div class="ds" id="petCardDesc">Vào hồ cá thăm bạn thú</div></button>
     <button class="place-card" data-place="math"><div class="emo">🔢</div><div class="nm">Toán học</div><div class="ds" id="mathCardDesc">Quiz Toán · 66 câu</div></button>
     <button class="place-card" data-place="english"><div class="emo">🔤</div><div class="nm">Tiếng Anh</div><div class="ds">Sắp có bài học</div></button>
-    <button class="place-card" data-place="it"><div class="emo">💻</div><div class="nm">Tin học</div><div class="ds">Sắp có bài học</div></button>
+    <button class="place-card" data-place="it"><div class="emo">📖</div><div class="nm">Ngữ văn</div><div class="ds">Sắp có bài học</div></button>
   </div>
 </section>
 
@@ -191,7 +192,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
       <button class="btn small" id="fsResetBtn">🔄 Góc nhìn mặc định</button>
       <button class="btn small ghost" id="fsExitBtn" style="background:#fff">Thoát toàn màn hình</button>
     </div>
-    <p id="tankHint" style="position:absolute;inset-inline:0;bottom:6px;text-align:center;color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.6);pointer-events:none;margin:0">Chạm vào xu vàng 🪙 và kim cương 💎 rơi xuống để nhặt nhé!</p>
+    <p id="tankHint" style="position:absolute;inset-inline:0;bottom:6px;text-align:center;color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.6);pointer-events:none;margin:0">Bấm chữ a–z ở giữa 🪙 💎, hoặc chạm, để nhặt nhé!</p>
   </div>
   <div class="toolbar">
     <button class="btn small" id="backIslandBtn">🏝️ Về đảo</button>
@@ -559,7 +560,7 @@ function openPlace(id){
   if (id==="pet") { refreshWallets(); show("tank"); }
   else if (id==="math") { openQuizHome(); show("quiz"); }
   else if (id==="english") { $("soonEmoji").textContent="🔤"; $("soonTitle").textContent="Tiếng Anh"; show("soon"); }
-  else if (id==="it") { $("soonEmoji").textContent="💻"; $("soonTitle").textContent="Tin học"; show("soon"); }
+  else if (id==="it") { $("soonEmoji").textContent="📖"; $("soonTitle").textContent="Ngữ văn"; show("soon"); }
 }
 document.querySelectorAll(".place-card").forEach(function(b){
   b.addEventListener("click", function(){ openPlace(b.getAttribute("data-place")); });
@@ -775,7 +776,7 @@ var PLACES = [
   { id:"pet", label:"Thú cưng 🐾", angle:Math.PI*0.78, body:0xffedd5, roof:0xfb7185 },
   { id:"math", label:"Toán học 🔢", angle:Math.PI*0.22, body:0xfef9c3, roof:0xf59e0b },
   { id:"english", label:"Tiếng Anh 🔤", angle:Math.PI*1.72, body:0xdbeafe, roof:0x3b82f6 },
-  { id:"it", label:"Tin học 💻", angle:Math.PI*1.28, body:0xede9fe, roof:0x8b5cf6 }
+  { id:"it", label:"Ngữ văn 📖", angle:Math.PI*1.28, body:0xede9fe, roof:0x8b5cf6 }
 ];
 var HOUSES = {
   pet:     { glb:ASSET+"house-pikachu.glb", tex:ASSET+"house-pikachu.jpg" },
@@ -1387,7 +1388,7 @@ function startDrops(){
   dropTimer = setInterval(function(){
     if (drops.length>=5) return;
     var isDia = Math.random() < 0.14*rar.diamondMult;
-    var d = { id:++dropSeq, kind:isDia?"diamond":"gold", x:8+Math.random()*84, y:-6, speed:5.5+Math.random()*3.5 };
+    var d = { id:++dropSeq, kind:isDia?"diamond":"gold", letter:rollDropLetter(), x:8+Math.random()*84, y:-6, speed:5.5+Math.random()*3.5 };
     drops.push(d); renderDrop(d);
   }, spawnMs);
   fallTimer = setInterval(function(){
@@ -1409,16 +1410,49 @@ function stopDrops(){
   var layer = $("dropLayer"); if (layer) layer.innerHTML = "";
   tankState.chase = null;
 }
+function rollDropLetter(){
+  var used = {};
+  drops.forEach(function(d){ if (d.letter) used[d.letter] = true; });
+  var pool = [];
+  for (var i = 0; i < 26; i++){
+    var ch = String.fromCharCode(97 + i);
+    if (!used[ch]) pool.push(ch);
+  }
+  if (!pool.length){
+    for (var j = 0; j < 26; j++) pool.push(String.fromCharCode(97 + j));
+  }
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 function renderDrop(d){
   var layer = $("dropLayer");
   var b = document.createElement("button");
-  b.className = "drop"; b.setAttribute("data-drop", d.id);
+  b.className = "drop"; b.setAttribute("data-drop", d.id); b.setAttribute("data-key", d.letter);
   b.style.left = d.x + "%"; b.style.top = d.y + "%";
-  b.textContent = d.kind==="gold" ? "🪙" : "💎";
-  b.setAttribute("aria-label", d.kind==="gold" ? "Nhặt xu vàng" : "Nhặt kim cương");
+  var ico = document.createElement("span");
+  ico.className = "drop-ico";
+  ico.textContent = d.kind==="gold" ? "🪙" : "💎";
+  var key = document.createElement("span");
+  key.className = "drop-key";
+  key.textContent = d.letter;
+  b.appendChild(ico);
+  b.appendChild(key);
+  b.setAttribute("aria-label", (d.kind==="gold" ? "Nhặt xu vàng" : "Nhặt kim cương") + ", phím " + d.letter);
   b.onclick = function(){ collectDrop(d, b); };
   layer.appendChild(b);
 }
+document.addEventListener("keydown", function(e){
+  if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+  var tag = e.target && e.target.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+  var tank = $("scr-tank");
+  if (!tank || !tank.classList.contains("on")) return;
+  var ch = String(e.key || "").toLowerCase();
+  if (ch.length !== 1 || ch < "a" || ch > "z") return;
+  var hits = document.querySelectorAll('#dropLayer .drop[data-key="' + ch + '"]');
+  if (!hits.length) return;
+  e.preventDefault();
+  Array.prototype.forEach.call(hits, function(el){ el.click(); });
+});
 function collectDrop(d, el){
   drops = drops.filter(function(x){ return x.id!==d.id; });
   if (el) el.remove();
