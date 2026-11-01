@@ -43,6 +43,13 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 .stage canvas{display:block;width:100%;height:100%}
 #islandStage{height:min(62vh,520px)}
 #tankStage{height:min(58vh,480px);touch-action:none}
+#evoStage{height:min(42vh,340px);background:#0e7490}
+.evo-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:12px 0}
+@media(min-width:700px){.evo-grid{grid-template-columns:repeat(10,minmax(0,1fr))}}
+.evo-lv{border-radius:12px;border:2px solid var(--line);background:#fff;padding:8px 2px;font-weight:800;color:var(--ink)}
+.evo-lv.now{box-shadow:inset 0 0 0 2px var(--accent)}
+.evo-lv.sel{border-color:var(--accent);background:rgba(14,155,181,.16)}
+.evo-lv.lock{opacity:.48}
 #dropLayer{pointer-events:none}
 .drop{pointer-events:auto}
 .stage .hud{position:absolute;left:10px;top:10px;right:10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;flex-wrap:wrap}
@@ -190,7 +197,29 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <button class="place-card" data-place="english"><div class="emo">🔤</div><div class="nm">Tiếng Anh</div><div class="ds">Sắp có bài học</div></button>
     <button class="place-card" data-place="it"><div class="emo">📖</div><div class="nm">Ngữ văn</div><div class="ds" id="vanCardDesc">2 dàn ý · 2 bài mẫu · 20 câu</div></button>
     <button class="place-card" data-place="exam"><div class="emo">🏯</div><div class="nm">Phó Bản</div><div class="ds" id="examCardDesc">Toán 6 · 20 câu · 30 phút</div></button>
+    <button class="place-card" data-place="evo"><div class="emo">🌳</div><div class="nm">Tiến hóa</div><div class="ds" id="evoCardDesc">Xem dạng thú · mở đến Lv.10</div></button>
   </div>
+</section>
+
+<!-- EVOLUTION -->
+<section class="screen" id="scr-evo">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+    <h2>🌳 Nhà tiến hóa</h2>
+  </div>
+  <p class="sub" id="evoIntro">Chọn một cấp để xem dạng thú. Lv.1 đến Lv.10 đã mở. Lv.11 đến Lv.30 còn khóa.</p>
+  <div class="stage" id="evoStage">
+    <div id="evoMount" style="position:absolute;inset:0"></div>
+    <div id="evoLock" style="display:none;position:absolute;inset:0;z-index:3;background:rgba(8,30,40,.94);color:#fff;align-items:center;justify-content:center;text-align:center;padding:18px">
+      <div>
+        <div style="font-size:54px">🔒</div>
+        <b id="evoLockText" style="font-size:20px">Lv.11 chưa mở</b>
+        <p style="margin:8px 0 0">Hiện chỉ nuôi và xem được đến Lv.10.</p>
+      </div>
+    </div>
+    <div class="hud"><span class="pill" id="evoName">Thú cưng</span></div>
+  </div>
+  <div class="evo-grid" id="evoGrid"></div>
+  <button class="btn ghost" id="evoBack">🏝️ Về đảo</button>
 </section>
 
 <!-- TANK -->
@@ -554,6 +583,7 @@ function refreshWallets(){
     $("vanCardDesc").textContent = "2 dàn ý · 2 bài mẫu · 20 câu · " + vanPassed + "/2 bài đã qua" + (vanMiss ? " · còn " + vanMiss + " câu sai" : "");
     var examBest = profile.quizBest["exam:toan6"];
     $("examCardDesc").textContent = "Toán 6 · 20 câu · 30 phút" + (profile.quizPassed.indexOf("exam:toan6")>=0 ? " · đã qua" : "") + (examBest!=null ? " · kỷ lục " + examBest + "%" : "");
+    $("evoCardDesc").textContent = PETS[profile.giftPet].emoji + " đang Lv." + profile.level + " · xem dạng 1–10 · 11–30 khóa";
     $("petCardDesc").textContent = PETS[profile.giftPet].emoji + " " + petDisplayName(profile.giftPet, profile.level) + " (" + PETS[profile.giftPet].label + ", " + rar.label + " Lv." + profile.level + ") đang chờ trong hồ";
     var cost = LEVEL_UP_COSTS[profile.level];
     $("levelUpBtn").textContent = cost ? ("⬆️ Level Up · " + cost + " 💎") : "👑 Đã Lv.10 tối đa";
@@ -619,11 +649,13 @@ function openPlace(id){
   else if (id==="english") { $("soonEmoji").textContent="🔤"; $("soonTitle").textContent="Tiếng Anh"; show("soon"); }
   else if (id==="it") { quizMode = "van"; openQuizHome(); show("quiz"); }
   else if (id==="exam") { quizMode = "exam"; openQuizHome(); show("quiz"); }
+  else if (id==="evo") { show("evo"); }
 }
 document.querySelectorAll(".place-card").forEach(function(b){
   b.addEventListener("click", function(){ openPlace(b.getAttribute("data-place")); });
 });
 $("soonBack").onclick = function(){ show("island"); };
+$("evoBack").onclick = function(){ show("island"); };
 $("backIslandBtn").onclick = function(){ saveProfile(true); show("island"); };
 
 $("changeGradeBtn").onclick = function(){
@@ -837,14 +869,16 @@ var PLACES = [
   { id:"math", label:"Toán học 🔢", angle:Math.PI*0.22, body:0xfef9c3, roof:0xf59e0b },
   { id:"english", label:"Tiếng Anh 🔤", angle:Math.PI*1.72, body:0xdbeafe, roof:0x3b82f6 },
   { id:"it", label:"Ngữ văn 📖", angle:Math.PI*1.28, body:0xede9fe, roof:0x8b5cf6 },
-  { id:"exam", label:"Phó Bản 🏯", angle:Math.PI*0.5, radius:6.4, body:0xffe4e6, roof:0xe11d48 }
+  { id:"exam", label:"Phó Bản 🏯", angle:Math.PI*0.5, radius:6.4, body:0xffe4e6, roof:0xe11d48 },
+  { id:"evo", label:"Tiến hóa 🌳", angle:Math.PI, radius:6.3, body:0xdcfce7, roof:0x16a34a }
 ];
 var HOUSES = {
   pet:     { glb:ASSET+"house-pikachu.glb", tex:ASSET+"house-pikachu.jpg" },
   math:    { glb:ASSET+"house-medieval.glb", tex:ASSET+"house-medieval.jpg" },
   english: { glb:ASSET+"house-chikorita.glb", tex:ASSET+"house-chikorita.jpg" },
   it:      { glb:ASSET+"house-cubone.glb", tex:ASSET+"house-cubone.jpg" },
-  exam:    { glb:ASSET+"house-machop.glb", tex:ASSET+"house-machop.png" }
+  exam:    { glb:ASSET+"house-machop.glb", tex:ASSET+"house-machop.png" },
+  evo:     { glb:ASSET+"house-tree.glb", keepMat:true }
 };
 var islandApi = null;
 function startIsland(){
@@ -917,14 +951,16 @@ function startIsland(){
     var def = HOUSES[slot.placeId]; if (!def) return;
     houseLoader.loadAsync(def.glb).then(function(gltf){
       var model = gltf.scene;
-      var tex = new THREE.TextureLoader().load(def.tex);
-      if (THREE.SRGBEncoding) tex.encoding = THREE.SRGBEncoding;
-      tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
-      model.traverse(function(o){
-        if (!o.isMesh) return;
-        var mats = Array.isArray(o.material) ? o.material : [o.material];
-        mats.forEach(function(m){ if (m.isMeshStandardMaterial){ m.map = tex; m.color.set(0xffffff); m.roughness = 0.85; m.needsUpdate = true; } });
-      });
+      if (!def.keepMat && def.tex){
+        var tex = new THREE.TextureLoader().load(def.tex);
+        if (THREE.SRGBEncoding) tex.encoding = THREE.SRGBEncoding;
+        tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
+        model.traverse(function(o){
+          if (!o.isMesh) return;
+          var mats = Array.isArray(o.material) ? o.material : [o.material];
+          mats.forEach(function(m){ if (m.isMeshStandardMaterial){ m.map = tex; m.color.set(0xffffff); m.roughness = 0.85; m.needsUpdate = true; } });
+        });
+      }
       model.updateMatrixWorld(true);
       var box = new THREE.Box3().setFromObject(model);
       if (box.isEmpty()) return;
@@ -2247,12 +2283,166 @@ function finishQuiz(){
 }
 $("resBack").onclick = function(){ openQuizHome(); };
 
+/* ============================== Evolution house ============================== */
+var PET_LEVEL_OPEN = 10;
+var PET_LEVEL_TOTAL = 30;
+var evoApi = null;
+var evoToken = 0;
+var evoSel = 1;
+function renderEvoGrid(){
+  var html = "";
+  for (var lv=1; lv<=PET_LEVEL_TOTAL; lv++){
+    var open = lv<=PET_LEVEL_OPEN;
+    var cls = "evo-lv" + (lv===profile.level?" now":"") + (lv===evoSel?" sel":"") + (open?"":" lock");
+    html += '<button type="button" class="' + cls + '" data-lv="' + lv + '">' + (open?lv:("🔒"+lv)) + '</button>';
+  }
+  $("evoGrid").innerHTML = html;
+}
+function showEvoLevel(lv){
+  evoSel = lv;
+  renderEvoGrid();
+  var pet = profile.giftPet;
+  var open = lv<=PET_LEVEL_OPEN;
+  var lock = $("evoLock");
+  lock.style.display = open ? "none" : "flex";
+    if (!open){
+      $("evoLockText").textContent = "Lv." + lv + " chưa mở";
+      $("evoName").textContent = "🔒 Lv." + lv + " đang khóa";
+      if (evoApi) evoApi.clear();
+      return;
+    }
+  $("evoName").textContent = PETS[pet].emoji + " " + petDisplayName(pet, lv) + " · Lv." + lv + (lv===profile.level?" · đang nuôi":"");
+  if (evoApi) evoApi.setLevel(lv);
+}
+function startEvo(){
+  if (!profile) return;
+  var pet = PETS[profile.giftPet];
+  $("evoIntro").textContent = pet.emoji + " " + pet.label + " đang Lv." + profile.level + ". Chọn một cấp để xem dạng. Lv.1–10 đã mở, Lv.11–30 còn khóa.";
+  evoSel = Math.max(1, Math.min(PET_LEVEL_OPEN, profile.level||1));
+  if (!HAS_THREE){
+    renderEvoGrid();
+    showEvoLevel(evoSel);
+    return;
+  }
+  if (!evoApi){
+    var mount = $("evoMount");
+    var renderer = new THREE.WebGLRenderer({ antialias:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    if (THREE.SRGBEncoding) renderer.outputEncoding = THREE.SRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+    mount.appendChild(renderer.domElement);
+    var scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0e7490);
+    var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 50);
+    camera.position.set(1.6, 1.5, 5.2);
+    camera.lookAt(0, 0.7, 0);
+    scene.add(new THREE.HemisphereLight(0xeaf7ff, 0x14532d, 1.15));
+    var sun = new THREE.DirectionalLight(0xfff3d6, 1.3); sun.position.set(4, 8, 5); scene.add(sun);
+    var sand = new THREE.Mesh(new THREE.CircleGeometry(3.2, 28), stdMat(0xd9bd8a,{roughness:1}));
+    sand.rotation.x = -Math.PI/2; sand.position.y = -0.02; scene.add(sand);
+    var petRoot = new THREE.Group(); scene.add(petRoot);
+    var mixer = null, running = false, raf = 0, clock = new THREE.Clock();
+    function resize(){
+      var w = mount.clientWidth, h = mount.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h); camera.aspect = w/h; camera.updateProjectionMatrix();
+    }
+    resize(); window.addEventListener("resize", resize);
+    (function loop(){
+      raf = requestAnimationFrame(loop);
+      if (!running) return;
+      var dt = Math.min(0.05, clock.getDelta());
+      petRoot.rotation.y += dt*0.6;
+      if (mixer) mixer.update(dt);
+      renderer.render(scene, camera);
+    })();
+    evoApi = {
+      resume: function(){ running = true; resize(); },
+      pause: function(){ running = false; },
+      clear: function(){
+        ++evoToken; mixer = null;
+        while (petRoot.children.length) petRoot.remove(petRoot.children[0]);
+      },
+      setLevel: function(lv){
+        var token = ++evoToken;
+        mixer = null;
+        while (petRoot.children.length) petRoot.remove(petRoot.children[0]);
+        var mesh = makePetMesh(profile.giftPet, lv);
+        petRoot.add(mesh);
+        petRoot.rotation.y = 0.4;
+        function swap(group){
+          if (token!==evoToken) return;
+          petRoot.remove(mesh); mesh = group; petRoot.add(group);
+        }
+        if (profile.giftPet==="shark"){
+          gltfLoader2.loadAsync(ASSET+"sport-shark.glb").then(function(gltf){
+            if (token!==evoToken) return;
+            var lt = (lv-1)/9, bright = 1.78 - lt*1.33;
+            var mat = new THREE.MeshPhysicalMaterial({
+              map: loadTex(ASSET+"sport-shark-diffuse.png", true),
+              normalMap: loadTex(ASSET+"sport-shark-normals.png", false),
+              normalScale: new THREE.Vector2(0.65,0.65),
+              roughness: 1.0, roughnessMap: loadTex(ASSET+"sport-shark-roughness.png", false),
+              metalness: 0.0,
+              emissive: 0xffffff, emissiveMap: loadTex(ASSET+"sport-shark-emissive.png", true), emissiveIntensity: 0.6
+            });
+            mat.color.setRGB(bright*1.03, bright*0.96, bright*1.14);
+            var inst = gltf.scene;
+            inst.traverse(function(o){ if (o.isMesh){ o.material = mat; o.frustumCulled = false; } });
+            inst.position.set(0, 0.25, 0.19);
+            var wrap = new THREE.Group();
+            wrap.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2);
+            wrap.add(inst); wrap.scale.setScalar(0.6);
+            var grp = new THREE.Group(); grp.add(wrap);
+            grp.scale.setScalar(0.55 + (lv-1)/9*1.1);
+            swap(grp);
+            var full = gltf.animations && gltf.animations[0];
+            if (full && THREE.AnimationUtils.subclip){
+              mixer = new THREE.AnimationMixer(inst);
+              mixer.clipAction(THREE.AnimationUtils.subclip(full, "SwimIdle", 0, 40, 24)).play();
+            }
+          }).catch(function(){});
+        } else if (profile.giftPet==="crab"){
+          gltfLoader2.loadAsync(ASSET+"cc0-japanese-freshwater-crab/source/QS1726-E4-W01-1-1_animation.glb").then(function(gltf){
+            if (token!==evoToken) return;
+            var map = loadTex(ASSET+"cc0-japanese-freshwater-crab/textures/texture2048_0.jpeg", true);
+            var mat = new THREE.MeshStandardMaterial({ map: map, roughness: 0.78, metalness: 0.04, skinning: true, side: THREE.DoubleSide });
+            var inst = gltf.scene;
+            inst.traverse(function(o){ if (o.isMesh){ o.material = mat; o.frustumCulled = false; o.castShadow = false; } });
+            inst.position.set(0.22, 1.51, -0.27);
+            var wrap = new THREE.Group();
+            wrap.rotation.y = Math.PI/2;
+            wrap.add(inst);
+            wrap.scale.setScalar(0.50 + (lv-1)/9*0.24);
+            swap(wrap);
+            if (gltf.animations && gltf.animations[0]){
+              mixer = new THREE.AnimationMixer(inst);
+              mixer.clipAction(gltf.animations[0]).play();
+            }
+          }).catch(function(){});
+        }
+      }
+    };
+  }
+  evoApi.resume();
+  showEvoLevel(evoSel);
+}
+function stopEvo(){ if (evoApi) evoApi.pause(); }
+$("evoGrid").onclick = function(e){
+  var b = e.target.closest("[data-lv]");
+  if (!b || !profile) return;
+  var lv = parseInt(b.getAttribute("data-lv"), 10);
+  if (lv>PET_LEVEL_OPEN) toast("Lv." + lv + " còn khóa. Hiện chỉ mở đến Lv.10.");
+  showEvoLevel(lv);
+};
+
 /* Hook drops into show(): start when entering tank, stop when leaving */
 (function(){
   var origShow = show;
   show = function(screen){
     origShow(screen);
     if (screen==="tank") startDrops(); else stopDrops();
+    if (screen==="evo") startEvo(); else stopEvo();
   };
 })();
 
