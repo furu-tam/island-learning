@@ -132,7 +132,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 <!-- REGISTER -->
 <section class="screen" id="scr-register">
   <h1>🎁 Chào bạn nhỏ!</h1>
-  <p class="sub">Đặt tên cho mình, chọn lớp đang học, rồi mở hộp quà để nhận một bạn thú cưng bất ngờ nhé.</p>
+  <p class="sub">Đặt tên cho mình, chọn lớp đang học, rồi mở hộp quà để nhận cá mập nhé.</p>
   <div class="card">
     <label for="nameInput" style="font-weight:800">Biệt danh trong game — không cần tên thật</label>
     <input type="text" id="nameInput" maxlength="30" placeholder="Ví dụ: Bạn nhỏ" autocomplete="off" style="margin:8px 0 14px" />
@@ -150,7 +150,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 <section class="screen" id="scr-gift">
   <div class="center">
     <h1>Hộp quà của bạn!</h1>
-    <p class="sub">Chạm vào hộp quà để mở xem bạn thú nào đang chờ bạn nhé.</p>
+    <p class="sub">Chạm vào hộp quà để gặp cá mập nhé.</p>
     <button class="giftbox" id="giftBox" aria-label="Mở hộp quà">🎁</button>
     <div id="giftReveal" style="display:none">
       <div style="font-size:96px" id="giftEmoji">🦈</div>
@@ -211,7 +211,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
   <div class="toolbar">
     <button class="btn small" id="backIslandBtn">🏝️ Về đảo</button>
     <button class="btn small gold" id="shopBtn">🛒 Cửa hàng</button>
-    <button class="btn small" id="decoBtn">🎨 Trang trí hồ</button>
+    <button class="btn small" id="decoBtn">🪸 Đồ trang trí</button>
     <button class="btn small" id="arrangeBtn">🧲 Sắp xếp</button>
     <button class="btn small" id="levelUpBtn">⬆️ Level Up bằng 💎</button>
     <button class="btn small ghost" id="fsBtn">⛶ Toàn màn hình</button>
@@ -289,9 +289,10 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
       <div class="wallet" id="shopWallet"></div>
     </div>
     <div class="tabs" style="margin-top:12px">
-      <button class="tab sel" id="tabFish">🐠 Cá &amp; bạn bơi</button>
-      <button class="tab" id="tabDeco">🎁 Đồ trang trí đặc biệt</button>
+      <button class="tab sel" id="tabFish">🐠 Cá</button>
+      <button class="tab" id="tabDeco">🪸 Đồ trang trí</button>
     </div>
+    <p class="mut" id="shopHint" style="margin:8px 0 0">Mỗi món trong hồ đều phải mua bằng xu hoặc kim cương. Bớt món sẽ hoàn lại đúng số tiền đã trả.</p>
     <div class="shop-grid" id="shopGrid"></div>
     <button class="btn ghost" id="shopClose" style="margin-top:14px;width:100%">Đóng cửa hàng</button>
   </div>
@@ -301,7 +302,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 <div class="overlay" id="decoOverlay">
   <div class="sheet">
     <h2 style="margin-top:0">🎨 Trang trí hồ</h2>
-    <p class="mut">Dùng nút − / + để thêm hoặc bớt từng món. Đồ mới sẽ hiện trong hồ, bấm “Sắp xếp” ở hồ để kéo đi nơi khác.</p>
+    <p class="mut">Đồ trong hồ mua ở Cửa hàng. Bấm Sắp xếp ở hồ để kéo món đã mua đi nơi khác.</p>
     <div id="decoList"></div>
     <button class="btn ghost" id="decoClose" style="margin-top:12px;width:100%">Đóng</button>
   </div>
@@ -422,32 +423,36 @@ var SHOP_DECOS = [
   { id:"goldChest", label:"Rương Vàng", emoji:"👑", price:10, currency:"diamond" }
 ];
 var DECO_KINDS = [
-  { id:"stone", label:"Đá & sỏi đáy", emoji:"🪨", max:3 },
-  { id:"plant", label:"Cây thủy sinh", emoji:"🌿", max:3 },
-  { id:"wood", label:"Gỗ lũa", emoji:"🪵", max:2 },
-  { id:"chest", label:"Rương kho báu", emoji:"🎁", max:2 },
-  { id:"shell", label:"Vỏ sò Lambis", emoji:"🐚", max:3 },
-  { id:"coral", label:"San hô Lowpoly", emoji:"🪸", max:3 },
-  { id:"castle", label:"Lâu đài cát", emoji:"🏰", max:2 },
-  { id:"stylaster", label:"San hô đỏ Stylaster", emoji:"🪷", max:2 },
-  { id:"glow", label:"Rạn phát sáng", emoji:"✨", max:2 },
-  { id:"grass", label:"Thảm cỏ thủy sinh", emoji:"🌱", max:2 },
-  { id:"cluster", label:"Cụm cây & nấm biển", emoji:"🍄", max:1 },
-  { id:"octopus", label:"Bạch tuộc (bơi)", emoji:"🐙", max:2 },
-  { id:"cartoonfish", label:"Cá hoạt hình (bơi)", emoji:"🐠", max:3 },
-  { id:"plainfish", label:"Cá thường (bơi)", emoji:"🐟", max:3 },
-  { id:"orangefish", label:"Cá cam (bơi)", emoji:"🍊", max:3 },
-  { id:"seafish", label:"Cá biển (bơi)", emoji:"🐟", max:3 },
-  { id:"glowfish", label:"Cá phát sáng (bơi)", emoji:"✨", max:2 },
-  { id:"mudskipper", label:"Cá thòi lòi (bơi)", emoji:"🐸", max:2 },
-  { id:"neontetra", label:"Cá neon tetra (bơi)", emoji:"💡", max:3 },
-  { id:"boat", label:"Thuyền câu (nổi)", emoji:"⛵", max:2 },
-  { id:"fisherboat", label:"Thuyền đánh cá (nổi)", emoji:"🚤", max:2 },
-  { id:"crown", label:"Vương miện vỏ sò & sao biển", emoji:"👑", max:1 }
+  { id:"neontetra", label:"Cá Neon Tetra", emoji:"💡", max:3, price:60, currency:"gold", tab:"fish" },
+  { id:"plainfish", label:"Cá Thường", emoji:"🐟", max:3, price:80, currency:"gold", tab:"fish" },
+  { id:"orangefish", label:"Cá Cam", emoji:"🍊", max:3, price:100, currency:"gold", tab:"fish" },
+  { id:"seafish", label:"Cá Biển", emoji:"🐟", max:3, price:120, currency:"gold", tab:"fish" },
+  { id:"mudskipper", label:"Cá Thòi Lòi", emoji:"🐸", max:2, price:140, currency:"gold", tab:"fish" },
+  { id:"cartoonfish", label:"Cá Hoạt Hình", emoji:"🐠", max:3, price:160, currency:"gold", tab:"fish" },
+  { id:"octopus", label:"Bạch Tuộc", emoji:"🐙", max:2, price:6, currency:"diamond", tab:"fish" },
+  { id:"glowfish", label:"Cá Phát Sáng", emoji:"✨", max:2, price:8, currency:"diamond", tab:"fish" },
+  { id:"stone", label:"Đá & sỏi đáy", emoji:"🪨", max:3, price:40, currency:"gold", tab:"deco" },
+  { id:"plant", label:"Cây thủy sinh", emoji:"🌿", max:3, price:50, currency:"gold", tab:"deco" },
+  { id:"grass", label:"Thảm cỏ thủy sinh", emoji:"🌱", max:2, price:60, currency:"gold", tab:"deco" },
+  { id:"wood", label:"Gỗ lũa", emoji:"🪵", max:2, price:70, currency:"gold", tab:"deco" },
+  { id:"shell", label:"Vỏ sò Lambis", emoji:"🐚", max:3, price:80, currency:"gold", tab:"deco" },
+  { id:"chest", label:"Rương kho báu", emoji:"🎁", max:2, price:90, currency:"gold", tab:"deco" },
+  { id:"coral", label:"San hô", emoji:"🪸", max:3, price:100, currency:"gold", tab:"deco" },
+  { id:"coralGate", label:"Cổng San Hô", emoji:"🪸", max:1, price:120, currency:"gold", tab:"deco" },
+  { id:"castle", label:"Lâu đài cát", emoji:"🏰", max:2, price:150, currency:"gold", tab:"deco" },
+  { id:"boat", label:"Thuyền câu", emoji:"⛵", max:2, price:160, currency:"gold", tab:"deco" },
+  { id:"shellTower", label:"Tháp Vỏ Sò", emoji:"🐚", max:1, price:180, currency:"gold", tab:"deco" },
+  { id:"fisherboat", label:"Thuyền đánh cá", emoji:"🚤", max:2, price:200, currency:"gold", tab:"deco" },
+  { id:"glowLamp", label:"Đèn Biển Phát Sáng", emoji:"💡", max:1, price:6, currency:"diamond", tab:"deco" },
+  { id:"stylaster", label:"San hô đỏ Stylaster", emoji:"🪷", max:2, price:8, currency:"diamond", tab:"deco" },
+  { id:"glow", label:"Rạn phát sáng", emoji:"✨", max:2, price:8, currency:"diamond", tab:"deco" },
+  { id:"goldChest", label:"Rương Vàng", emoji:"👑", max:1, price:10, currency:"diamond", tab:"deco" },
+  { id:"cluster", label:"Cụm cây & nấm biển", emoji:"🍄", max:1, price:10, currency:"diamond", tab:"deco" },
+  { id:"crown", label:"Vương miện vỏ sò & sao biển", emoji:"👑", max:1, price:12, currency:"diamond", tab:"deco" }
 ];
 var LEVEL_UP_COSTS = {1:3,2:5,3:8,4:12,5:17,6:23,7:30,8:38,9:47};
 var QUIZ_REWARDS = {1:5, 2:8, 3:12};
-var DEFAULT_DECO_COUNTS = { stone:1, plant:1, wood:1, chest:1, shell:1, coral:1, castle:1, stylaster:1, glow:1, grass:1, cluster:0 };
+var DEFAULT_DECO_COUNTS = {};
 var DEFAULT_POS = {};
 (function(){
   var kinds = DECO_KINDS.map(function(k){return k.id;});
@@ -469,6 +474,19 @@ function normalizeProfile(p){
   p.ownedDecorations = p.ownedDecorations || [];
   p.decoCounts = p.decoCounts || {};
   p.positions = p.positions || {};
+  if (!p.boughtAssets){
+    var kept = {};
+    p.ownedFish.forEach(function(id){ kept[id] = 1; });
+    p.ownedDecorations.forEach(function(id){
+      kept[id] = 1;
+      if (p.positions["shop-"+id]) p.positions[id+"-0"] = p.positions["shop-"+id];
+    });
+    p.decoCounts = kept;
+    p.boughtAssets = true;
+    p._migratedAssets = true;
+  }
+  p.ownedFish = [];
+  p.ownedDecorations = [];
   p.quizPassed = p.quizPassed || [];
   p.quizBest = p.quizBest || {};
   p.vanMissed = p.vanMissed || [];
@@ -538,7 +556,10 @@ $("gradeBtn6").onclick = function(){ regGrade = 6; $("gradeBtn6").classList.add(
 function boot(){
   sbRpc("get_profile", { p_browser_key: BROWSER_KEY }).then(function(data){
     profile = normalizeProfile(data);
-    if (profile) { refreshWallets(); show("island"); }
+    if (profile) {
+      if (profile._migratedAssets){ delete profile._migratedAssets; saveProfile(true); }
+      refreshWallets(); show("island");
+    }
     else show("register");
   }).catch(function(e){
     console.warn("get_profile failed, offline start", e);
@@ -550,14 +571,13 @@ function boot(){
 var pendingGift = null;
 $("createBtn").onclick = function(){
   var name = $("nameInput").value.trim() || "bạn nhỏ";
-  var petKeys = Object.keys(PETS);
-  var pet = petKeys[Math.floor(Math.random()*petKeys.length)];
+  var pet = "shark";
   var rarity = rollRarity();
   var rar = RARITIES[rarity];
   profile = normalizeProfile({
     name: name, giftPet: pet, rarity: rarity, grade: regGrade,
     level: rar.startLevel, xp: 0, gold: 120, diamonds: 5,
-    ownedFish: [], ownedDecorations: [], decoCounts: Object.assign({}, DEFAULT_DECO_COUNTS),
+    ownedFish: [], ownedDecorations: [], decoCounts: {}, boughtAssets: true,
     positions: {}, quizPassed: [], quizBest: {}
   });
   pendingGift = { pet: pet, rarity: rarity };
@@ -1543,7 +1563,7 @@ function collectDrop(d, el){
 /* ============================== Tank controls ============================== */
 $("shopBtn").onclick = function(){ renderShop("fish"); $("shopOverlay").classList.add("on"); };
 $("shopClose").onclick = function(){ $("shopOverlay").classList.remove("on"); };
-$("decoBtn").onclick = function(){ renderDecoMenu(); $("decoOverlay").classList.add("on"); };
+$("decoBtn").onclick = function(){ renderShop("deco"); $("shopOverlay").classList.add("on"); };
 $("decoClose").onclick = function(){ $("decoOverlay").classList.remove("on"); };
 ["shopOverlay","decoOverlay","gradeOverlay","deleteOverlay"].forEach(function(id){
   var overlay = $(id);
@@ -1618,77 +1638,77 @@ var _showTank = show;
 var shopTab = "fish";
 $("tabFish").onclick = function(){ renderShop("fish"); };
 $("tabDeco").onclick = function(){ renderShop("deco"); };
+function assetPriceText(item){
+  return item.currency==="gold" ? item.price + " xu 🪙" : item.price + " 💎";
+}
+function canAfford(item){
+  return item.currency==="gold" ? profile.gold>=item.price : profile.diamonds>=item.price;
+}
+function chargeAsset(item){
+  if (!canAfford(item)){
+    toast(item.currency==="gold" ? "Chưa đủ xu vàng 🪙" : "Chưa đủ kim cương 💎");
+    return false;
+  }
+  if (item.currency==="gold") profile.gold -= item.price;
+  else profile.diamonds -= item.price;
+  return true;
+}
+function refundAsset(item){
+  if (item.currency==="gold") profile.gold += item.price;
+  else profile.diamonds += item.price;
+}
 function renderShop(tab){
   shopTab = tab;
   $("tabFish").classList.toggle("sel", tab==="fish");
   $("tabDeco").classList.toggle("sel", tab==="deco");
   refreshWallets();
   var grid = $("shopGrid");
-  if (tab==="fish"){
-    grid.innerHTML = SHOP_FISH.map(function(f){
-      var owned = profile.ownedFish.indexOf(f.id)>=0;
-      var priceTxt = f.currency==="gold" ? f.price + " xu 🪙" : f.price + " 💎";
-      var afford = f.currency==="gold" ? profile.gold>=f.price : profile.diamonds>=f.price;
-      return '<div class="shop-item"><div class="emo">' + f.emoji + '</div><div style="font-weight:800">' + f.label + '</div>' +
-        '<div class="mut">Model 3D thật · bơi trong hồ</div><div style="font-weight:900;margin:6px 0">' + priceTxt + '</div>' +
-        (owned ? '<button class="btn small" disabled>Đã có trong hồ ✓</button>' :
-          '<button class="btn small ' + (afford?"gold":"") + '" data-buy-fish="' + f.id + '"' + (afford?"":" disabled") + '>Mua</button>') + '</div>';
-    }).join("");
-  } else {
-    grid.innerHTML = SHOP_DECOS.map(function(f){
-      var owned = profile.ownedDecorations.indexOf(f.id)>=0;
-      var priceTxt = f.currency==="gold" ? f.price + " xu 🪙" : f.price + " 💎";
-      var afford = f.currency==="gold" ? profile.gold>=f.price : profile.diamonds>=f.price;
-      return '<div class="shop-item"><div class="emo">' + f.emoji + '</div><div style="font-weight:800">' + f.label + '</div>' +
-        '<div class="mut">Đồ trang trí đặc biệt cho hồ</div><div style="font-weight:900;margin:6px 0">' + priceTxt + '</div>' +
-        (owned ? '<button class="btn small" disabled>Đã có trong hồ ✓</button>' :
-          '<button class="btn small ' + (afford?"gold":"") + '" data-buy-deco="' + f.id + '"' + (afford?"":" disabled") + '>Mua</button>') + '</div>';
-    }).join("");
-  }
-  grid.querySelectorAll("[data-buy-fish]").forEach(function(b){
+  var items = DECO_KINDS.filter(function(k){ return k.tab===tab; });
+  grid.innerHTML = items.map(function(f){
+    var count = profile.decoCounts[f.id] || 0;
+    var afford = canAfford(f);
+    var full = count >= f.max;
+    return '<div class="shop-item"><div class="emo">' + f.emoji + '</div><div style="font-weight:800">' + f.label + '</div>' +
+      '<div class="mut">Đang có ' + count + '/' + f.max + '</div><div style="font-weight:900;margin:6px 0">' + assetPriceText(f) + '</div>' +
+      '<div style="display:flex;gap:6px;justify-content:center">' +
+      (count>0 ? '<button class="btn small ghost" data-sell="' + f.id + '">Bớt</button>' : '') +
+      (full ? '<button class="btn small" disabled>Đã đủ</button>' :
+        '<button class="btn small ' + (afford?"gold":"") + '" data-buy="' + f.id + '"' + (afford?"":" disabled") + '>Mua</button>') +
+      '</div></div>';
+  }).join("");
+  grid.querySelectorAll("[data-buy]").forEach(function(b){
     b.addEventListener("click", function(){
-      var f = SHOP_FISH.find(function(x){ return x.id===b.getAttribute("data-buy-fish"); });
-      if (!f || profile.ownedFish.indexOf(f.id)>=0) return;
-      if (f.currency==="gold"){ if (profile.gold<f.price) return toast("Chưa đủ xu vàng 🪙"); profile.gold -= f.price; }
-      else { if (profile.diamonds<f.price) return toast("Chưa đủ kim cương 💎"); profile.diamonds -= f.price; }
-      profile.ownedFish.push(f.id);
-      saveProfile(true); refreshWallets(); renderShop("fish");
+      var f = DECO_KINDS.find(function(x){ return x.id===b.getAttribute("data-buy"); });
+      if (!f) return;
+      var count = profile.decoCounts[f.id] || 0;
+      if (count >= f.max) return;
+      if (!chargeAsset(f)) return;
+      profile.decoCounts[f.id] = count + 1;
+      saveProfile(true); refreshWallets(); renderShop(tab);
       if (tankApi) tankApi.rebuild();
-      toast("Đã mua " + f.label + "! Bạn ấy đang bơi trong hồ 🐠");
+      toast("Đã mua " + f.label + " · còn " + (f.currency==="gold" ? profile.gold + " xu" : profile.diamonds + " kim cương"));
     });
   });
-  grid.querySelectorAll("[data-buy-deco]").forEach(function(b){
+  grid.querySelectorAll("[data-sell]").forEach(function(b){
     b.addEventListener("click", function(){
-      var f = SHOP_DECOS.find(function(x){ return x.id===b.getAttribute("data-buy-deco"); });
-      if (!f || profile.ownedDecorations.indexOf(f.id)>=0) return;
-      if (f.currency==="gold"){ if (profile.gold<f.price) return toast("Chưa đủ xu vàng 🪙"); profile.gold -= f.price; }
-      else { if (profile.diamonds<f.price) return toast("Chưa đủ kim cương 💎"); profile.diamonds -= f.price; }
-      profile.ownedDecorations.push(f.id);
-      saveProfile(true); refreshWallets(); renderShop("deco");
+      var f = DECO_KINDS.find(function(x){ return x.id===b.getAttribute("data-sell"); });
+      if (!f) return;
+      var count = profile.decoCounts[f.id] || 0;
+      if (count < 1) return;
+      profile.decoCounts[f.id] = count - 1;
+      refundAsset(f);
+      saveProfile(true); refreshWallets(); renderShop(tab);
       if (tankApi) tankApi.rebuild();
-      toast("Đã mua " + f.label + "! Vào Sắp xếp để kéo đi đâu tuỳ ý ✨");
+      toast("Đã bớt " + f.label + " và hoàn " + assetPriceText(f));
     });
   });
 }
 
 /* ============================== Deco menu ============================== */
 function renderDecoMenu(){
-  $("decoList").innerHTML = DECO_KINDS.map(function(k){
-    var count = profile.decoCounts[k.id] || 0;
-    return '<div class="row"><div><span style="font-size:22px">' + k.emoji + '</span> <b>' + k.label + '</b><div class="mut">Tối đa ' + k.max + ' món</div></div>' +
-      '<div class="pm"><button data-dec="-1" data-kind="' + k.id + '" aria-label="Bớt">−</button><b style="min-width:22px;text-align:center">×' + count + '</b><button data-dec="1" data-kind="' + k.id + '" aria-label="Thêm">+</button></div></div>';
-  }).join("");
-  $("decoList").querySelectorAll("[data-dec]").forEach(function(b){
-    b.addEventListener("click", function(){
-      var kind = b.getAttribute("data-kind");
-      var kd = DECO_KINDS.find(function(k){ return k.id===kind; });
-      var cur = profile.decoCounts[kind] || 0;
-      var next = Math.max(0, Math.min(kd.max, cur + parseInt(b.getAttribute("data-dec"),10)));
-      profile.decoCounts[kind] = next;
-      saveProfile(false); renderDecoMenu();
-      if (tankApi) tankApi.rebuild();
-    });
-  });
+  renderShop("deco");
+  $("decoOverlay").classList.remove("on");
+  $("shopOverlay").classList.add("on");
 }
 
 /* ============================== Quiz Ngữ văn ============================== */
