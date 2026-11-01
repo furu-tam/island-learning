@@ -72,10 +72,13 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 @keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.05)}}
 .rarity{display:inline-block;padding:5px 14px;border-radius:999px;font-weight:800}
 .drop{position:absolute;width:46px;height:46px;margin-left:-23px;border-radius:50%;border:none;background:rgba(255,255,255,.25);font-size:27px;z-index:5;padding:0;line-height:46px}
-.drop.gold{width:92px;height:92px;margin-left:-46px;font-size:54px;line-height:92px;background:radial-gradient(circle at 32% 30%, #fff4b8, #ffd23a 46%, #f0a000 80%)}
-.drop.gold .drop-ico{display:inline-block;filter:sepia(1) saturate(7) hue-rotate(2deg) brightness(1.08)}
-.drop-key{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:900;line-height:1;color:#12303f;pointer-events:none;text-shadow:0 0 3px #fff,0 0 3px #fff,0 1px 0 #fff}
-.drop.gold .drop-key{font-size:24px}
+.drop.gold,.drop.diamond{width:92px;height:92px;margin-left:-46px;font-size:54px;line-height:92px}
+.drop.gold{background:radial-gradient(circle at 32% 30%, #fff4b8, #ffd23a 46%, #f0a000 80%)}
+.drop.diamond{background:radial-gradient(circle at 32% 30%, #f7fdff, #c8f1ff 40%, #49b7ea 78%)}
+.drop.gold .drop-ico,.drop.diamond .drop-ico{display:inline-block}
+.drop.gold .drop-ico{filter:sepia(1) saturate(7) hue-rotate(2deg) brightness(1.08)}
+.drop-key{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:900;line-height:1;color:#12303f;pointer-events:none;text-shadow:0 0 3px #fff,0 0 3px #fff,0 1px 0 #fff;z-index:1}
+.drop.gold .drop-key,.drop.diamond .drop-key{font-size:24px}
 .floater{position:absolute;transform:translate(-50%,0);font-weight:900;color:#fde68a;text-shadow:0 2px 6px rgba(0,0,0,.5);animation:rise 1.1s forwards;pointer-events:none;z-index:5;font-size:18px}
 @keyframes rise{to{transform:translate(-50%,-46px);opacity:0}}
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#12303f;color:#fff;padding:12px 20px;border-radius:999px;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:92vw;text-align:center}
@@ -216,7 +219,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
       <button class="btn small" id="arrangeDone">✓ Xong</button>
     </div>
   </div>
-  <p class="mut">Trong chế độ toàn màn hình: kéo trên vùng nước trống để đổi góc nhìn, chụm 2 ngón hoặc lăn chuột để phóng to / thu nhỏ, nút Sắp xếp luôn hiện ở góc phải.</p>
+  <p class="mut">Kéo trên vùng nước để xoay hồ 3D, chụm 2 ngón hoặc lăn chuột để phóng to. Trong toàn màn hình, nút Sắp xếp nằm ở góc phải.</p>
 </section>
 
 <!-- QUIZ -->
@@ -1081,26 +1084,55 @@ function startTank(){
   mount.appendChild(renderer.domElement);
   var scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0b5e7d);
-  scene.fog = new THREE.Fog(0x0b5e7d, 16, 30);
-  var camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
-  var camTarget = new THREE.Vector3(0, 2.1, 0);
-  var camTheta = 0, camPhi = 1.42, camRadius = 12;
+  scene.fog = new THREE.Fog(0x0b5e7d, 24, 52);
+  var camera = new THREE.PerspectiveCamera(52, 1, 0.1, 100);
+  var camTarget = new THREE.Vector3(0, 1.7, 0);
+  var camTheta = 0.62, camPhi = 0.96, camRadius = 15;
   function applyCamera(){
-    camTheta = Math.max(-1.05, Math.min(1.05, camTheta));
-    camPhi = Math.max(1.0, Math.min(1.52, camPhi));
-    camRadius = Math.max(7, Math.min(19, camRadius));
+    camTheta = Math.max(-2.6, Math.min(2.6, camTheta));
+    camPhi = Math.max(0.58, Math.min(1.25, camPhi));
+    camRadius = Math.max(8, Math.min(24, camRadius));
     var sp = Math.sin(camPhi);
     camera.position.set(camTarget.x + camRadius*sp*Math.sin(camTheta), camTarget.y + camRadius*Math.cos(camPhi), camTarget.z + camRadius*sp*Math.cos(camTheta));
     camera.lookAt(camTarget);
   }
-  function resetCamera(){ camTheta = 0; camPhi = 1.42; camRadius = (camera.aspect<0.9?14.5:12); applyCamera(); }
+  function resetCamera(){ camTheta = 0.62; camPhi = 0.96; camRadius = (camera.aspect<0.9?17:15); applyCamera(); }
   scene.add(new THREE.HemisphereLight(0xcdf3ff, 0x0b3a4d, 1.0));
   var key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(5,10,6); scene.add(key);
   var rim = new THREE.DirectionalLight(0x7dd3fc, 0.6); rim.position.set(-6,4,-6); scene.add(rim);
-  var floor = new THREE.Mesh(new THREE.PlaneGeometry(17,8.6), stdMat(0xd9bd8a,{roughness:1}));
-  floor.rotation.x = -Math.PI/2; scene.add(floor);
-  var back = new THREE.Mesh(new THREE.PlaneGeometry(17,9), stdMat(0x0e6d94,{roughness:1}));
-  back.position.set(0,4.5,-4.3); scene.add(back);
+  var TW = 16.2, TD = 8.4, TH = 6.1;
+  var sand = new THREE.Mesh(new THREE.BoxGeometry(TW, 0.42, TD), stdMat(0xd9bd8a,{roughness:1}));
+  sand.position.y = -0.2; scene.add(sand);
+  var inside = new THREE.Mesh(new THREE.PlaneGeometry(TW-0.2, TH-0.3), stdMat(0x0e6d94,{roughness:0.9}));
+  inside.position.set(0, TH*0.46, -TD/2+0.08); scene.add(inside);
+  var glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0xd7f4ff, transparent: true, opacity: 0.16, roughness: 0.04,
+    metalness: 0.02, side: THREE.DoubleSide, depthWrite: false
+  });
+  function glassWall(w, h, x, y, z, rotY){
+    var m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), glassMat);
+    m.position.set(x, y, z);
+    if (rotY) m.rotation.y = rotY;
+    scene.add(m);
+  }
+  glassWall(TW, TH, 0, TH/2, -TD/2);
+  glassWall(TD, TH, -TW/2, TH/2, 0, Math.PI/2);
+  glassWall(TD, TH, TW/2, TH/2, 0, Math.PI/2);
+  glassWall(TW, TH, 0, TH/2, TD/2);
+  var rimMat = stdMat(0x0c455c,{roughness:0.35, metalness:0.2});
+  function addRim(w, h, d, x, y, z){
+    var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), rimMat);
+    m.position.set(x, y, z); scene.add(m);
+  }
+  addRim(TW+0.45, 0.28, 0.18, 0, TH, -TD/2);
+  addRim(TW+0.45, 0.28, 0.18, 0, TH, TD/2);
+  addRim(0.18, 0.28, TD, -TW/2, TH, 0);
+  addRim(0.18, 0.28, TD, TW/2, TH, 0);
+  var water = new THREE.Mesh(new THREE.PlaneGeometry(TW-0.35, TD-0.35), new THREE.MeshPhysicalMaterial({
+    color: 0x8fd4ee, transparent: true, opacity: 0.28, roughness: 0.08, metalness: 0.04,
+    side: THREE.DoubleSide, depthWrite: false
+  }));
+  water.rotation.x = -Math.PI/2; water.position.y = TH-0.55; scene.add(water);
   var pebbleGeo = new THREE.DodecahedronGeometry(0.14);
   var pebbles = new THREE.InstancedMesh(pebbleGeo, stdMat(0xb8a888,{roughness:1}), 46);
   var dummy = new THREE.Object3D();
@@ -1242,11 +1274,11 @@ function startTank(){
         return;
       }
     }
-    if (tankState.fs) orbitDrag = { x:e.clientX, y:e.clientY };
+    orbitDrag = { x:e.clientX, y:e.clientY };
   });
   el.addEventListener("pointermove", function(e){
     if (pointers[e.pointerId]) pointers[e.pointerId] = { x:e.clientX, y:e.clientY };
-    if (Object.keys(pointers).length===2 && tankState.fs){
+    if (Object.keys(pointers).length===2){
       var ps = Object.values(pointers);
       var d = Math.hypot(ps[0].x-ps[1].x, ps[0].y-ps[1].y);
       if (pinchDist) camRadius -= (d-pinchDist)*0.03;
@@ -1267,7 +1299,7 @@ function startTank(){
       }
       return;
     }
-    if (orbitDrag && tankState.fs){
+    if (orbitDrag){
       camTheta -= (e.clientX-orbitDrag.x)*0.008;
       camPhi -= (e.clientY-orbitDrag.y)*0.006;
       orbitDrag = { x:e.clientX, y:e.clientY };
@@ -1282,7 +1314,6 @@ function startTank(){
   el.addEventListener("pointerup", endPointer);
   el.addEventListener("pointercancel", endPointer);
   el.addEventListener("wheel", function(e){
-    if (!tankState.fs) return;
     e.preventDefault();
     camRadius += (e.deltaY>0?0.7:-0.7); applyCamera();
   }, { passive:false });
@@ -1293,7 +1324,7 @@ function startTank(){
     var w = mount.clientWidth, h = mount.clientHeight;
     if (!w || !h) return;
     renderer.setSize(w, h); camera.aspect = w/h; camera.updateProjectionMatrix();
-    if (!tankState.fs) { camRadius = camera.aspect<0.9 ? 14.5 : 12; applyCamera(); }
+    if (!tankState.fs) { camRadius = camera.aspect<0.9 ? 17 : 15; applyCamera(); }
   }
   resize(); window.addEventListener("resize", resize);
   (function loop(){
@@ -1360,6 +1391,7 @@ function startTank(){
       bm.position.y += bm.userData.speed*dt;
       if (bm.position.y > 5.4) bm.position.y = 0.15;
     });
+    water.position.y = (TH-0.55) + Math.sin(t*0.8)*0.04;
     renderer.render(scene, camera);
   })();
   buildPet(); buildDecos(); buildShopFish(); applyCamera();
@@ -1429,7 +1461,7 @@ function rollDropLetter(){
 function renderDrop(d){
   var layer = $("dropLayer");
   var b = document.createElement("button");
-  b.className = "drop" + (d.kind==="gold" ? " gold" : ""); b.setAttribute("data-drop", d.id); b.setAttribute("data-key", d.letter);
+  b.className = "drop " + (d.kind==="gold" ? "gold" : "diamond"); b.setAttribute("data-drop", d.id); b.setAttribute("data-key", d.letter);
   b.style.left = d.x + "%"; b.style.top = d.y + "%";
   var ico = document.createElement("span");
   ico.className = "drop-ico";
