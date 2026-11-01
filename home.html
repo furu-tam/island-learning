@@ -185,6 +185,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <button class="place-card" data-place="math"><div class="emo">🔢</div><div class="nm">Toán học</div><div class="ds" id="mathCardDesc">Quiz Toán · 66 câu</div></button>
     <button class="place-card" data-place="english"><div class="emo">🔤</div><div class="nm">Tiếng Anh</div><div class="ds">Sắp có bài học</div></button>
     <button class="place-card" data-place="it"><div class="emo">📖</div><div class="nm">Ngữ văn</div><div class="ds" id="vanCardDesc">2 dàn ý · 20 câu</div></button>
+    <button class="place-card" data-place="exam"><div class="emo">🏯</div><div class="nm">Phó Bản</div><div class="ds" id="examCardDesc">Toán 6 · 20 câu · 30 phút</div></button>
   </div>
 </section>
 
@@ -243,6 +244,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
   </div>
   <div id="quizPlay" style="display:none">
     <div class="progress"><i id="qProg"></i></div>
+    <p class="mut" id="qTimer" style="display:none;margin:8px 0 0;font-weight:800"></p>
     <p class="mut" id="qMeta" style="margin:8px 0"></p>
     <div class="card">
       <div style="display:flex;gap:8px;align-items:flex-start">
@@ -539,13 +541,15 @@ function refreshWallets(){
     var bank = profile.grade===1 ? QUIZ1 : QUIZ6;
     var totalLevels = bank.topics.length*3;
     var passedCount = profile.quizPassed.filter(function(k){
-      if (k.indexOf("van:")===0) return false;
+      if (k.indexOf("van:")===0 || k.indexOf("exam:")===0) return false;
       return profile.grade===1 ? k.indexOf("g1:")===0 : k.indexOf("g1:")!==0;
     }).length;
     $("mathCardDesc").textContent = "Quiz Toán " + profile.grade + " · " + bank.questions.length + " câu · " + passedCount + "/" + totalLevels + " level đã qua";
     var vanPassed = profile.quizPassed.filter(function(k){ return k.indexOf("van:")===0; }).length;
     var vanMiss = (profile.vanMissed||[]).length;
     $("vanCardDesc").textContent = "2 dàn ý · 20 câu · " + vanPassed + "/2 bài đã qua" + (vanMiss ? " · còn " + vanMiss + " câu sai" : "");
+    var examBest = profile.quizBest["exam:toan6"];
+    $("examCardDesc").textContent = "Toán 6 · 20 câu · 30 phút" + (profile.quizPassed.indexOf("exam:toan6")>=0 ? " · đã qua" : "") + (examBest!=null ? " · kỷ lục " + examBest + "%" : "");
     $("petCardDesc").textContent = PETS[profile.giftPet].emoji + " " + petDisplayName(profile.giftPet, profile.level) + " (" + PETS[profile.giftPet].label + ", " + rar.label + " Lv." + profile.level + ") đang chờ trong hồ";
     var cost = LEVEL_UP_COSTS[profile.level];
     $("levelUpBtn").textContent = cost ? ("⬆️ Level Up · " + cost + " 💎") : "👑 Đã Lv.10 tối đa";
@@ -610,6 +614,7 @@ function openPlace(id){
   else if (id==="math") { quizMode = "math"; openQuizHome(); show("quiz"); }
   else if (id==="english") { $("soonEmoji").textContent="🔤"; $("soonTitle").textContent="Tiếng Anh"; show("soon"); }
   else if (id==="it") { quizMode = "van"; openQuizHome(); show("quiz"); }
+  else if (id==="exam") { quizMode = "exam"; openQuizHome(); show("quiz"); }
 }
 document.querySelectorAll(".place-card").forEach(function(b){
   b.addEventListener("click", function(){ openPlace(b.getAttribute("data-place")); });
@@ -827,13 +832,15 @@ var PLACES = [
   { id:"pet", label:"Thú cưng 🐾", angle:Math.PI*0.78, body:0xffedd5, roof:0xfb7185 },
   { id:"math", label:"Toán học 🔢", angle:Math.PI*0.22, body:0xfef9c3, roof:0xf59e0b },
   { id:"english", label:"Tiếng Anh 🔤", angle:Math.PI*1.72, body:0xdbeafe, roof:0x3b82f6 },
-  { id:"it", label:"Ngữ văn 📖", angle:Math.PI*1.28, body:0xede9fe, roof:0x8b5cf6 }
+  { id:"it", label:"Ngữ văn 📖", angle:Math.PI*1.28, body:0xede9fe, roof:0x8b5cf6 },
+  { id:"exam", label:"Phó Bản 🏯", angle:Math.PI*0.5, radius:6.4, body:0xffe4e6, roof:0xe11d48 }
 ];
 var HOUSES = {
   pet:     { glb:ASSET+"house-pikachu.glb", tex:ASSET+"house-pikachu.jpg" },
   math:    { glb:ASSET+"house-medieval.glb", tex:ASSET+"house-medieval.jpg" },
   english: { glb:ASSET+"house-chikorita.glb", tex:ASSET+"house-chikorita.jpg" },
-  it:      { glb:ASSET+"house-cubone.glb", tex:ASSET+"house-cubone.jpg" }
+  it:      { glb:ASSET+"house-cubone.glb", tex:ASSET+"house-cubone.jpg" },
+  exam:    { glb:ASSET+"house-machop.glb", tex:ASSET+"house-machop.png" }
 };
 var islandApi = null;
 function startIsland(){
@@ -881,7 +888,8 @@ function startIsland(){
   var houseSlots = [];
   PLACES.forEach(function(place){
     var g = new THREE.Group();
-    var x = Math.cos(place.angle)*4.6, z = Math.sin(place.angle)*4.6;
+    var dist = place.radius || 4.6;
+    var x = Math.cos(place.angle)*dist, z = Math.sin(place.angle)*dist;
     var drawn = new THREE.Group();
     var base = new THREE.Mesh(new THREE.BoxGeometry(2.2,1.7,2.0), stdMat(place.body));
     base.position.y = 0.85; drawn.add(base);
@@ -1791,10 +1799,61 @@ var QUIZ_VAN = {
   ]
 };
 
+/* Phó Bản: 20 câu tổng hợp Toán 6, làm trong 30 phút. */
+var QUIZ_EXAM = { minutes: 30, pass: 16, reward: 15, questions: [
+  { text: "Tập hợp A = {x thuộc N | x < 5} có bao nhiêu phần tử?", options: ["4", "5", "6", "3"], correct: 1, explanation: "0 cũng là số tự nhiên, nên A = {0; 1; 2; 3; 4}, có 5 phần tử." },
+  { text: "Số lớn nhất có 3 chữ số khác nhau và chia hết cho 5 là:", options: ["980", "985", "975", "990"], correct: 1, explanation: "Chia hết cho 5 thì tận cùng 0 hoặc 5. 985 có các chữ số khác nhau và lớn hơn 980, 975. 990 có hai chữ số 9." },
+  { text: "Tập các số tự nhiên x thỏa mãn 20 < x ≤ 24 và x chẵn là:", options: ["{22; 24}", "{20; 22; 24}", "{22}", "{21; 23}"], correct: 0, explanation: "20 không được lấy vì x > 20. Các số chẵn còn lại là 22 và 24." },
+  { text: "Sắp xếp 508, 580, 85, 805 theo thứ tự tăng dần:", options: ["85; 508; 580; 805", "85; 508; 805; 580", "508; 85; 580; 805", "805; 580; 508; 85"], correct: 0, explanation: "85 có ít chữ số nhất nên nhỏ nhất, rồi so 508 với 580, cuối cùng là 805." },
+  { text: "2^4 × 2^3 = ?", options: ["2^7 = 128", "2^12 = 4096", "4^7", "2^1 = 2"], correct: 0, explanation: "Nhân cùng cơ số thì cộng số mũ: 4 + 3 = 7, 2^7 = 128." },
+  { text: "4 + 3 × (8 − 2^2) = ?", options: ["16", "28", "24", "4"], correct: 0, explanation: "2^2 = 4, trong ngoặc còn 8 − 4 = 4, nhân trước 3 × 4 = 12, rồi 4 + 12 = 16." },
+  { text: "Tìm x, biết 3x − 4 = 11:", options: ["5", "7", "15", "3"], correct: 0, explanation: "3x = 15 nên x = 5." },
+  { text: "Tính nhanh 15 × 8 + 15 × 2:", options: ["150", "120", "160", "30"], correct: 0, explanation: "Tách thừa số chung: 15 × (8 + 2) = 15 × 10 = 150." },
+  { text: "Số nào chia hết cho cả 2, 3 và 5?", options: ["130", "120", "125", "114"], correct: 1, explanation: "120 tận cùng là 0 nên chia hết cho 2 và 5, tổng chữ số 1 + 2 + 0 = 3 nên chia hết cho 3." },
+  { text: "ƯCLN(18, 24) = ?", options: ["6", "12", "3", "72"], correct: 0, explanation: "18 = 2 × 3^2, 24 = 2^3 × 3, phần chung là 2 × 3 = 6." },
+  { text: "BCNN(8, 12) = ?", options: ["24", "48", "4", "96"], correct: 0, explanation: "8 = 2^3, 12 = 2^2 × 3, bội chung nhỏ nhất là 2^3 × 3 = 24." },
+  { text: "Cô có 18 cái kẹo và 30 cái bánh, muốn chia thành nhiều phần bằng nhau nhất, không thừa. Mỗi phần có:", options: ["3 kẹo, 5 bánh", "6 kẹo, 10 bánh", "2 kẹo, 3 bánh", "9 kẹo, 15 bánh"], correct: 0, explanation: "ƯCLN(18, 30) = 6 phần. Mỗi phần có 18 : 6 = 3 kẹo và 30 : 6 = 5 bánh." },
+  { text: "(−7) + 12 − (−3) = ?", options: ["8", "2", "−8", "16"], correct: 0, explanation: "(−7) + 12 = 5, rồi 5 − (−3) = 5 + 3 = 8." },
+  { text: "(−6) × (−4) : (−3) = ?", options: ["−8", "8", "−2", "72"], correct: 0, explanation: "Nhân và chia cùng cấp, làm từ trái sang: (−6) × (−4) = 24, 24 : (−3) = −8." },
+  { text: "Trong các số −9, −2, −15, 0, số nguyên âm lớn nhất là:", options: ["−2", "−9", "−15", "0"], correct: 0, explanation: "0 không phải số âm. Trong các số âm, −2 gần 0 nhất nên lớn nhất." },
+  { text: "Tìm x, biết x + (−8) = −3:", options: ["5", "−11", "−5", "11"], correct: 0, explanation: "x = −3 − (−8) = −3 + 8 = 5." },
+  { text: "Hình chữ nhật dài 15 cm, rộng 6 cm có diện tích là:", options: ["90 cm2", "42 cm2", "21 cm2", "180 cm2"], correct: 0, explanation: "Diện tích = dài × rộng = 15 × 6 = 90. 42 là chu vi." },
+  { text: "Hình thoi có hai đường chéo 10 cm và 8 cm thì diện tích là:", options: ["40 cm2", "80 cm2", "18 cm2", "36 cm2"], correct: 0, explanation: "Diện tích hình thoi = tích hai đường chéo chia 2: (10 × 8) : 2 = 40." },
+  { text: "Hình thang có đáy lớn 12 cm, đáy nhỏ 8 cm, chiều cao 5 cm thì diện tích là:", options: ["50 cm2", "100 cm2", "60 cm2", "25 cm2"], correct: 0, explanation: "(12 + 8) × 5 : 2 = 50." },
+  { text: "Sân hình chữ nhật dài 20 m, rộng 12 m. Muốn rào xung quanh thì cần hàng rào dài bao nhiêu?", options: ["64 m", "32 m", "240 m", "240 m2"], correct: 0, explanation: "Rào xung quanh là chu vi: 2 × (20 + 12) = 64. 240 là diện tích sân." }
+]};
+
 /* ============================== Quiz ============================== */
 var quizCtx = null;
 var quizMode = "math";
+var examTimer = null;
+function stopExamTimer(){ if (examTimer){ clearInterval(examTimer); examTimer = null; } }
+function formatLeft(ms){
+  var s = Math.ceil(ms/1000);
+  var m = Math.floor(s/60), r = s%60;
+  return (m<10?"0":"") + m + ":" + (r<10?"0":"") + r;
+}
+function startExamClock(){
+  stopExamTimer();
+  examTimer = setInterval(function(){
+    if (!quizCtx || quizMode!=="exam"){ stopExamTimer(); return; }
+    var left = Math.max(0, quizCtx.endsAt - Date.now());
+    var el = $("qTimer");
+    if (el){
+      el.style.display = "block";
+      el.textContent = left<=0 ? "⏱ Hết giờ" : "⏱ Còn " + formatLeft(left);
+      el.style.color = left < 5*60*1000 ? "#b91c1c" : "";
+    }
+    if (left<=0){
+      quizCtx.timedOut = true;
+      stopExamTimer();
+      toast("Hết 30 phút. Bài được nộp với những câu đã làm.");
+      finishQuiz();
+    }
+  }, 250);
+}
 function quizKey(topic, level){
+  if (quizMode==="exam") return "exam:toan6";
   if (quizMode==="van") return "van:" + topic + "-" + level;
   return (profile.grade===1 ? "g1:" : "") + topic + "-" + level;
 }
@@ -1818,9 +1877,11 @@ function vanReminder(){
   return "Đọc tóm tắt đề cương và dàn ý ở dưới, nhớ khung mở – thân – kết, rồi hãy làm bài. Quiz chỉ để nhớ từ khóa. Xong rồi viết lại đoạn văn 15 phút theo dàn ý, đừng nhìn văn mẫu.";
 }
 function openQuizHome(){
+  stopExamTimer();
   $("quizHome").style.display = "block";
   $("quizPlay").style.display = "none";
   $("quizResult").style.display = "none";
+  $("qTimer").style.display = "none";
   refreshWallets();
   if (quizMode==="van"){
     $("quizTitle").textContent = "📖 Ngữ văn · Lớp 6";
@@ -1841,6 +1902,18 @@ function openQuizHome(){
         '<div class="van-box"><h4>Dàn ý viết đoạn</h4>' + outline + '<p class="kw">Từ khóa: ' + t.keywords + '</p></div>' +
         '<div class="lvrow">' + fullBtn + reviewBtn + '</div></div>';
     }).join("");
+  } else if (quizMode==="exam"){
+    var ekey = "exam:toan6";
+    var ePassed = profile.quizPassed.indexOf(ekey)>=0;
+    var eBest = profile.quizBest[ekey];
+    $("quizTitle").textContent = "🏯 Phó Bản · Toán lớp 6";
+    $("quizIntro").textContent = "Bài thi tổng hợp 5 chủ đề đang học: tập hợp và số tự nhiên, phép tính và lũy thừa, chia hết – ước bội, số nguyên, hình học. 20 câu, làm trong 30 phút. Đúng từ 16/20 là qua và nhận 15 kim cương lần đầu.";
+    $("topicList").innerHTML = '<div class="topic"><b style="font-size:18px">⏱️ Kiểm tra 30 phút</b><div class="mut">' +
+      (ePassed ? "Đã qua Phó Bản." : "Chưa qua Phó Bản.") + (eBest!=null ? " Kỷ lục " + eBest + "%." : "") +
+      '</div><div class="lvrow"><button class="lvbtn' + (ePassed?" passed":"") + '" id="examStart">' +
+      (ePassed ? "✅ Làm lại bài thi" : "▶️ Bắt đầu bài thi") +
+      '<br><span class="mut">20 câu · 30 phút · Thưởng 15 💎 lần đầu</span></button></div></div>';
+    $("examStart").onclick = startExam;
   } else {
     var bank = currentBank();
     $("quizTitle").textContent = "🔢 Quiz Toán Lớp " + profile.grade;
@@ -1922,7 +1995,7 @@ function startQuiz(topic, level, review){
   if (review) qs = qs.filter(function(q){ return (profile.vanMissed||[]).indexOf(q.id)>=0; });
   if (!qs.length){ if (review) toast("Hết câu sai của bài này rồi."); return; }
   var prepared = qs.map(function(q){
-    var v = (quizMode!=="van" && profile.grade===1) ? variant1(q) : null;
+    var v = (quizMode==="math" && profile.grade===1) ? variant1(q) : null;
     var base = v || { text: q.text, options: q.options.slice(), correct: q.correct };
     var order = shuffle([0,1,2,3]);
     return {
@@ -1944,6 +2017,23 @@ function startQuiz(topic, level, review){
   $("quizPlay").style.display = "block";
   renderQuestion();
 }
+function startExam(){
+  var prepared = QUIZ_EXAM.questions.map(function(q){
+    var order = shuffle([0,1,2,3]);
+    return {
+      id: "", part: "", text: q.text,
+      options: order.map(function(i){ return q.options[i]; }),
+      correct: order.indexOf(q.correct),
+      explanation: q.explanation, hints: null, drop: [], hintUsed: 0, points: 10
+    };
+  });
+  quizCtx = { topic: "toan6", level: 1, questions: prepared, idx: 0, correct: 0, score: 0, answered: false, wrongStreak: 0, review: false, endsAt: Date.now() + QUIZ_EXAM.minutes*60*1000, timedOut: false };
+  $("quizHome").style.display = "none";
+  $("quizResult").style.display = "none";
+  $("quizPlay").style.display = "block";
+  startExamClock();
+  renderQuestion();
+}
 function speak(text){
   try {
     if (!window.speechSynthesis) return;
@@ -1959,6 +2049,7 @@ function speak(text){
 function qMetaText(){
   var ctx = quizCtx, q = ctx.questions[ctx.idx];
   var s = "Câu " + (ctx.idx+1) + " / " + ctx.questions.length + " · Đúng: " + ctx.correct;
+  if (quizMode==="exam") s += " · Cần " + QUIZ_EXAM.pass + "/" + ctx.questions.length + " để qua";
   if (quizMode==="van") s += " · Phần " + q.part + " · Điểm câu này: " + q.points;
   return s;
 }
@@ -1966,8 +2057,9 @@ function renderQuestion(){
   var ctx = quizCtx; if (!ctx) return;
   var q = ctx.questions[ctx.idx];
   ctx.answered = false;
-  var big = quizMode!=="van" && profile.grade===1;
+  var big = quizMode==="math" && profile.grade===1;
   $("qProg").style.width = ((ctx.idx)/ctx.questions.length*100) + "%";
+  if (quizMode!=="exam") $("qTimer").style.display = "none";
   $("qMeta").textContent = qMetaText();
   var qt = $("qText"); qt.textContent = q.text;
   qt.classList.toggle("big", big);
@@ -2033,7 +2125,7 @@ function answer(i, btn){
   var ctx = quizCtx; if (!ctx || ctx.answered) return;
   ctx.answered = true;
   var q = ctx.questions[ctx.idx];
-  var big = quizMode!=="van" && profile.grade===1;
+  var big = quizMode==="math" && profile.grade===1;
   var buttons = $("qOpts").querySelectorAll(".opt");
   buttons.forEach(function(b, j){
     b.disabled = true;
@@ -2069,12 +2161,15 @@ $("qNext").onclick = function(){
   if (ctx.idx >= ctx.questions.length) finishQuiz();
   else renderQuestion();
 };
-$("qQuit").onclick = function(){ if (quizMode==="van") saveProfile(true); quizCtx = null; openQuizHome(); };
+$("qQuit").onclick = function(){ stopExamTimer(); if (quizMode==="van") saveProfile(true); quizCtx = null; openQuizHome(); };
 function finishQuiz(){
+  stopExamTimer();
   var ctx = quizCtx; if (!ctx) return;
+  quizCtx = null;
   var total = ctx.questions.length;
   var percent = Math.round(ctx.correct/total*100);
   var van = quizMode==="van";
+  var exam = quizMode==="exam";
   if (ctx.review){
     saveProfile(true);
     var left = (profile.vanMissed||[]).length;
@@ -2088,19 +2183,20 @@ function finishQuiz(){
     refreshWallets();
     return;
   }
-  var passed = ctx.correct/total >= 0.8;
+  var passed = exam ? ctx.correct >= QUIZ_EXAM.pass : ctx.correct/total >= 0.8;
   var key = quizKey(ctx.topic, ctx.level);
   var reward = 0;
   if (passed){
     if (profile.quizPassed.indexOf(key)<0){
       profile.quizPassed.push(key);
-      reward = QUIZ_REWARDS[ctx.level] || 0;
+      reward = exam ? QUIZ_EXAM.reward : (QUIZ_REWARDS[ctx.level] || 0);
       profile.diamonds += reward;
     }
-    if (profile.quizBest[key]==null || percent > profile.quizBest[key]) profile.quizBest[key] = percent;
+    if (!exam && (profile.quizBest[key]==null || percent > profile.quizBest[key])) profile.quizBest[key] = percent;
   }
+  if (exam && (profile.quizBest[key]==null || percent > profile.quizBest[key])) profile.quizBest[key] = percent;
   if (van){ profile.vanStamp = Date.now(); saveProfile(true); }
-  else if (passed) saveProfile(true);
+  else if (passed || exam) saveProfile(true);
   var missedLeft = van ? (profile.vanMissed||[]).filter(function(id){ return id.indexOf("v" + ctx.topic + ".")===0; }).length : 0;
   quizCtx = null;
   $("quizPlay").style.display = "none";
@@ -2113,6 +2209,13 @@ function finishQuiz(){
       (missedLeft ? " Còn " + missedLeft + " câu sai, lần sau ôn đúng các câu đó trước." : "") +
       " Giờ viết lại đoạn văn 15 phút theo dàn ý nhé, đừng nhìn văn mẫu.";
     $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua bài!") : "Đã nhận thưởng bài này rồi, chơi lại không cộng trùng nhé.") : "";
+  } else if (exam){
+    var spent = QUIZ_EXAM.minutes*60*1000 - Math.max(0, (ctx.endsAt||0) - Date.now());
+    $("resTitle").textContent = passed ? "Qua Phó Bản rồi!" : "Chưa qua Phó Bản";
+    $("resText").textContent = "Bạn đúng " + ctx.correct + "/" + total + " câu (" + percent + "%)" +
+      (ctx.timedOut ? ", hết 30 phút." : (", làm trong " + formatLeft(spent) + ".")) +
+      (passed ? " Phó Bản đã qua." : (" Cần đúng từ " + QUIZ_EXAM.pass + "/" + total + " mới qua."));
+    $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua Phó Bản!") : "Đã nhận thưởng Phó Bản rồi, làm lại không cộng trùng nhé.") : "";
   } else {
     $("resText").textContent = "Bạn đúng " + ctx.correct + "/" + total + " câu (" + percent + "%). " + (passed ? "Level tiếp theo đã mở." : "Cần đúng từ 80% trở lên mới qua bài, chơi lại nào!");
     $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua bài!") : "Đã nhận thưởng level này rồi, chơi lại không cộng trùng nhé.") : "";
