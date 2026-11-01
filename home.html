@@ -86,6 +86,11 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#12303f;color:#fff;padding:12px 20px;border-radius:999px;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:92vw;text-align:center}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .topic{border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;background:var(--card);box-shadow:var(--shadow)}
+.van-box{margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(14,165,233,.08);border:1px solid var(--line)}
+.van-box h4{margin:0 0 6px;font-size:14px}
+.van-box p,.van-box li{font-size:14px;line-height:1.45;margin:0}
+.van-box ul{margin:2px 0 8px;padding-left:18px}
+.van-box .kw{margin-top:2px;font-weight:800}
 .lvrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .lvbtn{border-radius:12px;border:2px solid var(--line);background:var(--card);padding:10px 14px;font-weight:800;color:var(--ink)}
 .lvbtn.passed{border-color:var(--good);background:rgba(22,163,74,.12)}
@@ -179,7 +184,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <button class="place-card" data-place="pet"><div class="emo">🐾</div><div class="nm">Thú cưng</div><div class="ds" id="petCardDesc">Vào hồ cá thăm bạn thú</div></button>
     <button class="place-card" data-place="math"><div class="emo">🔢</div><div class="nm">Toán học</div><div class="ds" id="mathCardDesc">Quiz Toán · 66 câu</div></button>
     <button class="place-card" data-place="english"><div class="emo">🔤</div><div class="nm">Tiếng Anh</div><div class="ds">Sắp có bài học</div></button>
-    <button class="place-card" data-place="it"><div class="emo">📖</div><div class="nm">Ngữ văn</div><div class="ds" id="vanCardDesc">Quiz Ngữ văn · 20 câu</div></button>
+    <button class="place-card" data-place="it"><div class="emo">📖</div><div class="nm">Ngữ văn</div><div class="ds" id="vanCardDesc">2 dàn ý · 20 câu</div></button>
   </div>
 </section>
 
@@ -518,7 +523,7 @@ function refreshWallets(){
     $("mathCardDesc").textContent = "Quiz Toán " + profile.grade + " · " + bank.questions.length + " câu · " + passedCount + "/" + totalLevels + " level đã qua";
     var vanPassed = profile.quizPassed.filter(function(k){ return k.indexOf("van:")===0; }).length;
     var vanMiss = (profile.vanMissed||[]).length;
-    $("vanCardDesc").textContent = "Quiz Ngữ văn · 20 câu · " + vanPassed + "/2 bài đã qua" + (vanMiss ? " · còn " + vanMiss + " câu sai" : "");
+    $("vanCardDesc").textContent = "2 dàn ý · 20 câu · " + vanPassed + "/2 bài đã qua" + (vanMiss ? " · còn " + vanMiss + " câu sai" : "");
     $("petCardDesc").textContent = PETS[profile.giftPet].emoji + " " + petDisplayName(profile.giftPet, profile.level) + " (" + PETS[profile.giftPet].label + ", " + rar.label + " Lv." + profile.level + ") đang chờ trong hồ";
     var cost = LEVEL_UP_COSTS[profile.level];
     $("levelUpBtn").textContent = cost ? ("⬆️ Level Up · " + cost + " 💎") : "👑 Đã Lv.10 tối đa";
@@ -1692,8 +1697,22 @@ function vanQ(id, topic, part, text, options, correct, explanation, hints, drop)
 }
 var QUIZ_VAN = {
   topics: [
-    {id:1, name:"Chuyện cổ tích về loài người", emoji:"🧚", author:"Xuân Quỳnh", note:"Ý cần nhớ: chỉ toàn là trẻ con, trái đất trụi trần, chưa có cây cỏ và mặt trời, chỉ toàn là bóng đêm. Con người làm nên thế giới đẹp bằng tình yêu thương và sự chăm sóc."},
-    {id:2, name:"Những cánh buồm", emoji:"⛵", author:"Hoàng Trung Thông", note:"Ý cần nhớ: cha dắt con trên cát mịn, ánh nắng chạy đầy vai là nhân hóa, buồm trắng là ước mơ tuổi thơ. Cha trầm ngâm đối lập với con hồn nhiên, háo hức."}
+    {id:1, name:"Chuyện cổ tích về loài người", emoji:"🧚", author:"Xuân Quỳnh",
+      brief:"Bài 1 phần Viết: viết một đoạn văn nêu cảm nhận về đoạn thơ. Cần đủ mở, thân, kết. Nội dung chính là thế giới buổi đầu còn trống vắng, giọng kể cổ tích, và thông điệp con người làm nên thế giới đẹp bằng tình yêu thương, sự chăm sóc.",
+      outline:[
+        {h:"Mở đoạn", items:["Nêu tên bài và tác giả Xuân Quỳnh.", "Cảm xúc: ngạc nhiên, thích thú."]},
+        {h:"Thân đoạn", items:["Thế giới buổi đầu: chỉ toàn là trẻ con, trái đất trụi trần, chưa có cây cỏ, chưa có mặt trời.", "Chi tiết bóng đêm, không khí chỉ màu đen: không gian trống, thiếu ánh sáng, thiếu sức sống.", "Điệp ngữ chỉ toàn là nhấn mạnh sự trống vắng.", "Liệt kê cái chưa có để làm nổi bật điều sắp có, do con người tạo nên.", "Giọng kể cổ tích giản dị, hồn nhiên, như kể cho trẻ con nghe."]},
+        {h:"Kết đoạn", items:["Thông điệp: con người làm nên thế giới đẹp bằng tình yêu thương và sự chăm sóc.", "Cảm xúc ấm áp, yêu cuộc sống. Không chỉ tóm tắt hay kêu gọi học thuộc."]}
+      ],
+      keywords:"trụi trần, chỉ toàn là, bóng đêm, giọng cổ tích, tình yêu thương"},
+    {id:2, name:"Những cánh buồm", emoji:"⛵", author:"Hoàng Trung Thông",
+      brief:"Bài 2 phần Viết: viết một đoạn văn nêu cảm nhận về đoạn thơ. Cần đủ mở, thân, kết. Nội dung chính là cảnh cha dắt con bên biển, nhân hóa ánh nắng, ẩn dụ buồm trắng, và tình cha thầm lặng bên khát vọng của con.",
+      outline:[
+        {h:"Mở đoạn", items:["Nêu tên bài và tác giả Hoàng Trung Thông.", "Cảm xúc: ấm áp, xao xuyến, trân trọng tình cha."]},
+        {h:"Thân đoạn", items:["Cha dắt con đi trên cát mịn. Có ánh nắng và cánh buồm xa, không có mưa to gió lớn.", "Ánh nắng chạy đầy vai là nhân hóa, vì chạy là hành động của người.", "Buồm trắng là ẩn dụ cho ước mơ, hoài bão muốn đi xa của tuổi thơ.", "Cha trầm ngâm đối lập với con hồn nhiên, háo hức: làm nổi bật tình yêu thương thầm lặng của cha và khát vọng của con.", "Lời con: Cha mượn cho con buồm trắng nhé, Để con đi..."]}
+        ,{h:"Kết đoạn", items:["Ước mơ tuổi thơ xứng đáng được chắp cánh.", "Trân trọng cha, và khát khao được lớn lên, được đi xa như cánh buồm trắng."]}
+      ],
+      keywords:"cát mịn, ánh nắng chạy, buồm trắng, trầm ngâm, háo hức"}
   ],
   questions: [
     vanQ("v1.1", 1, "mở", "Đoạn thơ trong văn mẫu trích từ bài thơ nào?", ["Mẹ", "Chuyện cổ tích về loài người", "Những cánh buồm", "Lượm"], 1, "Đây là bài 1 trong phần Viết của đề cương.", ["Nhớ lại mở đoạn của văn mẫu, câu đầu tiên ghi tên bài thơ nào?", "Bài thơ kể về buổi đầu của loài người.", "Bỏ ý Mẹ và Những cánh buồm: một bài là thơ về mẹ, một bài là thơ về buồm."], [0, 2]),
@@ -1743,7 +1762,7 @@ function vanReminder(){
     if (days >= 1) return "Hôm nay ôn 1 bài thơ thôi, khoảng 5 phút. Đọc lại đoạn thơ 2 phút, nhớ khung mở – thân – kết rồi hãy bấm bắt đầu.";
     return "Quiz hôm nay xong rồi thì viết lại đoạn văn 15 phút theo dàn ý, đừng nhìn văn mẫu.";
   }
-  return "Đọc lại đoạn thơ 2 phút, nhớ khung mở – thân – kết rồi hãy bấm bắt đầu. Quiz chỉ để nhớ từ khóa. Xong rồi viết lại đoạn văn 15 phút theo dàn ý, đừng nhìn văn mẫu.";
+  return "Đọc tóm tắt đề cương và dàn ý ở dưới, nhớ khung mở – thân – kết, rồi hãy làm bài. Quiz chỉ để nhớ từ khóa. Xong rồi viết lại đoạn văn 15 phút theo dàn ý, đừng nhìn văn mẫu.";
 }
 function openQuizHome(){
   $("quizHome").style.display = "block";
@@ -1751,7 +1770,7 @@ function openQuizHome(){
   $("quizResult").style.display = "none";
   refreshWallets();
   if (quizMode==="van"){
-    $("quizTitle").textContent = "📖 Quiz Ngữ văn · Lớp 6";
+    $("quizTitle").textContent = "📖 Ngữ văn · Lớp 6";
     $("quizIntro").textContent = vanReminder();
     $("topicList").innerHTML = QUIZ_VAN.topics.map(function(t){
       var key = quizKey(t.id, 1);
@@ -1761,7 +1780,13 @@ function openQuizHome(){
       var fullBtn = '<button class="lvbtn' + (passed?" passed":"") + '" data-topic="' + t.id + '" data-level="1">' +
         (passed?"✅ ":"▶️ ") + 'Làm 10 câu<br><span class="mut">Thưởng 5 💎 lần đầu' + (best!=null ? ' · Kỷ lục ' + best + '%' : '') + '</span></button>';
       var reviewBtn = missed.length ? '<button class="lvbtn" data-topic="' + t.id + '" data-level="1" data-review="1">🔁 Ôn ' + missed.length + ' câu sai<br><span class="mut">Chỉ ôn câu đã sai, không làm lại từ đầu</span></button>' : "";
-      return '<div class="topic"><b style="font-size:18px">' + t.emoji + ' ' + t.name + '</b><div class="mut">Tác giả: ' + t.author + '</div><p class="mut" style="font-size:14px;line-height:1.45;margin:6px 0 0">' + t.note + '</p><div class="lvrow">' + fullBtn + reviewBtn + '</div></div>';
+      var outline = (t.outline||[]).map(function(part){
+        return "<h4>" + part.h + "</h4><ul>" + part.items.map(function(item){ return "<li>" + item + "</li>"; }).join("") + "</ul>";
+      }).join("");
+      return '<div class="topic"><b style="font-size:18px">' + t.emoji + ' ' + t.name + '</b><div class="mut">Tác giả: ' + t.author + '</div>' +
+        '<div class="van-box"><h4>Tóm tắt đề cương</h4><p>' + t.brief + '</p></div>' +
+        '<div class="van-box"><h4>Dàn ý viết đoạn</h4>' + outline + '<p class="kw">Từ khóa: ' + t.keywords + '</p></div>' +
+        '<div class="lvrow">' + fullBtn + reviewBtn + '</div></div>';
     }).join("");
   } else {
     var bank = currentBank();
