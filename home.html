@@ -132,7 +132,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 <!-- REGISTER -->
 <section class="screen" id="scr-register">
   <h1>🎁 Chào bạn nhỏ!</h1>
-  <p class="sub">Đặt tên cho mình, chọn lớp đang học, rồi mở hộp quà để nhận cá mập nhé.</p>
+  <p class="sub">Đặt tên cho mình, chọn lớp đang học, rồi mở hộp quà để nhận ngẫu nhiên cá mập hoặc cua nhé.</p>
   <div class="card">
     <label for="nameInput" style="font-weight:800">Biệt danh trong game — không cần tên thật</label>
     <input type="text" id="nameInput" maxlength="30" placeholder="Ví dụ: Bạn nhỏ" autocomplete="off" style="margin:8px 0 14px" />
@@ -150,7 +150,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 <section class="screen" id="scr-gift">
   <div class="center">
     <h1>Hộp quà của bạn!</h1>
-    <p class="sub">Chạm vào hộp quà để gặp cá mập nhé.</p>
+    <p class="sub">Chạm vào hộp quà để xem bạn nhận cá mập hay cua nhé.</p>
     <button class="giftbox" id="giftBox" aria-label="Mở hộp quà">🎁</button>
     <div id="giftReveal" style="display:none">
       <div style="font-size:96px" id="giftEmoji">🦈</div>
@@ -413,7 +413,9 @@ var SHOP_FISH = [
   { id:"mudskipper", label:"Cá Thòi Lòi",   emoji:"🐸", price:140, currency:"gold" },
   { id:"cartoonfish",label:"Cá Hoạt Hình",  emoji:"🐠", price:160, currency:"gold" },
   { id:"octopus",    label:"Bạch Tuộc",     emoji:"🐙", price:6,   currency:"diamond" },
-  { id:"glowfish",   label:"Cá Phát Sáng",  emoji:"✨", price:8,   currency:"diamond" }
+  { id:"glowfish",   label:"Cá Phát Sáng",  emoji:"✨", price:8,   currency:"diamond" },
+  { id:"bluejelly",  label:"Sứa xanh",      emoji:"🪼", price:120, currency:"gold" },
+  { id:"colorjelly", label:"Sứa sắc màu",   emoji:"🪼", price:180, currency:"gold" }
 ];
 var LEGACY_FISH = { neon:"neontetra", goldfish:"orangefish", clown:"cartoonfish", purple:"glowfish" };
 var SHOP_DECOS = [
@@ -431,6 +433,8 @@ var DECO_KINDS = [
   { id:"cartoonfish", label:"Cá Hoạt Hình", emoji:"🐠", max:3, price:160, currency:"gold", tab:"fish" },
   { id:"octopus", label:"Bạch Tuộc", emoji:"🐙", max:2, price:6, currency:"diamond", tab:"fish" },
   { id:"glowfish", label:"Cá Phát Sáng", emoji:"✨", max:2, price:8, currency:"diamond", tab:"fish" },
+  { id:"bluejelly", label:"Sứa xanh", emoji:"🪼", max:2, price:120, currency:"gold", tab:"fish" },
+  { id:"colorjelly", label:"Sứa sắc màu", emoji:"🪼", max:2, price:180, currency:"gold", tab:"fish" },
   { id:"stone", label:"Đá & sỏi đáy", emoji:"🪨", max:3, price:40, currency:"gold", tab:"deco" },
   { id:"plant", label:"Cây thủy sinh", emoji:"🌿", max:3, price:50, currency:"gold", tab:"deco" },
   { id:"grass", label:"Thảm cỏ thủy sinh", emoji:"🌱", max:2, price:60, currency:"gold", tab:"deco" },
@@ -571,7 +575,7 @@ function boot(){
 var pendingGift = null;
 $("createBtn").onclick = function(){
   var name = $("nameInput").value.trim() || "bạn nhỏ";
-  var pet = "shark";
+  var pet = Math.random() < 0.5 ? "shark" : "crab";
   var rarity = rollRarity();
   var rar = RARITIES[rarity];
   profile = normalizeProfile({
@@ -682,6 +686,8 @@ var REAL_DECO = {
   glowfish:{ url:ASSET+"swim-glow.glb", size:1.5, mode:"swim", centerY:true, yaw:Math.PI/2, makeMat:function(){ var t=loadTex(ASSET+"glowfish-diffuse.jpg",true); return new THREE.MeshStandardMaterial({ map:t, emissive:0x9fd8ff, emissiveMap:t, emissiveIntensity:0.55, roughness:0.45, metalness:0.05 }); } },
   mudskipper:{ url:ASSET+"swim-mud.glb", size:1.6, mode:"swim", centerY:true, yaw:Math.PI/2, makeMat:function(){ return decorMat(ASSET+"mudskipper-diffuse.jpg", null, 0.6); } },
   neontetra:{ url:ASSET+"swim-neon.glb", size:1.15, mode:"swim", centerY:true, makeMat:function(){ return new THREE.MeshStandardMaterial({ map:loadTex(ASSET+"neon-diffuse.png",true), normalMap:loadTex(ASSET+"neon-normal.jpg",false), normalScale:new THREE.Vector2(0.6,0.6), roughness:0.5, metalness:0.05, alphaTest:0.3, side:THREE.DoubleSide }); } },
+  bluejelly:{ url:ASSET+"blue-jellyfish/jellyfish.glb", size:1.85, mode:"swim", centerY:true, pulse:true, makeMat:function(){ var map=loadTex(ASSET+"blue-jellyfish/Jellyfish2.png",true); return new THREE.MeshStandardMaterial({ map:map, emissive:0x60a5fa, emissiveMap:map, emissiveIntensity:0.18, roughness:0.35, metalness:0.02, transparent:true, opacity:0.94, side:THREE.DoubleSide, depthWrite:false }); } },
+  colorjelly:{ url:ASSET+"colorful-jellyfish/jellyfish.glb", size:1.85, mode:"swim", centerY:true, pulse:true, makeMat:function(){ var map=loadTex(ASSET+"colorful-jellyfish/Jellyfish1_albedo.jpeg",true); return new THREE.MeshStandardMaterial({ map:map, emissive:0xff7aa2, emissiveMap:map, emissiveIntensity:0.16, roughness:0.4, metalness:0.02, transparent:true, opacity:0.92, side:THREE.DoubleSide, depthWrite:false }); } },
   boat:    { url:ASSET+"decor-boat.glb", size:3.2, mode:"float", yaw:Math.PI/2, keepMat:true },
   fisherboat:{ url:ASSET+"decor-fisherboat.glb", size:3.4, mode:"float", makeMat:function(){ return decorMat(ASSET+"fisherboat-diffuse.jpg", ASSET+"fisherboat-normal.jpg", 0.6); } },
   crown:   { url:ASSET+"decor-crown.glb", size:2.4, keepMat:true }
@@ -787,7 +793,7 @@ function makeProceduralDeco(kind){
     var bulb = new THREE.Mesh(new THREE.SphereGeometry(0.3,12,10), new THREE.MeshStandardMaterial({ color:0xfde68a, emissive:0xf59e0b, emissiveIntensity:1.6, roughness:0.3 }));
     bulb.position.y = 1.65; g.add(bulb);
   } else if (REAL_DECO[kind] && REAL_DECO[kind].mode==="swim"){
-    var colors = { octopus:0xa855f7, cartoonfish:0x38bdf8, plainfish:0x94a3b8, orangefish:0xfb923c, seafish:0x2dd4bf, glowfish:0x22d3ee, mudskipper:0xa3a380, neontetra:0x60a5fa };
+    var colors = { octopus:0xa855f7, cartoonfish:0x38bdf8, plainfish:0x94a3b8, orangefish:0xfb923c, seafish:0x2dd4bf, glowfish:0x22d3ee, mudskipper:0xa3a380, neontetra:0x60a5fa, bluejelly:0x60a5fa, colorjelly:0xf472b6 };
     var f = makeFishMesh(colors[kind]||0x38bdf8, 0.9); f.position.y = 0.9; g.add(f);
   } else if (REAL_DECO[kind] && REAL_DECO[kind].mode==="float"){
     var hull = new THREE.Mesh(new THREE.BoxGeometry(2.0,0.5,0.95), stdMat(0xb45309,{roughness:0.7}));
@@ -1290,7 +1296,7 @@ function startTank(){
     while (fishGroup.children.length) fishGroup.remove(fishGroup.children[0]);
     shopFishObjs = [];
     (profile.ownedFish||[]).forEach(function(id, idx){
-      var colors = { neontetra:0x60a5fa, plainfish:0x94a3b8, orangefish:0xfb923c, seafish:0x2dd4bf, mudskipper:0xa3a380, cartoonfish:0x38bdf8, octopus:0xa855f7, glowfish:0x22d3ee };
+      var colors = { neontetra:0x60a5fa, plainfish:0x94a3b8, orangefish:0xfb923c, seafish:0x2dd4bf, mudskipper:0xa3a380, cartoonfish:0x38bdf8, octopus:0xa855f7, glowfish:0x22d3ee, bluejelly:0x60a5fa, colorjelly:0xf472b6 };
       var holder = new THREE.Group();
       var fb = makeFishMesh(colors[id]||0x38bdf8, 1.0);
       holder.add(fb);
@@ -1446,11 +1452,16 @@ function startTank(){
     Object.keys(decoObjs).forEach(function(k){
       var rec = decoObjs[k];
       if (rec.mode==="swim"){
-        var a = t*0.55 + rec.phase;
-        rec.group.position.x = rec.anchor.x + Math.cos(a)*1.1;
-        rec.group.position.z = rec.anchor.z + Math.sin(a)*0.8;
-        rec.group.position.y = 2.1 + Math.sin(t*1.4+rec.phase)*0.35;
-        rec.group.rotation.y = -a - Math.PI/2;
+        var jelly = REAL_DECO[rec.kind] && REAL_DECO[rec.kind].pulse;
+        var a = t*(jelly?0.28:0.55) + rec.phase;
+        rec.group.position.x = rec.anchor.x + Math.cos(a)*(jelly?1.5:1.1);
+        rec.group.position.z = rec.anchor.z + Math.sin(a*(jelly?0.7:1))*(jelly?0.95:0.8);
+        rec.group.position.y = (jelly?2.6:2.1) + Math.sin(t*(jelly?0.8:1.4)+rec.phase)*(jelly?0.65:0.35);
+        rec.group.rotation.y = jelly ? a*0.35 : (-a - Math.PI/2);
+        if (jelly){
+          var pulse = 1 + Math.sin(t*1.8+rec.phase)*0.08;
+          rec.group.scale.set(pulse, 2-pulse, pulse);
+        }
       } else if (rec.mode==="float"){
         rec.group.position.y = 4.35 + Math.sin(t*1.1+rec.phase)*0.12;
         rec.group.rotation.z = Math.sin(t*0.9+rec.phase)*0.03;
