@@ -98,6 +98,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 .opt.big{padding:22px;font-size:26px;min-height:76px;text-align:center}
 .opt.right{border-color:var(--good);background:rgba(22,163,74,.15)}
 .opt.wrong{border-color:var(--bad);background:rgba(220,38,38,.12)}
+.opt.out{opacity:.38}
 .feedback{margin-top:14px;font-size:17px;border-radius:14px;padding:12px 14px;display:none}
 .feedback.on{display:block}
 .feedback.good{background:rgba(22,163,74,.13)}
@@ -178,7 +179,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <button class="place-card" data-place="pet"><div class="emo">🐾</div><div class="nm">Thú cưng</div><div class="ds" id="petCardDesc">Vào hồ cá thăm bạn thú</div></button>
     <button class="place-card" data-place="math"><div class="emo">🔢</div><div class="nm">Toán học</div><div class="ds" id="mathCardDesc">Quiz Toán · 66 câu</div></button>
     <button class="place-card" data-place="english"><div class="emo">🔤</div><div class="nm">Tiếng Anh</div><div class="ds">Sắp có bài học</div></button>
-    <button class="place-card" data-place="it"><div class="emo">📖</div><div class="nm">Ngữ văn</div><div class="ds">Sắp có bài học</div></button>
+    <button class="place-card" data-place="it"><div class="emo">📖</div><div class="nm">Ngữ văn</div><div class="ds" id="vanCardDesc">Quiz Ngữ văn · 20 câu</div></button>
   </div>
 </section>
 
@@ -242,6 +243,10 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
       <div style="display:flex;gap:8px;align-items:flex-start">
         <div class="qtext" id="qText" style="flex:1"></div>
         <button class="btn small gold" id="speakBtn" style="display:none">🔊 Nghe</button>
+      </div>
+      <div id="hintRow" style="display:none;margin-top:12px">
+        <button class="btn small ghost" id="hintBtn" type="button">💡 Cần gợi ý?</button>
+        <div class="mut" id="hintBox" style="display:none;margin:8px 0 0;font-size:15px;line-height:1.5"></div>
       </div>
       <div class="opts" id="qOpts"></div>
       <div class="feedback" id="qFeed"></div>
@@ -461,6 +466,7 @@ function normalizeProfile(p){
   p.positions = p.positions || {};
   p.quizPassed = p.quizPassed || [];
   p.quizBest = p.quizBest || {};
+  p.vanMissed = p.vanMissed || [];
   return p;
 }
 function saveProfile(immediate){
@@ -505,8 +511,14 @@ function refreshWallets(){
     $("xpChip").textContent = "XP " + profile.xp + " / " + (profile.level*40);
     var bank = profile.grade===1 ? QUIZ1 : QUIZ6;
     var totalLevels = bank.topics.length*3;
-    var passedCount = profile.quizPassed.filter(function(k){ return profile.grade===1 ? k.indexOf("g1:")===0 : k.indexOf("g1:")!==0; }).length;
+    var passedCount = profile.quizPassed.filter(function(k){
+      if (k.indexOf("van:")===0) return false;
+      return profile.grade===1 ? k.indexOf("g1:")===0 : k.indexOf("g1:")!==0;
+    }).length;
     $("mathCardDesc").textContent = "Quiz Toán " + profile.grade + " · " + bank.questions.length + " câu · " + passedCount + "/" + totalLevels + " level đã qua";
+    var vanPassed = profile.quizPassed.filter(function(k){ return k.indexOf("van:")===0; }).length;
+    var vanMiss = (profile.vanMissed||[]).length;
+    $("vanCardDesc").textContent = "Quiz Ngữ văn · 20 câu · " + vanPassed + "/2 bài đã qua" + (vanMiss ? " · còn " + vanMiss + " câu sai" : "");
     $("petCardDesc").textContent = PETS[profile.giftPet].emoji + " " + petDisplayName(profile.giftPet, profile.level) + " (" + PETS[profile.giftPet].label + ", " + rar.label + " Lv." + profile.level + ") đang chờ trong hồ";
     var cost = LEVEL_UP_COSTS[profile.level];
     $("levelUpBtn").textContent = cost ? ("⬆️ Level Up · " + cost + " 💎") : "👑 Đã Lv.10 tối đa";
@@ -566,9 +578,9 @@ $("giftGo").onclick = function(){ refreshWallets(); show("island"); };
 /* ============================== Island navigation ============================== */
 function openPlace(id){
   if (id==="pet") { refreshWallets(); show("tank"); }
-  else if (id==="math") { openQuizHome(); show("quiz"); }
+  else if (id==="math") { quizMode = "math"; openQuizHome(); show("quiz"); }
   else if (id==="english") { $("soonEmoji").textContent="🔤"; $("soonTitle").textContent="Tiếng Anh"; show("soon"); }
-  else if (id==="it") { $("soonEmoji").textContent="📖"; $("soonTitle").textContent="Ngữ văn"; show("soon"); }
+  else if (id==="it") { quizMode = "van"; openQuizHome(); show("quiz"); }
 }
 document.querySelectorAll(".place-card").forEach(function(b){
   b.addEventListener("click", function(){ openPlace(b.getAttribute("data-place")); });
@@ -1674,35 +1686,103 @@ function renderDecoMenu(){
   });
 }
 
+/* ============================== Quiz Ngữ văn ============================== */
+function vanQ(id, topic, part, text, options, correct, explanation, hints, drop){
+  return {id:id, topic:topic, level:1, part:part, text:text, options:options, correct:correct, explanation:explanation, hints:hints, drop:drop};
+}
+var QUIZ_VAN = {
+  topics: [
+    {id:1, name:"Chuyện cổ tích về loài người", emoji:"🧚", author:"Xuân Quỳnh", note:"Ý cần nhớ: chỉ toàn là trẻ con, trái đất trụi trần, chưa có cây cỏ và mặt trời, chỉ toàn là bóng đêm. Con người làm nên thế giới đẹp bằng tình yêu thương và sự chăm sóc."},
+    {id:2, name:"Những cánh buồm", emoji:"⛵", author:"Hoàng Trung Thông", note:"Ý cần nhớ: cha dắt con trên cát mịn, ánh nắng chạy đầy vai là nhân hóa, buồm trắng là ước mơ tuổi thơ. Cha trầm ngâm đối lập với con hồn nhiên, háo hức."}
+  ],
+  questions: [
+    vanQ("v1.1", 1, "mở", "Đoạn thơ trong văn mẫu trích từ bài thơ nào?", ["Mẹ", "Chuyện cổ tích về loài người", "Những cánh buồm", "Lượm"], 1, "Đây là bài 1 trong phần Viết của đề cương.", ["Nhớ lại mở đoạn của văn mẫu, câu đầu tiên ghi tên bài thơ nào?", "Bài thơ kể về buổi đầu của loài người.", "Bỏ ý Mẹ và Những cánh buồm: một bài là thơ về mẹ, một bài là thơ về buồm."], [0, 2]),
+    vanQ("v1.2", 1, "mở", "Tác giả của bài thơ trên là ai?", ["Hoàng Trung Thông", "Xuân Quỳnh", "Trần Đức Tiến", "Tố Hữu"], 1, "Xuân Quỳnh là tác giả bài Chuyện cổ tích về loài người.", ["Tác giả là nhà thơ nữ, nổi tiếng với thơ tình và thơ viết cho trẻ con.", "Tên tác giả bắt đầu bằng chữ X.", "Bỏ Hoàng Trung Thông và Tố Hữu, đó là hai nhà thơ nam khác."], [0, 3]),
+    vanQ("v1.3", 1, "thân", "Thế giới buổi đầu trong đoạn thơ được miêu tả như thế nào?", ["Đã có cây cỏ, mặt trời và màu sắc", "Chỉ toàn là trẻ con, trái đất trụi trần, chưa có gì", "Chỉ có người lớn", "Đã là thế giới hiện đại"], 1, "Trên trái đất trụi trần, không dáng cây ngọn cỏ, mặt trời cũng chưa có.", ["Nhớ các từ trụi trần và chưa có.", "Chỉ toàn là trẻ con, trên trái đất trụi trần.", "Bỏ hai ý đã có cây cỏ, mặt trời và thế giới hiện đại, vì đoạn thơ nói về cái chưa có."], [0, 3]),
+    vanQ("v1.4", 1, "thân", "Chi tiết chỉ toàn là bóng đêm gợi lên điều gì?", ["Không gian trống vắng, thiếu ánh sáng, thiếu sức sống", "Ban ngày nắng đẹp", "Thế giới nhiều màu sắc", "Buổi sáng trong lành"], 0, "Bóng đêm và không khí chỉ màu đen gợi không gian tối, trống, thiếu sức sống.", ["Bóng đêm thì có ánh sáng không?", "Đoạn thơ còn nói không khí chỉ màu đen.", "Bỏ ban ngày nắng đẹp và thế giới nhiều màu sắc, vì đó là hình ảnh ngược lại."], [1, 2]),
+    vanQ("v1.5", 1, "thân", "Điệp ngữ chỉ toàn là có tác dụng gì?", ["Nhấn mạnh sự trống vắng, chưa có gì", "Làm bài thơ dài hơn cho vui", "Tả màu sắc rực rỡ", "Kể về người lớn"], 0, "Điệp ngữ chỉ toàn là lặp lại để nhấn mạnh sự trống vắng.", ["Điệp ngữ là lặp lại, lặp lại để nhấn mạnh cái gì?", "Chỉ toàn là trẻ con, chỉ toàn là bóng đêm.", "Bỏ ý tả màu sắc rực rỡ và ý kể về người lớn."], [2, 3]),
+    vanQ("v1.6", 1, "thân", "Việc liệt kê hàng loạt cái chưa có nhằm mục đích gì?", ["Kể cho vui", "Làm nổi bật điều sắp có, do con người tạo nên", "Chê thế giới xấu", "Kể về quá khứ buồn"], 1, "Từ cái chưa có, bài thơ làm nổi bật cái sẽ có sau này nhờ tình yêu thương và sự chăm sóc của con người.", ["Nếu chưa có cây, chưa có mặt trời, thì sau này ai sẽ tạo ra chúng?", "Văn mẫu viết: từ đó làm nổi bật điều sắp có sau này.", "Bỏ kể cho vui và chê thế giới xấu, vì đó không phải mục đích của liệt kê."], [0, 2]),
+    vanQ("v1.7", 1, "mở", "Cảm xúc chung của đoạn văn mẫu về bài thơ này là gì?", ["Buồn và sợ hãi", "Ngạc nhiên, thích thú, ấm áp", "Giận dữ", "Chán nản"], 1, "Văn mẫu mở bằng ngạc nhiên, thích thú và khép lại bằng cảm xúc ấm áp.", ["Mở đoạn của văn mẫu bắt đầu bằng cảm xúc nào?", "Không khỏi ngạc nhiên và thích thú.", "Bỏ buồn, sợ hãi và giận dữ, vì bài thơ viết cho trẻ con, giọng hồn nhiên."], [0, 2]),
+    vanQ("v1.8", 1, "thân", "Nét độc đáo trong cách tự sự và miêu tả của Xuân Quỳnh ở đây là gì?", ["Giọng kể cổ tích giản dị, hồn nhiên như kể cho trẻ con nghe", "Giọng kể hùng tráng, dồn dập", "Dùng nhiều số liệu", "Kể bằng giọng người lớn nghiêm khắc"], 0, "Bài thơ kể bằng giọng cổ tích giản dị, hồn nhiên.", ["Bài thơ có tên là Chuyện cổ tích, giọng kể sẽ giống truyện cổ tích như thế nào?", "Văn mẫu ghi giọng kể cổ tích giản dị.", "Bỏ giọng hùng tráng và giọng người lớn nghiêm khắc."], [1, 3]),
+    vanQ("v1.9", 1, "kết", "Thông điệp chính của đoạn thơ, theo văn mẫu, là gì?", ["Con người làm nên thế giới đẹp đẽ bằng tình yêu thương và sự chăm sóc", "Thế giới tự nhiên đã có sẵn từ đầu", "Trẻ con không làm được gì", "Bóng đêm là đẹp nhất"], 0, "Con người là người làm nên thế giới đẹp đẽ bằng tình yêu thương và sự chăm sóc.", ["Ai sẽ sinh ra cây cỏ, mặt trời và màu sắc sau này?", "Văn mẫu kết luận: con người là người làm nên thế giới đẹp đẽ.", "Bỏ thế giới đã có sẵn và bóng đêm là đẹp nhất, vì trái với nội dung đoạn thơ."], [1, 3]),
+    vanQ("v1.10", 1, "kết", "Câu kết của đoạn văn mẫu nhấn mạnh điều gì?", ["Niềm tin con người làm nên thế giới đẹp và cảm xúc ấm áp, yêu cuộc sống", "Chỉ tóm tắt lại nội dung thơ", "Kêu gọi học thuộc thơ", "Chê bài thơ ngắn"], 0, "Kết đoạn nhắc niềm tin ấy và cảm xúc ấm áp, yêu cuộc sống.", ["Kết đoạn trong dàn ý phải nhắc lại điều gì?", "Đoạn thơ vì thế để lại trong em cảm xúc ấm áp.", "Bỏ chỉ tóm tắt và kêu gọi học thuộc, vì kết đoạn không chỉ tóm tắt và không kêu gọi học thuộc."], [1, 2]),
+    vanQ("v2.1", 2, "mở", "Đoạn thơ trong văn mẫu trích từ bài thơ nào?", ["Chuyện cổ tích về loài người", "Những cánh buồm", "Mẹ", "Lượm"], 1, "Đây là bài 2, Những cánh buồm.", ["Bài thơ có hình ảnh trung tâm là gì?", "Con lại trỏ cánh buồm xa hỏi khẽ.", "Bỏ Chuyện cổ tích về loài người và Lượm, vì đó là hai bài khác."], [0, 3]),
+    vanQ("v2.2", 2, "mở", "Tác giả của bài thơ trên là ai?", ["Xuân Quỳnh", "Hoàng Trung Thông", "Trần Đức Tiến", "Tố Hữu"], 1, "Hoàng Trung Thông là tác giả Những cánh buồm.", ["Nhớ mở đoạn của văn mẫu bài 2.", "Tên tác giả có họ Hoàng.", "Bỏ Xuân Quỳnh và Trần Đức Tiến: Xuân Quỳnh là tác giả bài 1, Trần Đức Tiến là tác giả truyện Hai chú dê."], [0, 2]),
+    vanQ("v2.3", 2, "thân", "Ai dắt con đi trong đoạn thơ?", ["Mẹ", "Cha", "Ông", "Anh trai"], 1, "Cha lại dắt con đi trên cát mịn.", ["Câu thơ đầu tiên nhắc tới ai?", "Cha lại dắt con.", "Bỏ mẹ và ông, vì trong thơ không nhắc tới mẹ hay ông."], [0, 2]),
+    vanQ("v2.4", 2, "thân", "Câu thơ Ánh nắng chạy đầy vai sử dụng biện pháp tu từ nào là chính?", ["So sánh", "Nhân hóa", "Điệp ngữ", "Nói quá"], 1, "Chạy là hành động của con người, gán cho ánh nắng nên là nhân hóa.", ["Ánh nắng có chân để chạy không, hay nhà thơ gán cho nó hành động của người?", "Từ khóa là chạy.", "Bỏ so sánh và nói quá: câu này không có từ như và không phóng đại quá mức."], [0, 3]),
+    vanQ("v2.5", 2, "thân", "Hình ảnh buồm trắng trong đoạn thơ là ẩn dụ cho điều gì?", ["Một chiếc thuyền thật ngoài khơi, chỉ vậy thôi", "Ước mơ, hoài bão muốn đi xa, khám phá thế giới của tuổi thơ", "Một đám mây trắng", "Một chiếc áo trắng"], 1, "Buồm trắng là ẩn dụ cho ước mơ muốn đi xa của tuổi thơ.", ["Con xin cha mượn buồm để làm gì?", "Để con đi... đi đâu, đi để làm gì?", "Bỏ đám mây trắng và chiếc áo trắng, vì đó là nghĩa đen, không phải nghĩa ẩn dụ."], [2, 3]),
+    vanQ("v2.6", 2, "thân", "Sự đối lập giữa cha trầm ngâm và con hồn nhiên, háo hức có tác dụng gì?", ["Làm nổi bật tình yêu thương thầm lặng của cha và khát vọng của con", "Cho thấy cha và con không hợp nhau", "Chỉ để tả cảnh biển", "Cho thấy cha buồn, con vui nên không liên quan"], 0, "Đối lập làm nổi bật tình yêu thương thầm lặng của cha và khát vọng của con.", ["Cha trầm ngâm thì cha đang nghĩ gì về con?", "Văn mẫu viết: làm nổi bật tình yêu thương thầm lặng của cha.", "Bỏ hai ý cha con không hợp và cha buồn con vui không liên quan: đối lập ở đây bổ sung cho nhau, không phải mâu thuẫn."], [1, 3]),
+    vanQ("v2.7", 2, "thân", "Lời thoại của con trong đoạn thơ là câu nào?", ["Cha ơi, con mệt quá", "Cha mượn cho con buồm trắng nhé, Để con đi...", "Cha nhìn kìa, có con cá", "Con muốn về nhà"], 1, "Con nói: Cha mượn cho con buồm trắng nhé, Để con đi...", ["Con xin cha mượn cái gì?", "Câu thơ cuối của đoạn trích, trong dấu ngoặc kép.", "Bỏ Cha ơi, con mệt quá và Con muốn về nhà, vì đó không phải lời trong thơ."], [0, 3]),
+    vanQ("v2.8", 2, "thân", "Chi tiết miêu tả nào KHÔNG có trong đoạn thơ?", ["Cát mịn", "Ánh nắng chạy đầy vai", "Mưa to gió lớn", "Cánh buồm xa"], 2, "Đoạn thơ có cát mịn, ánh nắng và cánh buồm, không có mưa to gió lớn.", ["Đọc lại đoạn thơ, có câu nào nói về mưa không?", "Các chi tiết có thật là cát mịn, ánh nắng, chân trời, cánh buồm.", "Bỏ cát mịn và ánh nắng chạy đầy vai, vì cả hai đều có trong thơ."], [0, 1]),
+    vanQ("v2.9", 2, "mở", "Cảm xúc chung của đoạn văn mẫu về bài thơ này là gì?", ["Ấm áp, xao xuyến, trân trọng tình cha", "Sợ hãi, lo lắng", "Giận dữ", "Buồn chán"], 0, "Văn mẫu bài 2 mở bằng cảm xúc ấm áp, xao xuyến và trân trọng tình cha.", ["Mở đoạn văn mẫu bài 2 bắt đầu bằng từ nào?", "Ấm áp và xao xuyến.", "Bỏ sợ hãi, lo lắng và giận dữ, vì bài thơ về tình cha con."], [1, 2]),
+    vanQ("v2.10", 2, "kết", "Điều tâm đắc ở kết đoạn của văn mẫu là gì?", ["Ước mơ tuổi thơ xứng đáng được chắp cánh, và niềm trân trọng dành cho cha", "Chỉ nhắc lại tên bài thơ", "Kêu gọi mọi người đi biển", "Chê đoạn thơ ngắn"], 0, "Kết đoạn nhắc ước mơ tuổi thơ được chắp cánh và niềm trân trọng dành cho cha.", ["Kết đoạn phải nhắc lại điều gì đã phân tích ở thân đoạn?", "Trân trọng dành cho cha và một niềm khát khao được lớn lên, được đi xa như cánh buồm trắng.", "Bỏ chỉ nhắc lại tên bài thơ và kêu gọi đi biển."], [1, 2])
+  ]
+};
+
 /* ============================== Quiz ============================== */
-var quizCtx = null; // {topic, level, questions, idx, correct, answered}
-function quizKey(topic, level){ return (profile.grade===1 ? "g1:" : "") + topic + "-" + level; }
+var quizCtx = null;
+var quizMode = "math";
+function quizKey(topic, level){
+  if (quizMode==="van") return "van:" + topic + "-" + level;
+  return (profile.grade===1 ? "g1:" : "") + topic + "-" + level;
+}
 function levelUnlocked(topic, level){
   if (level===1) return true;
   return profile.quizPassed.indexOf(quizKey(topic, level-1))>=0;
+}
+function currentBank(){
+  if (quizMode==="van") return QUIZ_VAN;
+  return profile.grade===1 ? QUIZ1 : QUIZ6;
+}
+function vanReminder(){
+  var missed = profile.vanMissed || [];
+  if (missed.length) return "Còn " + missed.length + " câu sai. Ôn lại đúng các câu đó trước, đừng làm lại từ đầu. Đọc lại đoạn thơ 2 phút, nhớ khung mở – thân – kết rồi hãy bấm bắt đầu.";
+  if (profile.vanStamp){
+    var days = Math.floor((Date.now() - profile.vanStamp) / 86400000);
+    if (days >= 3) return "Đã vài ngày rồi. Hôm nay làm lại 1 bài thơ, 10 câu, khoảng 5 phút. Đọc lại đoạn thơ 2 phút, nhớ khung mở – thân – kết rồi hãy bấm bắt đầu.";
+    if (days >= 1) return "Hôm nay ôn 1 bài thơ thôi, khoảng 5 phút. Đọc lại đoạn thơ 2 phút, nhớ khung mở – thân – kết rồi hãy bấm bắt đầu.";
+    return "Quiz hôm nay xong rồi thì viết lại đoạn văn 15 phút theo dàn ý, đừng nhìn văn mẫu.";
+  }
+  return "Đọc lại đoạn thơ 2 phút, nhớ khung mở – thân – kết rồi hãy bấm bắt đầu. Quiz chỉ để nhớ từ khóa. Xong rồi viết lại đoạn văn 15 phút theo dàn ý, đừng nhìn văn mẫu.";
 }
 function openQuizHome(){
   $("quizHome").style.display = "block";
   $("quizPlay").style.display = "none";
   $("quizResult").style.display = "none";
-  var bank = profile.grade===1 ? QUIZ1 : QUIZ6;
-  $("quizTitle").textContent = "🔢 Quiz Toán Lớp " + profile.grade;
   refreshWallets();
-  $("topicList").innerHTML = bank.topics.map(function(t){
-    var lvBtns = [1,2,3].map(function(lv){
-      var qs = bank.questions.filter(function(q){ return q.topic===t.id && q.level===lv; });
-      var passed = profile.quizPassed.indexOf(quizKey(t.id, lv))>=0;
-      var unlocked = levelUnlocked(t.id, lv);
-      var best = profile.quizBest[quizKey(t.id, lv)];
-      return '<button class="lvbtn' + (passed?" passed":"") + '" data-topic="' + t.id + '" data-level="' + lv + '"' + (unlocked?"":" disabled") + '>' +
-        (passed?"✅ ":unlocked?"▶️ ":"🔒 ") + 'Level ' + lv + (lv===1?" · Dễ":lv===2?" · Trung bình":" · Khó") +
-        '<br><span class="mut">' + qs.length + ' câu · Thưởng ' + QUIZ_REWARDS[lv] + ' 💎' + (best!=null ? ' · Kỷ lục ' + best + '%' : '') + '</span></button>';
+  if (quizMode==="van"){
+    $("quizTitle").textContent = "📖 Quiz Ngữ văn · Lớp 6";
+    $("quizIntro").textContent = vanReminder();
+    $("topicList").innerHTML = QUIZ_VAN.topics.map(function(t){
+      var key = quizKey(t.id, 1);
+      var passed = profile.quizPassed.indexOf(key)>=0;
+      var best = profile.quizBest[key];
+      var missed = (profile.vanMissed||[]).filter(function(id){ return id.indexOf("v" + t.id + ".")===0; });
+      var fullBtn = '<button class="lvbtn' + (passed?" passed":"") + '" data-topic="' + t.id + '" data-level="1">' +
+        (passed?"✅ ":"▶️ ") + 'Làm 10 câu<br><span class="mut">Thưởng 5 💎 lần đầu' + (best!=null ? ' · Kỷ lục ' + best + '%' : '') + '</span></button>';
+      var reviewBtn = missed.length ? '<button class="lvbtn" data-topic="' + t.id + '" data-level="1" data-review="1">🔁 Ôn ' + missed.length + ' câu sai<br><span class="mut">Chỉ ôn câu đã sai, không làm lại từ đầu</span></button>' : "";
+      return '<div class="topic"><b style="font-size:18px">' + t.emoji + ' ' + t.name + '</b><div class="mut">Tác giả: ' + t.author + '</div><p class="mut" style="font-size:14px;line-height:1.45;margin:6px 0 0">' + t.note + '</p><div class="lvrow">' + fullBtn + reviewBtn + '</div></div>';
     }).join("");
-    return '<div class="topic"><b style="font-size:18px">' + t.emoji + ' Chủ đề ' + t.id + ': ' + t.name + '</b><div class="lvrow">' + lvBtns + '</div></div>';
-  }).join("");
+  } else {
+    var bank = currentBank();
+    $("quizTitle").textContent = "🔢 Quiz Toán Lớp " + profile.grade;
+    $("quizIntro").textContent = "Chọn một chủ đề và level để chơi. Đúng từ 80% trở lên là qua bài, mở level tiếp theo và nhận kim cương thưởng lần đầu qua bài.";
+    $("topicList").innerHTML = bank.topics.map(function(t){
+      var lvBtns = [1,2,3].map(function(lv){
+        var qs = bank.questions.filter(function(q){ return q.topic===t.id && q.level===lv; });
+        var passed = profile.quizPassed.indexOf(quizKey(t.id, lv))>=0;
+        var unlocked = levelUnlocked(t.id, lv);
+        var best = profile.quizBest[quizKey(t.id, lv)];
+        return '<button class="lvbtn' + (passed?" passed":"") + '" data-topic="' + t.id + '" data-level="' + lv + '"' + (unlocked?"":" disabled") + '>' +
+          (passed?"✅ ":unlocked?"▶️ ":"🔒 ") + 'Level ' + lv + (lv===1?" · Dễ":lv===2?" · Trung bình":" · Khó") +
+          '<br><span class="mut">' + qs.length + ' câu · Thưởng ' + QUIZ_REWARDS[lv] + ' 💎' + (best!=null ? ' · Kỷ lục ' + best + '%' : '') + '</span></button>';
+      }).join("");
+      return '<div class="topic"><b style="font-size:18px">' + t.emoji + ' Chủ đề ' + t.id + ': ' + t.name + '</b><div class="lvrow">' + lvBtns + '</div></div>';
+    }).join("");
+  }
   $("topicList").querySelectorAll("[data-topic]").forEach(function(b){
     b.addEventListener("click", function(){
-      startQuiz(parseInt(b.getAttribute("data-topic"),10), parseInt(b.getAttribute("data-level"),10));
+      startQuiz(parseInt(b.getAttribute("data-topic"),10), parseInt(b.getAttribute("data-level"),10), b.getAttribute("data-review")==="1");
     });
   });
 }
@@ -1758,22 +1838,29 @@ function makeVariant(correctVal, text, _){
   var arr = shuffle(Array.from(opts).map(String));
   return { text: text, options: arr, correct: arr.indexOf(String(correctVal)) };
 }
-function startQuiz(topic, level){
-  var bank = profile.grade===1 ? QUIZ1 : QUIZ6;
+function startQuiz(topic, level, review){
+  var bank = currentBank();
   var qs = bank.questions.filter(function(q){ return q.topic===topic && q.level===level; });
-  if (!qs.length) return;
+  if (review) qs = qs.filter(function(q){ return (profile.vanMissed||[]).indexOf(q.id)>=0; });
+  if (!qs.length){ if (review) toast("Hết câu sai của bài này rồi."); return; }
   var prepared = qs.map(function(q){
-    var v = (profile.grade===1) ? variant1(q) : null;
+    var v = (quizMode!=="van" && profile.grade===1) ? variant1(q) : null;
     var base = v || { text: q.text, options: q.options.slice(), correct: q.correct };
     var order = shuffle([0,1,2,3]);
     return {
+      id: q.id || "",
+      part: q.part || "",
       text: base.text,
       options: order.map(function(i){ return base.options[i]; }),
       correct: order.indexOf(base.correct),
-      explanation: q.explanation
+      explanation: q.explanation,
+      hints: q.hints || null,
+      drop: (q.drop||[]).map(function(i){ return order.indexOf(i); }),
+      hintUsed: 0,
+      points: 10
     };
   });
-  quizCtx = { topic: topic, level: level, questions: prepared, idx: 0, correct: 0, answered: false };
+  quizCtx = { topic: topic, level: level, questions: prepared, idx: 0, correct: 0, score: 0, answered: false, wrongStreak: 0, review: !!review };
   $("quizHome").style.display = "none";
   $("quizResult").style.display = "none";
   $("quizPlay").style.display = "block";
@@ -1791,18 +1878,34 @@ function speak(text){
     speechSynthesis.speak(u);
   } catch(e){}
 }
+function qMetaText(){
+  var ctx = quizCtx, q = ctx.questions[ctx.idx];
+  var s = "Câu " + (ctx.idx+1) + " / " + ctx.questions.length + " · Đúng: " + ctx.correct;
+  if (quizMode==="van") s += " · Phần " + q.part + " · Điểm câu này: " + q.points;
+  return s;
+}
 function renderQuestion(){
   var ctx = quizCtx; if (!ctx) return;
   var q = ctx.questions[ctx.idx];
   ctx.answered = false;
-  var big = profile.grade===1;
+  var big = quizMode!=="van" && profile.grade===1;
   $("qProg").style.width = ((ctx.idx)/ctx.questions.length*100) + "%";
-  $("qMeta").textContent = "Câu " + (ctx.idx+1) + " / " + ctx.questions.length + " · Đúng: " + ctx.correct;
+  $("qMeta").textContent = qMetaText();
   var qt = $("qText"); qt.textContent = q.text;
   qt.classList.toggle("big", big);
   $("speakBtn").style.display = big ? "inline-block" : "none";
   var feed = $("qFeed"); feed.className = "feedback"; feed.textContent = "";
   $("qNext").style.display = "none";
+  var hintRow = $("hintRow"), hintBtn = $("hintBtn"), hintBox = $("hintBox");
+  if (quizMode==="van" && q.hints){
+    q.hintUsed = 0; q.points = 10;
+    hintRow.style.display = "block";
+    hintBtn.style.display = "inline-block";
+    hintBtn.disabled = false;
+    hintBtn.textContent = "💡 Cần gợi ý?";
+    hintBox.style.display = "none";
+    hintBox.textContent = "";
+  } else hintRow.style.display = "none";
   var opts = $("qOpts");
   opts.innerHTML = "";
   q.options.forEach(function(opt, i){
@@ -1814,29 +1917,71 @@ function renderQuestion(){
   });
   if (big) speak(q.text);
 }
+function showHint(){
+  var ctx = quizCtx; if (!ctx || ctx.answered) return;
+  var q = ctx.questions[ctx.idx];
+  if (!q.hints || q.hintUsed>=3) return;
+  q.hintUsed++;
+  q.points = [10,7,5,3][q.hintUsed];
+  var box = $("hintBox");
+  box.style.display = "block";
+  var line = document.createElement("div");
+  line.textContent = "Gợi ý " + q.hintUsed + ": " + q.hints[q.hintUsed-1];
+  box.appendChild(line);
+  if (q.hintUsed===3){
+    (q.drop||[]).forEach(function(i){
+      var b = $("qOpts").children[i];
+      if (b && i!==q.correct){ b.disabled = true; b.classList.add("out"); }
+    });
+    $("hintBtn").style.display = "none";
+  } else if (q.hintUsed===1) {
+    $("hintBtn").textContent = "💡 Gợi ý tiếp";
+  } else {
+    $("hintBtn").textContent = "💡 Gợi ý 3 · loại 2 đáp án sai";
+  }
+  $("qMeta").textContent = qMetaText();
+}
 $("speakBtn").onclick = function(){ if (quizCtx) speak(quizCtx.questions[quizCtx.idx].text); };
+$("hintBtn").onclick = showHint;
+function rememberVan(q, ok){
+  if (quizMode!=="van" || !q.id) return;
+  if (!profile.vanMissed) profile.vanMissed = [];
+  var at = profile.vanMissed.indexOf(q.id);
+  if (ok){ if (at>=0) profile.vanMissed.splice(at, 1); }
+  else if (at<0) profile.vanMissed.push(q.id);
+  saveProfile(false);
+}
 function answer(i, btn){
   var ctx = quizCtx; if (!ctx || ctx.answered) return;
   ctx.answered = true;
   var q = ctx.questions[ctx.idx];
-  var big = profile.grade===1;
+  var big = quizMode!=="van" && profile.grade===1;
   var buttons = $("qOpts").querySelectorAll(".opt");
   buttons.forEach(function(b, j){
     b.disabled = true;
     if (j===q.correct) b.classList.add("right");
     else if (j===i) b.classList.add("wrong");
   });
+  $("hintBtn").style.display = "none";
   var feed = $("qFeed");
   if (i===q.correct){
     ctx.correct++;
+    ctx.wrongStreak = 0;
+    if (quizMode==="van") ctx.score += q.points;
     feed.className = "feedback on good";
     feed.innerHTML = (big ? "<b style='font-size:24px'>🎉 Đúng rồi! Giỏi quá!</b><br>" : "<b>✅ Đúng rồi!</b> ") + q.explanation;
     if (big) speak("Đúng rồi! Giỏi quá!");
+    rememberVan(q, true);
   } else {
+    ctx.wrongStreak++;
+    q.points = 0;
     feed.className = "feedback on bad";
-    feed.innerHTML = "<b>Chưa đúng rồi.</b> Đáp án đúng là: <b>" + q.options[q.correct] + "</b>. " + q.explanation;
+    var extra = "";
+    if (quizMode==="van" && ctx.wrongStreak>=2) extra = "<br><b>Dừng lại một chút.</b> Đọc lại đoạn thơ, đừng đoán vội. Câu sai vừa rồi nằm ở phần " + q.part + " của dàn ý.";
+    feed.innerHTML = "<b>Chưa đúng rồi.</b> Đáp án đúng là: <b>" + q.options[q.correct] + "</b>. " + q.explanation + extra;
+    rememberVan(q, false);
   }
-  $("qMeta").textContent = "Câu " + (ctx.idx+1) + " / " + ctx.questions.length + " · Đúng: " + ctx.correct;
+  $("qMeta").textContent = qMetaText();
   $("qNext").style.display = "inline-block";
   $("qNext").textContent = ctx.idx+1 >= ctx.questions.length ? "Xem kết quả 🏁" : "Câu tiếp theo ➡️";
 }
@@ -1846,30 +1991,54 @@ $("qNext").onclick = function(){
   if (ctx.idx >= ctx.questions.length) finishQuiz();
   else renderQuestion();
 };
-$("qQuit").onclick = function(){ quizCtx = null; openQuizHome(); };
+$("qQuit").onclick = function(){ if (quizMode==="van") saveProfile(true); quizCtx = null; openQuizHome(); };
 function finishQuiz(){
   var ctx = quizCtx; if (!ctx) return;
   var total = ctx.questions.length;
   var percent = Math.round(ctx.correct/total*100);
+  var van = quizMode==="van";
+  if (ctx.review){
+    saveProfile(true);
+    var left = (profile.vanMissed||[]).length;
+    quizCtx = null;
+    $("quizPlay").style.display = "none";
+    $("quizResult").style.display = "block";
+    $("resEmoji").textContent = left ? "🔁" : "🎉";
+    $("resTitle").textContent = left ? "Ôn xong một lượt" : "Hết câu sai rồi!";
+    $("resText").textContent = "Bạn đúng " + ctx.correct + "/" + total + " câu." + (left ? " Còn " + left + " câu sai, lần sau ôn đúng các câu đó trước." : " Giờ viết lại đoạn văn 15 phút theo dàn ý nhé, đừng nhìn văn mẫu.");
+    $("resReward").textContent = "";
+    refreshWallets();
+    return;
+  }
   var passed = ctx.correct/total >= 0.8;
   var key = quizKey(ctx.topic, ctx.level);
-  var reward = 0, already = false;
+  var reward = 0;
   if (passed){
     if (profile.quizPassed.indexOf(key)<0){
       profile.quizPassed.push(key);
       reward = QUIZ_REWARDS[ctx.level] || 0;
       profile.diamonds += reward;
-    } else already = true;
+    }
     if (profile.quizBest[key]==null || percent > profile.quizBest[key]) profile.quizBest[key] = percent;
-    saveProfile(true);
   }
+  if (van){ profile.vanStamp = Date.now(); saveProfile(true); }
+  else if (passed) saveProfile(true);
+  var missedLeft = van ? (profile.vanMissed||[]).filter(function(id){ return id.indexOf("v" + ctx.topic + ".")===0; }).length : 0;
   quizCtx = null;
   $("quizPlay").style.display = "none";
   var res = $("quizResult"); res.style.display = "block";
   $("resEmoji").textContent = passed ? "🎉" : "💪";
   $("resTitle").textContent = passed ? "Qua bài rồi! Giỏi quá!" : "Chưa qua bài — cố lên nhé!";
-  $("resText").textContent = "Bạn đúng " + ctx.correct + "/" + total + " câu (" + percent + "%). " + (passed ? "Level tiếp theo đã mở." : "Cần đúng từ 80% trở lên mới qua bài, chơi lại nào!");
-  $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua bài!") : "Đã nhận thưởng level này rồi, chơi lại không cộng trùng nhé.") : "";
+  if (van){
+    $("resText").textContent = "Bạn đúng " + ctx.correct + "/" + total + " câu (" + percent + "%). Điểm gợi ý: " + ctx.score + "/" + (total*10) + ". " +
+      (passed ? "Bài đã qua." : "Cần đúng từ 80% trở lên mới qua bài.") +
+      (missedLeft ? " Còn " + missedLeft + " câu sai, lần sau ôn đúng các câu đó trước." : "") +
+      " Giờ viết lại đoạn văn 15 phút theo dàn ý nhé, đừng nhìn văn mẫu.";
+    $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua bài!") : "Đã nhận thưởng bài này rồi, chơi lại không cộng trùng nhé.") : "";
+  } else {
+    $("resText").textContent = "Bạn đúng " + ctx.correct + "/" + total + " câu (" + percent + "%). " + (passed ? "Level tiếp theo đã mở." : "Cần đúng từ 80% trở lên mới qua bài, chơi lại nào!");
+    $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua bài!") : "Đã nhận thưởng level này rồi, chơi lại không cộng trùng nhé.") : "";
+  }
   refreshWallets();
 }
 $("resBack").onclick = function(){ openQuizHome(); };
