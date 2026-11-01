@@ -42,7 +42,9 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 .stage{position:relative;border-radius:22px;overflow:hidden;box-shadow:var(--shadow);background:#0b5e7d}
 .stage canvas{display:block;width:100%;height:100%}
 #islandStage{height:min(62vh,520px)}
-#tankStage{height:min(58vh,480px)}
+#tankStage{height:min(58vh,480px);touch-action:none}
+#dropLayer{pointer-events:none}
+.drop{pointer-events:auto}
 .stage .hud{position:absolute;left:10px;top:10px;right:10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;flex-wrap:wrap}
 .stage .hud>*{pointer-events:auto}
 .fsbar{position:absolute;right:10px;top:56px;display:none;flex-direction:column;gap:8px;z-index:6}
@@ -1247,17 +1249,23 @@ function startTank(){
   }
 
   /* ---- interaction: orbit / pinch / drag deco ---- */
-  var el = renderer.domElement;
-  el.style.touchAction = "none";
+  var stageEl = $("tankStage");
+  stageEl.style.touchAction = "none";
   var pointers = {};
   var dragDeco = null, orbitDrag = null, pinchDist = 0;
   var floorPlane = new THREE.Plane(new THREE.Vector3(0,1,0), 0);
+  var camPlaced = false;
   function pointerPos(e){
-    var rect = el.getBoundingClientRect();
+    var rect = stageEl.getBoundingClientRect();
     return { x: ((e.clientX-rect.left)/rect.width)*2-1, y: -((e.clientY-rect.top)/rect.height)*2+1, cx: e.clientX, cy: e.clientY };
   }
-  el.addEventListener("pointerdown", function(e){
+  function onUiControl(t){
+    return !!(t && t.closest && t.closest("button, a, input, select, .drop"));
+  }
+  stageEl.addEventListener("pointerdown", function(e){
+    if (onUiControl(e.target)) return;
     pointers[e.pointerId] = { x:e.clientX, y:e.clientY };
+    try { stageEl.setPointerCapture(e.pointerId); } catch(err){}
     if (Object.keys(pointers).length===2){
       var ps = Object.values(pointers);
       pinchDist = Math.hypot(ps[0].x-ps[1].x, ps[0].y-ps[1].y);
@@ -1276,7 +1284,8 @@ function startTank(){
     }
     orbitDrag = { x:e.clientX, y:e.clientY };
   });
-  el.addEventListener("pointermove", function(e){
+  stageEl.addEventListener("pointermove", function(e){
+    if (!pointers[e.pointerId] && !orbitDrag && !dragDeco) return;
     if (pointers[e.pointerId]) pointers[e.pointerId] = { x:e.clientX, y:e.clientY };
     if (Object.keys(pointers).length===2){
       var ps = Object.values(pointers);
@@ -1311,11 +1320,11 @@ function startTank(){
     if (Object.keys(pointers).length<2) pinchDist = 0;
     dragDeco = null; orbitDrag = null;
   }
-  el.addEventListener("pointerup", endPointer);
-  el.addEventListener("pointercancel", endPointer);
-  el.addEventListener("wheel", function(e){
+  stageEl.addEventListener("pointerup", endPointer);
+  stageEl.addEventListener("pointercancel", endPointer);
+  stageEl.addEventListener("wheel", function(e){
     e.preventDefault();
-    camRadius += (e.deltaY>0?0.7:-0.7); applyCamera();
+    camRadius += (e.deltaY>0?0.85:-0.85); applyCamera();
   }, { passive:false });
 
   var running = true, raf = 0, clock = new THREE.Clock();
@@ -1324,7 +1333,8 @@ function startTank(){
     var w = mount.clientWidth, h = mount.clientHeight;
     if (!w || !h) return;
     renderer.setSize(w, h); camera.aspect = w/h; camera.updateProjectionMatrix();
-    if (!tankState.fs) { camRadius = camera.aspect<0.9 ? 17 : 15; applyCamera(); }
+    if (!camPlaced){ camRadius = camera.aspect<0.9 ? 17 : 15; camPlaced = true; }
+    applyCamera();
   }
   resize(); window.addEventListener("resize", resize);
   (function loop(){
