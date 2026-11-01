@@ -207,7 +207,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
   <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
     <h2>🌳 Nhà tiến hóa</h2>
   </div>
-  <p class="sub" id="evoIntro">Chọn một cấp để xem dạng thú. Lv.1 đến Lv.10 đã mở. Lv.11 đến Lv.30 còn khóa.</p>
+  <p class="sub" id="evoIntro">Cá mập và cua giữ dạng ban đầu đến Lv.5, tiến hóa từ Lv.6, rồi đậm màu và to dần từ Lv.7. Lv.11 đến Lv.30 còn khóa.</p>
   <div class="stage" id="evoStage">
     <div id="evoMount" style="position:absolute;inset:0"></div>
     <div id="evoLock" style="display:none;position:absolute;inset:0;z-index:3;background:rgba(8,30,40,.94);color:#fff;align-items:center;justify-content:center;text-align:center;padding:18px">
@@ -1097,9 +1097,60 @@ function currentDecos(){
   });
   return list;
 }
+function petShadeT(level){
+  var lv = Math.max(1, Math.min(10, level));
+  if (lv < 7) return 0;
+  return (lv - 6) / 4;
+}
+function petEvolved(pet, level){
+  return (pet==="shark" || pet==="crab") && level >= 6;
+}
+function styleSharkMat(mat, level){
+  var t = petShadeT(level);
+  var bright = 1.08 - t*0.62;
+  mat.color.setRGB(bright*1.03, bright*0.96, bright*1.14);
+  mat.emissiveIntensity = 0.55 - t*0.32;
+}
+function styleCrabMat(mat, level){
+  var t = petShadeT(level);
+  mat.color.setRGB(1 - t*0.32, 1 - t*0.45, 1 - t*0.58);
+}
+function makeSharkGroup(gltf, level){
+  var mat = new THREE.MeshPhysicalMaterial({
+    map: loadTex(ASSET+"sport-shark-diffuse.png", true),
+    normalMap: loadTex(ASSET+"sport-shark-normals.png", false),
+    normalScale: new THREE.Vector2(0.65,0.65),
+    roughness: 1.0, roughnessMap: loadTex(ASSET+"sport-shark-roughness.png", false),
+    metalness: 0.0,
+    emissive: 0xffffff, emissiveMap: loadTex(ASSET+"sport-shark-emissive.png", true), emissiveIntensity: 0.55
+  });
+  styleSharkMat(mat, level);
+  var inst = gltf.scene;
+  inst.traverse(function(o){ if (o.isMesh){ o.material = mat; o.frustumCulled = false; } });
+  inst.position.set(0, 0.25, 0.19);
+  var wrap = new THREE.Group();
+  wrap.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2);
+  wrap.add(inst); wrap.scale.setScalar(0.6);
+  var grp = new THREE.Group(); grp.add(wrap);
+  grp.scale.setScalar(1.12 + petShadeT(level)*0.58);
+  return { group: grp, inst: inst };
+}
+function makeCrabGroup(gltf, level){
+  var map = loadTex(ASSET+"cc0-japanese-freshwater-crab/textures/texture2048_0.jpeg", true);
+  var mat = new THREE.MeshStandardMaterial({ map: map, roughness: 0.78, metalness: 0.04, skinning: true, side: THREE.DoubleSide });
+  styleCrabMat(mat, level);
+  var inst = gltf.scene;
+  inst.traverse(function(o){ if (o.isMesh){ o.material = mat; o.frustumCulled = false; o.castShadow = false; } });
+  inst.position.set(0.22, 1.51, -0.27);
+  var wrap = new THREE.Group();
+  wrap.rotation.y = Math.PI/2;
+  wrap.add(inst);
+  wrap.scale.setScalar(0.62 + petShadeT(level)*0.34);
+  return { group: wrap, inst: inst };
+}
 function makePetMesh(pet, level){
   var g = new THREE.Group();
-  var scaleK = 0.55 + (Math.min(10,level)-1)/9*1.1;
+  var scaleK = 0.55 + ((pet==="shark" || pet==="crab") ? 0 : (Math.min(10,level)-1)/9*1.1);
   if (pet==="crab"){
     var m = stdMat(0xef4444,{roughness:0.55});
     var body = new THREE.Mesh(new THREE.SphereGeometry(0.55,14,10), m); body.scale.set(1.25,0.62,0.9); body.position.y=0.35; g.add(body);
@@ -1113,7 +1164,7 @@ function makePetMesh(pet, level){
       var eye = new THREE.Mesh(new THREE.SphereGeometry(0.07,8,8), stdMat(0x111827));
       eye.position.set(0.2*s, 0.75, 0.35); g.add(eye);
     });
-    g.scale.setScalar(scaleK);
+    g.scale.setScalar(1.05);
     g.userData.isFallbackCrab = true;
   } else if (pet==="shrimp"){
     var m2 = stdMat(0xfb923c,{roughness:0.5});
@@ -1147,7 +1198,7 @@ function makePetMesh(pet, level){
     }
     g.scale.setScalar(scaleK*0.9);
   } else {
-    // shark fallback (procedural) until / unless the real GLB loads
+    // shark levels 1–5 stay this mesh; level 6+ is replaced by the GLB
     var cm = stdMat(0x8aa8bd,{roughness:0.4});
     var body2 = new THREE.Mesh(new THREE.SphereGeometry(0.62,16,12), cm);
     body2.scale.set(1.9,0.85,0.7); g.add(body2);
@@ -1157,7 +1208,7 @@ function makePetMesh(pet, level){
     tail2.position.set(-1.35,0.15,0); tail2.rotation.z = 0.4; tail2.scale.set(1,1,0.25); g.add(tail2);
     var dorsal = new THREE.Mesh(new THREE.ConeGeometry(0.2,0.6,4), cm);
     dorsal.position.set(0.1,0.6,0); dorsal.scale.set(1,1,0.25); g.add(dorsal);
-    g.scale.setScalar(scaleK*1.15);
+    g.scale.setScalar(1.0);
     g.userData.isFallbackShark = true;
   }
   return g;
@@ -1256,56 +1307,32 @@ function startTank(){
     sharkMixer = null;
     petInner = makePetMesh(profile.giftPet, profile.level);
     petGroup.add(petInner);
-    if (profile.giftPet==="shark"){
+    var lvNow = Math.max(1, Math.min(10, profile.level));
+    if (petEvolved(profile.giftPet, lvNow) && profile.giftPet==="shark"){
+      var expectShark = petInner;
       gltfLoader2.loadAsync(ASSET+"sport-shark.glb").then(function(gltf){
-        if (!petInner || !petInner.userData.isFallbackShark) return;
+        if (petInner !== expectShark || !petInner.userData.isFallbackShark) return;
         try {
-          var lv = Math.max(1, Math.min(10, profile.level));
-          var lt = (lv-1)/9, bright = 1.78 - lt*1.33;
-          var mat = new THREE.MeshPhysicalMaterial({
-            map: loadTex(ASSET+"sport-shark-diffuse.png", true),
-            normalMap: loadTex(ASSET+"sport-shark-normals.png", false),
-            normalScale: new THREE.Vector2(0.65,0.65),
-            roughness: 1.0, roughnessMap: loadTex(ASSET+"sport-shark-roughness.png", false),
-            metalness: 0.0,
-            emissive: 0xffffff, emissiveMap: loadTex(ASSET+"sport-shark-emissive.png", true), emissiveIntensity: 0.6
-          });
-          mat.color.setRGB(bright*1.03, bright*0.96, bright*1.14);
-          var inst = gltf.scene;
-          inst.traverse(function(o){ if (o.isMesh){ o.material = mat; o.frustumCulled = false; } });
-          inst.position.set(0, 0.25, 0.19);
-          var wrap = new THREE.Group();
-          wrap.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2);
-          wrap.add(inst); wrap.scale.setScalar(0.6);
-          var grp = new THREE.Group(); grp.add(wrap);
-          grp.scale.setScalar(0.55 + (lv-1)/9*1.1);
-          petGroup.remove(petInner); petInner = grp; petGroup.add(grp);
+          var built = makeSharkGroup(gltf, lvNow);
+          petGroup.remove(petInner); petInner = built.group; petGroup.add(built.group);
           var full = gltf.animations && gltf.animations[0];
           if (full && THREE.AnimationUtils.subclip){
-            sharkMixer = new THREE.AnimationMixer(inst);
+            sharkMixer = new THREE.AnimationMixer(built.inst);
             sharkIdle = sharkMixer.clipAction(THREE.AnimationUtils.subclip(full, "SwimIdle", 0, 40, 24)); sharkIdle.play();
             sharkSpeed = sharkMixer.clipAction(THREE.AnimationUtils.subclip(full, "SwimSpeed", 408, 449, 24));
             sharkSpeed.setEffectiveWeight(0); sharkSpeed.play();
           }
         } catch(e){ /* keep fallback */ }
       }).catch(function(){});
-    } else if (profile.giftPet==="crab"){
+    } else if (petEvolved(profile.giftPet, lvNow) && profile.giftPet==="crab"){
+      var expectCrab = petInner;
       gltfLoader2.loadAsync(ASSET+"cc0-japanese-freshwater-crab/source/QS1726-E4-W01-1-1_animation.glb").then(function(gltf){
-        if (!petInner || !petInner.userData.isFallbackCrab) return;
+        if (petInner !== expectCrab || !petInner.userData.isFallbackCrab) return;
         try {
-          var lv = Math.max(1, Math.min(10, profile.level));
-          var map = loadTex(ASSET+"cc0-japanese-freshwater-crab/textures/texture2048_0.jpeg", true);
-          var mat = new THREE.MeshStandardMaterial({ map: map, roughness: 0.78, metalness: 0.04, skinning: true, side: THREE.DoubleSide });
-          var inst = gltf.scene;
-          inst.traverse(function(o){ if (o.isMesh){ o.material = mat; o.frustumCulled = false; o.castShadow = false; } });
-          inst.position.set(0.22, 1.51, -0.27);
-          var wrap = new THREE.Group();
-          wrap.rotation.y = Math.PI/2;
-          wrap.add(inst);
-          wrap.scale.setScalar(0.50 + (lv-1)/9*0.24);
-          petGroup.remove(petInner); petInner = wrap; petGroup.add(wrap);
+          var built = makeCrabGroup(gltf, lvNow);
+          petGroup.remove(petInner); petInner = built.group; petGroup.add(built.group);
           if (gltf.animations && gltf.animations[0]){
-            sharkMixer = new THREE.AnimationMixer(inst);
+            sharkMixer = new THREE.AnimationMixer(built.inst);
             sharkMixer.clipAction(gltf.animations[0]).play();
           }
         } catch(e){ /* keep fallback */ }
@@ -1686,7 +1713,9 @@ $("levelUpBtn").onclick = function(){
   profile.diamonds -= cost; profile.level += 1;
   saveProfile(true); refreshWallets();
   if (tankApi) tankApi.rebuild();
-  toast("🎉 " + petDisplayName(profile.giftPet, profile.level) + " lên Lv." + profile.level + "! Đã trừ " + cost + " 💎");
+  var grew = (profile.giftPet==="shark" || profile.giftPet==="crab");
+  var extra = grew && profile.level===6 ? " Đã tiến hóa sang dạng mới!" : (grew && profile.level>=7 ? " Đậm màu và to hơn rồi!" : "");
+  toast("🎉 " + petDisplayName(profile.giftPet, profile.level) + " lên Lv." + profile.level + "!" + extra + " Đã trừ " + cost + " 💎");
 };
 function enterFullscreen(){
   var stage = $("tankStage");
@@ -2322,13 +2351,15 @@ function showEvoLevel(lv){
       if (evoApi) evoApi.clear();
       return;
     }
-  $("evoName").textContent = PETS[pet].emoji + " " + petDisplayName(pet, lv) + " · Lv." + lv + (lv===profile.level?" · đang nuôi":"");
+  var formNote = "";
+  if (pet==="shark" || pet==="crab") formNote = lv<6 ? " · dạng ban đầu" : (lv===6 ? " · dạng tiến hóa" : " · đậm và to hơn");
+  $("evoName").textContent = PETS[pet].emoji + " " + petDisplayName(pet, lv) + " · Lv." + lv + formNote + (lv===profile.level?" · đang nuôi":"");
   if (evoApi) evoApi.setLevel(lv);
 }
 function startEvo(){
   if (!profile) return;
   var pet = PETS[profile.giftPet];
-  $("evoIntro").textContent = pet.emoji + " " + pet.label + " đang Lv." + profile.level + ". Chọn một cấp để xem dạng. Lv.1–10 đã mở, Lv.11–30 còn khóa.";
+  $("evoIntro").textContent = pet.emoji + " " + pet.label + " đang Lv." + profile.level + ". Dạng ban đầu đến Lv.5, tiến hóa từ Lv.6, đậm màu và to dần từ Lv.7. Lv.11–30 còn khóa.";
   evoSel = Math.max(1, Math.min(PET_LEVEL_OPEN, profile.level||1));
   if (!HAS_THREE){
     renderEvoGrid();
@@ -2385,49 +2416,24 @@ function startEvo(){
           if (token!==evoToken) return;
           petRoot.remove(mesh); mesh = group; petRoot.add(group);
         }
-        if (profile.giftPet==="shark"){
+        if (petEvolved(profile.giftPet, lv) && profile.giftPet==="shark"){
           gltfLoader2.loadAsync(ASSET+"sport-shark.glb").then(function(gltf){
             if (token!==evoToken) return;
-            var lt = (lv-1)/9, bright = 1.78 - lt*1.33;
-            var mat = new THREE.MeshPhysicalMaterial({
-              map: loadTex(ASSET+"sport-shark-diffuse.png", true),
-              normalMap: loadTex(ASSET+"sport-shark-normals.png", false),
-              normalScale: new THREE.Vector2(0.65,0.65),
-              roughness: 1.0, roughnessMap: loadTex(ASSET+"sport-shark-roughness.png", false),
-              metalness: 0.0,
-              emissive: 0xffffff, emissiveMap: loadTex(ASSET+"sport-shark-emissive.png", true), emissiveIntensity: 0.6
-            });
-            mat.color.setRGB(bright*1.03, bright*0.96, bright*1.14);
-            var inst = gltf.scene;
-            inst.traverse(function(o){ if (o.isMesh){ o.material = mat; o.frustumCulled = false; } });
-            inst.position.set(0, 0.25, 0.19);
-            var wrap = new THREE.Group();
-            wrap.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2);
-            wrap.add(inst); wrap.scale.setScalar(0.6);
-            var grp = new THREE.Group(); grp.add(wrap);
-            grp.scale.setScalar(0.55 + (lv-1)/9*1.1);
-            swap(grp);
+            var built = makeSharkGroup(gltf, lv);
+            swap(built.group);
             var full = gltf.animations && gltf.animations[0];
             if (full && THREE.AnimationUtils.subclip){
-              mixer = new THREE.AnimationMixer(inst);
+              mixer = new THREE.AnimationMixer(built.inst);
               mixer.clipAction(THREE.AnimationUtils.subclip(full, "SwimIdle", 0, 40, 24)).play();
             }
           }).catch(function(){});
-        } else if (profile.giftPet==="crab"){
+        } else if (petEvolved(profile.giftPet, lv) && profile.giftPet==="crab"){
           gltfLoader2.loadAsync(ASSET+"cc0-japanese-freshwater-crab/source/QS1726-E4-W01-1-1_animation.glb").then(function(gltf){
             if (token!==evoToken) return;
-            var map = loadTex(ASSET+"cc0-japanese-freshwater-crab/textures/texture2048_0.jpeg", true);
-            var mat = new THREE.MeshStandardMaterial({ map: map, roughness: 0.78, metalness: 0.04, skinning: true, side: THREE.DoubleSide });
-            var inst = gltf.scene;
-            inst.traverse(function(o){ if (o.isMesh){ o.material = mat; o.frustumCulled = false; o.castShadow = false; } });
-            inst.position.set(0.22, 1.51, -0.27);
-            var wrap = new THREE.Group();
-            wrap.rotation.y = Math.PI/2;
-            wrap.add(inst);
-            wrap.scale.setScalar(0.50 + (lv-1)/9*0.24);
-            swap(wrap);
+            var built = makeCrabGroup(gltf, lv);
+            swap(built.group);
             if (gltf.animations && gltf.animations[0]){
-              mixer = new THREE.AnimationMixer(inst);
+              mixer = new THREE.AnimationMixer(built.inst);
               mixer.clipAction(gltf.animations[0]).play();
             }
           }).catch(function(){});
