@@ -264,6 +264,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
         <label>B <input type="range" id="lightB" min="0" max="255" value="255"> <span id="lightBVal">255</span></label>
       </div>
       <div class="light-chips">
+        <button type="button" class="light-chip" id="lightOff" style="background:#102028;color:#fff;border:1px solid rgba(255,255,255,.45)">Tắt đèn</button>
         <button type="button" class="light-chip" data-rgb="255,40,90" style="background:#ff285a">Hồng</button>
         <button type="button" class="light-chip" data-rgb="255,150,40" style="background:#ff9628">Cam</button>
         <button type="button" class="light-chip" data-rgb="255,220,70" style="background:#ffdc46">Vàng</button>
@@ -295,7 +296,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
       <button class="btn small" id="arrangeDone">✓ Xong</button>
     </div>
   </div>
-  <p class="mut">Kéo trên vùng nước để xoay hồ 3D, chụm 2 ngón hoặc lăn chuột để phóng to. Nút Đèn RGB đổi màu ánh sáng. Trong toàn màn hình, nút Sắp xếp và Đèn nằm ở góc phải.</p>
+  <p class="mut">Kéo trên vùng nước để xoay hồ 3D, chụm 2 ngón hoặc lăn chuột để phóng to. Nút Đèn RGB đổi màu hoặc tắt đèn. Trong toàn màn hình, nút Sắp xếp và Đèn nằm ở góc phải.</p>
 </section>
 
 <!-- QUIZ -->
@@ -584,6 +585,7 @@ function normalizeProfile(p){
       b: Math.max(0, Math.min(255, Math.round(L.b)))
     };
   }
+  if (p.tankLightsOff !== true) delete p.tankLightsOff;
   p.vanMissed = p.vanMissed || [];
   return p;
 }
@@ -653,6 +655,11 @@ function refreshWallets(){
     $("petCardDesc").textContent = petEmoji(profile.giftPet, profile.level) + " " + petDisplayName(profile.giftPet, profile.level) + " (" + (profile.giftPet==="shark" && profile.level>=11 ? "Rồng vàng" : PETS[profile.giftPet].label) + ", " + rar.label + " Lv." + profile.level + ") đang chờ trong hồ";
     var cost = profile.level < maxLv ? LEVEL_UP_COSTS[profile.level] : 0;
     $("levelUpBtn").textContent = !cost ? ("👑 Đã Lv." + maxLv + " tối đa") : (DEMO ? "⬆️ Level Up · Miễn phí" : ("⬆️ Level Up · " + cost + " 💎"));
+    if ($("lightPanel").style.display === "none"){
+      var lamp = lightBtnLabel(false);
+      $("lightBtn").textContent = lamp.main;
+      $("fsLightBtn").textContent = lamp.fs;
+    }
   }
 }
 
@@ -1429,6 +1436,7 @@ function startTank(){
   var hemi = new THREE.HemisphereLight(0xcdf3ff, 0x0b3a4d, 1.05); scene.add(hemi);
   var key = new THREE.DirectionalLight(0xffffff, 1.35); key.position.set(4,9,6); scene.add(key);
   var rim = new THREE.DirectionalLight(0x7dd3fc, 0.55); rim.position.set(-5,4,-4); scene.add(rim);
+  var baseHemi = hemi.intensity, baseKey = key.intensity, baseRim = rim.intensity;
   var TW = 15.2, TD = 8.6, TH = 6.6;
   var sand = new THREE.Mesh(new THREE.BoxGeometry(TW, 0.5, TD), stdMat(0xd7c094,{roughness:1}));
   sand.position.y = -0.24; scene.add(sand);
@@ -1487,8 +1495,11 @@ function startTank(){
   var baseInside = inside.material.color.clone();
   var baseWater = water.material.color.clone();
   var baseBub = bubMat.color.clone();
-  function applyTankLight(rgb){
-    var custom = !!(rgb && (rgb.r !== 255 || rgb.g !== 255 || rgb.b !== 255));
+  function applyTankLight(rgb, lightsOff){
+    hemi.intensity = baseHemi;
+    key.intensity = baseKey;
+    rim.intensity = baseRim;
+    var custom = !lightsOff && !!(rgb && (rgb.r !== 255 || rgb.g !== 255 || rgb.b !== 255));
     if (!custom){
       tankLamp.color.set(0xffffff);
       tankLamp.intensity = 0;
@@ -1507,7 +1518,7 @@ function startTank(){
     water.material.color.copy(baseWater).lerp(c, 0.66);
     bubMat.color.copy(c).lerp(new THREE.Color(1,1,1), 0.28);
   }
-  applyTankLight(profile && profile.tankLight);
+  applyTankLight(profile && profile.tankLight, profile && profile.tankLightsOff);
   var bubbles = [];
   for (var b=0;b<26;b++){
     var bm = new THREE.Mesh(bubGeo, bubMat);
@@ -1925,7 +1936,7 @@ function startTank(){
   })();
   buildPet(); buildDecos(); buildShopFish(); spawnFauna(); applyCamera();
   tankApi = {
-    resume: function(){ running = true; resize(); applyTankLight(profile && profile.tankLight); },
+    resume: function(){ running = true; resize(); applyTankLight(profile && profile.tankLight, profile && profile.tankLightsOff); },
     pause: function(){ running = false; },
     rebuild: function(){ buildPet(); buildDecos(); buildShopFish(); refreshWallets(); },
     resetCamera: resetCamera,
@@ -2069,30 +2080,50 @@ function lightHex(n){
   var s = Math.max(0, Math.min(255, Math.round(n))).toString(16);
   return s.length < 2 ? "0" + s : s;
 }
+function lightBtnLabel(open){
+  if (open) return { main: "✓ Xong đèn", fs: "✓ Xong" };
+  if (profile && profile.tankLightsOff) return { main: "💡 Đèn tắt", fs: "💡 Tắt" };
+  return { main: "💡 Đèn RGB", fs: "💡 Đèn" };
+}
 function syncLightControls(){
+  var off = !!(profile && profile.tankLightsOff);
   var L = (profile && profile.tankLight) ? profile.tankLight : { r:255, g:255, b:255 };
   $("lightR").value = L.r; $("lightG").value = L.g; $("lightB").value = L.b;
   $("lightRVal").textContent = L.r; $("lightGVal").textContent = L.g; $("lightBVal").textContent = L.b;
   var hex = "#" + lightHex(L.r) + lightHex(L.g) + lightHex(L.b);
   $("lightPick").value = hex;
-  $("lightHex").textContent = hex.toUpperCase();
+  $("lightHex").textContent = off ? "ĐÈN TẮT" : hex.toUpperCase();
+  $("lightOff").textContent = off ? "Bật đèn" : "Tắt đèn";
 }
 function commitTankLight(r, g, b){
   if (!profile) return;
   r = Math.max(0, Math.min(255, Math.round(r)));
   g = Math.max(0, Math.min(255, Math.round(g)));
   b = Math.max(0, Math.min(255, Math.round(b)));
+  delete profile.tankLightsOff;
   if (r===255 && g===255 && b===255) delete profile.tankLight;
   else profile.tankLight = { r:r, g:g, b:b };
   saveProfile(false);
   syncLightControls();
-  if (tankApi && tankApi.setLight) tankApi.setLight(profile.tankLight || null);
+  if (tankApi && tankApi.setLight) tankApi.setLight(profile.tankLight || null, false);
+}
+function setLightsOff(off){
+  if (!profile) return;
+  if (off) profile.tankLightsOff = true;
+  else delete profile.tankLightsOff;
+  saveProfile(false);
+  syncLightControls();
+  var labels = lightBtnLabel($("lightPanel").style.display !== "none");
+  $("lightBtn").textContent = labels.main;
+  $("fsLightBtn").textContent = labels.fs;
+  if (tankApi && tankApi.setLight) tankApi.setLight(profile.tankLight || null, !!profile.tankLightsOff);
 }
 function setLightOpen(on){
   $("lightPanel").style.display = on ? "block" : "none";
   $("tankHint").style.visibility = on ? "hidden" : "visible";
-  $("lightBtn").textContent = on ? "✓ Xong đèn" : "💡 Đèn RGB";
-  $("fsLightBtn").textContent = on ? "✓ Xong" : "💡 Đèn";
+  var labels = lightBtnLabel(on);
+  $("lightBtn").textContent = labels.main;
+  $("fsLightBtn").textContent = labels.fs;
   if (on) syncLightControls();
 }
 $("lightBtn").onclick = function(){ setLightOpen($("lightPanel").style.display==="none"); };
@@ -2113,6 +2144,7 @@ document.querySelectorAll("[data-rgb]").forEach(function(b){
   });
 });
 $("lightReset").onclick = function(){ commitTankLight(255, 255, 255); };
+$("lightOff").onclick = function(){ setLightsOff(!(profile && profile.tankLightsOff)); };
 $("lightPanel").addEventListener("wheel", function(e){ e.stopPropagation(); }, { passive:true });
 $("arrangeSel").onchange = function(){ tankState.selectedKey = this.value; };
 document.querySelectorAll("[data-nudge]").forEach(function(b){
