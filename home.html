@@ -1131,35 +1131,51 @@ function petShadeT(level){
   var lv = Math.max(1, Math.min(10, level));
   return (lv - 1) / 9;
 }
-function styleSharkMat(mat, level){
-  var t = petShadeT(level);
-  var bright = 1.55 - t*1.09;
-  mat.color.setRGB(bright*1.03, bright*0.96, bright*1.14);
-  mat.emissiveIntensity = 0.62 - t*0.39;
-}
 function styleCrabMat(mat, level){
   var t = petShadeT(level);
   mat.color.setRGB(1 - t*0.32, 1 - t*0.45, 1 - t*0.58);
 }
 function makeSharkGroup(gltf, level){
-  var mat = new THREE.MeshPhysicalMaterial({
-    map: loadTex(ASSET+"sport-shark-diffuse.png", true),
-    normalMap: loadTex(ASSET+"sport-shark-normals.png", false),
-    normalScale: new THREE.Vector2(0.65,0.65),
-    roughness: 1.0, roughnessMap: loadTex(ASSET+"sport-shark-roughness.png", false),
-    metalness: 0.0,
-    emissive: 0xffffff, emissiveMap: loadTex(ASSET+"sport-shark-emissive.png", true), emissiveIntensity: 0.55
-  });
-  styleSharkMat(mat, level);
   var inst = gltf.scene;
-  inst.traverse(function(o){ if (o.isMesh){ o.material = mat; o.frustumCulled = false; } });
-  inst.position.set(0, 0.25, 0.19);
-  var wrap = new THREE.Group();
-  wrap.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2);
-  wrap.add(inst); wrap.scale.setScalar(0.6);
-  var grp = new THREE.Group(); grp.add(wrap);
-  grp.scale.setScalar(0.78 + petShadeT(level)*0.92);
-  return { group: grp, inst: inst };
+  var t = petShadeT(level);
+  var shade = 1.08 - t*0.48;
+  inst.traverse(function(o){
+    if (!o.isMesh || !o.material) return;
+    o.frustumCulled = false;
+    var list = Array.isArray(o.material) ? o.material : [o.material];
+    var cloned = list.map(function(m){
+      var c = m.clone();
+      if (c.color) c.color.multiplyScalar(shade);
+      if (typeof c.emissiveIntensity==="number") c.emissiveIntensity *= (1.05 - t*0.4);
+      return c;
+    });
+    o.material = Array.isArray(o.material) ? cloned : cloned[0];
+  });
+  inst.rotation.x += 5*Math.PI/180;
+  inst.rotation.y += 25*Math.PI/180;
+  inst.rotation.z += -50*Math.PI/180;
+  var holder = new THREE.Group();
+  holder.add(inst);
+  var fit = 2.4 + t*1.8;
+  var box = new THREE.Box3();
+  inst.traverse(function(o){ if (o.isMesh && o.name!=="koi_embers") box.expandByObject(o); });
+  if (box.isEmpty()) box.setFromObject(holder);
+  var size = new THREE.Vector3(); box.getSize(size);
+  var maxDim = Math.max(size.x, size.y, size.z) || 1;
+  inst.scale.multiplyScalar(fit / maxDim);
+  var box2 = new THREE.Box3();
+  inst.traverse(function(o){ if (o.isMesh && o.name!=="koi_embers") box2.expandByObject(o); });
+  if (box2.isEmpty()) box2.setFromObject(holder);
+  inst.position.x -= (box2.min.x+box2.max.x)/2;
+  inst.position.y -= (box2.min.y+box2.max.y)/2;
+  inst.position.z -= (box2.min.z+box2.max.z)/2;
+  var mixer = null;
+  var clip = gltf.animations && THREE.AnimationClip && THREE.AnimationClip.findByName(gltf.animations, "KoiSwim");
+  if (clip){
+    mixer = new THREE.AnimationMixer(inst);
+    mixer.clipAction(clip).play();
+  }
+  return { group: holder, inst: inst, mixer: mixer };
 }
 function makeCrabGroup(gltf, level){
   var map = loadTex(ASSET+"cc0-japanese-freshwater-crab/textures/texture2048_0.jpeg", true);
@@ -1330,24 +1346,18 @@ function startTank(){
   var petInner = null, sharkMixer = null, sharkIdle = null, sharkSpeed = null;
   function buildPet(){
     while (petGroup.children.length) petGroup.remove(petGroup.children[0]);
-    sharkMixer = null;
+    sharkMixer = null; sharkIdle = null; sharkSpeed = null;
     petInner = makePetMesh(profile.giftPet, profile.level);
     petGroup.add(petInner);
     var lvNow = Math.max(1, Math.min(10, profile.level));
     if (profile.giftPet==="shark"){
       var expectShark = petInner;
-      gltfLoader2.loadAsync(ASSET+"sport-shark.glb").then(function(gltf){
+      gltfLoader2.loadAsync(ASSET+"carp-dragon-gold.glb").then(function(gltf){
         if (petInner !== expectShark || !petInner.userData.isFallbackShark) return;
         try {
           var built = makeSharkGroup(gltf, lvNow);
           petGroup.remove(petInner); petInner = built.group; petGroup.add(built.group);
-          var full = gltf.animations && gltf.animations[0];
-          if (full && THREE.AnimationUtils.subclip){
-            sharkMixer = new THREE.AnimationMixer(built.inst);
-            sharkIdle = sharkMixer.clipAction(THREE.AnimationUtils.subclip(full, "SwimIdle", 0, 40, 24)); sharkIdle.play();
-            sharkSpeed = sharkMixer.clipAction(THREE.AnimationUtils.subclip(full, "SwimSpeed", 408, 449, 24));
-            sharkSpeed.setEffectiveWeight(0); sharkSpeed.play();
-          }
+          sharkMixer = built.mixer;
         } catch(e){ /* keep fallback */ }
       }).catch(function(){});
     } else if (profile.giftPet==="crab"){
@@ -2448,15 +2458,11 @@ function startEvo(){
           petRoot.remove(mesh); mesh = group; petRoot.add(group);
         }
         if (profile.giftPet==="shark"){
-          gltfLoader2.loadAsync(ASSET+"sport-shark.glb").then(function(gltf){
+          gltfLoader2.loadAsync(ASSET+"carp-dragon-gold.glb").then(function(gltf){
             if (token!==evoToken) return;
             var built = makeSharkGroup(gltf, lv);
             swap(built.group);
-            var full = gltf.animations && gltf.animations[0];
-            if (full && THREE.AnimationUtils.subclip){
-              mixer = new THREE.AnimationMixer(built.inst);
-              mixer.clipAction(THREE.AnimationUtils.subclip(full, "SwimIdle", 0, 40, 24)).play();
-            }
+            mixer = built.mixer;
           }).catch(function(){});
         } else if (profile.giftPet==="crab"){
           gltfLoader2.loadAsync(ASSET+"cc0-japanese-freshwater-crab/source/QS1726-E4-W01-1-1_animation.glb").then(function(gltf){
