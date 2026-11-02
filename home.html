@@ -610,7 +610,7 @@ function refreshWallets(){
       : (PETS[profile.giftPet].emoji + " đang Lv." + profile.level + " · xem dạng 1–10 · 11–30 khóa");
     $("petCardDesc").textContent = petEmoji(profile.giftPet, profile.level) + " " + petDisplayName(profile.giftPet, profile.level) + " (" + (profile.giftPet==="shark" && profile.level>=11 ? "Rồng vàng" : PETS[profile.giftPet].label) + ", " + rar.label + " Lv." + profile.level + ") đang chờ trong hồ";
     var cost = profile.level < maxLv ? LEVEL_UP_COSTS[profile.level] : 0;
-    $("levelUpBtn").textContent = cost ? ("⬆️ Level Up · " + cost + " 💎") : ("👑 Đã Lv." + maxLv + " tối đa");
+    $("levelUpBtn").textContent = !cost ? ("👑 Đã Lv." + maxLv + " tối đa") : (DEMO ? "⬆️ Level Up · Miễn phí" : ("⬆️ Level Up · " + cost + " 💎"));
   }
 }
 
@@ -625,7 +625,7 @@ function boot(){
     if (profile) {
       if (profile._migratedAssets){ delete profile._migratedAssets; saveProfile(true); }
       refreshWallets(); show("island");
-      if (DEMO) toast("Demo: cửa hàng mua không giới hạn, không trừ tiền và không lưu hồ sơ.");
+      if (DEMO) toast("Demo: mua đồ và lên cấp không trừ tiền, không giới hạn, và không lưu hồ sơ.");
     }
     else show("register");
   }).catch(function(e){
@@ -1170,7 +1170,7 @@ function makeSharkGroup(gltf, level){
   inst.rotation.z += -50*Math.PI/180;
   var holder = new THREE.Group();
   holder.add(inst);
-  var fit = 2.4 + t*1.8;
+  var fit = 1.2 + t*1.5;
   var box = new THREE.Box3();
   inst.traverse(function(o){ if (o.isMesh && o.name!=="koi_embers") box.expandByObject(o); });
   if (box.isEmpty()) box.setFromObject(holder);
@@ -1811,14 +1811,16 @@ $("levelUpBtn").onclick = function(){
   var maxLv = petLevelMax(profile.giftPet);
   var cost = profile.level < maxLv ? LEVEL_UP_COSTS[profile.level] : 0;
   if (!cost){ toast("👑 Bạn thú đã đạt Lv." + maxLv + " tối đa rồi!"); return; }
-  if (profile.diamonds < cost){ toast("Chưa đủ kim cương 💎 — lên Lv." + (profile.level+1) + " cần " + cost + " 💎, ví còn " + profile.diamonds + " 💎"); return; }
-  profile.diamonds -= cost; profile.level += 1;
+  if (!DEMO && profile.diamonds < cost){ toast("Chưa đủ kim cương 💎 — lên Lv." + (profile.level+1) + " cần " + cost + " 💎, ví còn " + profile.diamonds + " 💎"); return; }
+  if (!DEMO) profile.diamonds -= cost;
+  profile.level += 1;
   saveProfile(true); refreshWallets();
   if (tankApi) tankApi.rebuild();
   var extra = "";
   if (profile.giftPet==="shark" && profile.level===11) extra = " Hóa thành rồng vàng rồi!";
   else if (profile.giftPet==="shark" || profile.giftPet==="crab") extra = " To và đậm màu hơn rồi!";
-  toast("🎉 " + petDisplayName(profile.giftPet, profile.level) + " lên Lv." + profile.level + "!" + extra + " Đã trừ " + cost + " 💎");
+  var pay = DEMO ? "" : (" Đã trừ " + cost + " 💎");
+  toast("🎉 " + petDisplayName(profile.giftPet, profile.level) + " lên Lv." + profile.level + "!" + extra + pay);
 };
 function enterFullscreen(){
   var stage = $("tankStage");
