@@ -1466,35 +1466,32 @@ function startTank(){
   }).catch(function(){});
   var bubGeo = new THREE.SphereGeometry(0.06,8,6);
   var bubMat = new THREE.MeshBasicMaterial({ color:0xcfeeff, transparent:true, opacity:0.5 });
-  var baseLight = {
-    key: key.color.clone(), rim: rim.color.clone(), sky: hemi.color.clone(), ground: hemi.groundColor.clone(),
-    bg: scene.background.clone(), water: water.material.color.clone(), inside: inside.material.color.clone(),
-    glass: glassMat.color.clone(), bub: bubMat.color.clone()
-  };
+  var tankLamp = new THREE.PointLight(0xffffff, 0, 14, 2);
+  tankLamp.position.set(0, 3.2, 0);
+  scene.add(tankLamp);
+  var baseSand = sand.material.color.clone();
+  var baseInside = inside.material.color.clone();
+  var baseWater = water.material.color.clone();
+  var baseBub = bubMat.color.clone();
   function applyTankLight(rgb){
     var custom = !!(rgb && (rgb.r !== 255 || rgb.g !== 255 || rgb.b !== 255));
     if (!custom){
-      key.color.copy(baseLight.key); rim.color.copy(baseLight.rim);
-      hemi.color.copy(baseLight.sky); hemi.groundColor.copy(baseLight.ground);
-      scene.background.copy(baseLight.bg); scene.fog.color.copy(baseLight.bg);
-      water.material.color.copy(baseLight.water); inside.material.color.copy(baseLight.inside);
-      glassMat.color.copy(baseLight.glass); bubMat.color.copy(baseLight.bub);
-      key.intensity = 1.35; rim.intensity = 0.55; hemi.intensity = 1.05;
+      tankLamp.color.set(0xffffff);
+      tankLamp.intensity = 0;
+      sand.material.color.copy(baseSand);
+      inside.material.color.copy(baseInside);
+      water.material.color.copy(baseWater);
+      bubMat.color.copy(baseBub);
       return;
     }
     var c = new THREE.Color(rgb.r/255, rgb.g/255, rgb.b/255);
     var luma = 0.299*(rgb.r/255) + 0.587*(rgb.g/255) + 0.114*(rgb.b/255);
-    key.color.copy(c); rim.color.copy(c); hemi.color.copy(c);
-    hemi.groundColor.copy(baseLight.ground).lerp(c, 0.4);
-    var bg = baseLight.bg.clone().lerp(c, 0.62);
-    scene.background.copy(bg); scene.fog.color.copy(bg);
-    water.material.color.copy(baseLight.water).lerp(c, 0.78);
-    inside.material.color.copy(baseLight.inside).lerp(c, 0.74);
-    glassMat.color.copy(baseLight.glass).lerp(c, 0.5);
-    bubMat.color.copy(c).lerp(new THREE.Color(1,1,1), 0.3);
-    key.intensity = 0.65 + luma*0.85;
-    rim.intensity = 0.3 + luma*0.4;
-    hemi.intensity = 0.5 + luma*0.65;
+    tankLamp.color.copy(c);
+    tankLamp.intensity = 16 + luma*14;
+    sand.material.color.copy(baseSand).lerp(c, 0.62);
+    inside.material.color.copy(baseInside).lerp(c, 0.7);
+    water.material.color.copy(baseWater).lerp(c, 0.66);
+    bubMat.color.copy(c).lerp(new THREE.Color(1,1,1), 0.28);
   }
   applyTankLight(profile && profile.tankLight);
   var bubbles = [];
