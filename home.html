@@ -218,6 +218,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
       </div>
     </div>
     <div class="hud"><span class="pill" id="evoName">Thú cưng</span></div>
+    <p id="evoViewHint" style="position:absolute;inset-inline:0;bottom:6px;text-align:center;color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.6);pointer-events:none;margin:0;z-index:2">Kéo để xoay thú cưng, lăn chuột hoặc chụm 2 ngón để phóng to.</p>
   </div>
   <div class="evo-grid" id="evoGrid"></div>
   <button class="btn ghost" id="evoBack">🏝️ Về đảo</button>
@@ -1622,6 +1623,8 @@ function startTank(){
       wanderT = 4.5 + Math.random()*4;
       dx = wanderTarget.x - petPos.x; dz = wanderTarget.z - petPos.z; dist = Math.hypot(dx, dz);
     }
+    var pace = (profile.giftPet==="shark" && profile.level<11) ? 0.42 : 1;
+    var chasePace = (profile.giftPet==="shark" && profile.level<11) ? 0.65 : 1;
     if (dist > 0.9){
       var want = Math.atan2(-dz, dx);
       var diff = want - petAngle;
@@ -1629,14 +1632,14 @@ function startTank(){
       while (diff < -Math.PI) diff += Math.PI*2;
       var turn = (tankState.chase ? 1.8 : 0.9) * dt;
       petAngle += Math.max(-turn, Math.min(turn, diff));
-      var sp = (tankState.chase ? 2.4 : 1.25) * (0.4 + 0.6*Math.max(0, Math.cos(diff)));
+      var sp = (tankState.chase ? 2.4*chasePace : 1.25*pace) * (0.4 + 0.6*Math.max(0, Math.cos(diff)));
       petPos.x += Math.cos(petAngle)*sp*dt;
       petPos.z -= Math.sin(petAngle)*sp*dt;
       if (sharkSpeed) sharkSpeed.setEffectiveWeight(0.7);
       if (sharkIdle) sharkIdle.setEffectiveWeight(0.3);
     } else {
-      petPos.x += Math.cos(petAngle)*0.45*dt;
-      petPos.z -= Math.sin(petAngle)*0.45*dt;
+      petPos.x += Math.cos(petAngle)*0.45*pace*dt;
+      petPos.z -= Math.sin(petAngle)*0.45*pace*dt;
       if (!tankState.chase && wanderT>0.2) wanderT = 0.2;
       if (sharkSpeed) sharkSpeed.setEffectiveWeight(0);
       if (sharkIdle) sharkIdle.setEffectiveWeight(1);
@@ -1658,7 +1661,7 @@ function startTank(){
       var p = f.group.position;
       var ddx = f.tx-p.x, ddz = f.tz-p.z, ddy = f.ty-p.y;
       var dd = Math.hypot(ddx,ddz,ddy)||1;
-      p.x += ddx/dd*f.speed*dt*1.6; p.y += ddy/dd*f.speed*dt*1.6; p.z += ddz/dd*f.speed*dt*1.6;
+      p.x += ddx/dd*f.speed*dt*0.7; p.y += ddy/dd*f.speed*dt*0.7; p.z += ddz/dd*f.speed*dt*0.7;
       f.group.rotation.y = Math.atan2(-ddz, ddx);
       f.group.rotation.z = Math.sin(t*3+f.phase)*0.08;
       if (f.mixer) f.mixer.update(dt);
@@ -1681,8 +1684,8 @@ function startTank(){
           if (!rec.cruise) rec.cruise = { x: rec.anchor.x, z: rec.anchor.z, heading: rec.phase*2, wait: 1.2 };
           rec.cruise.wait -= dt;
           if (rec.cruise.wait<=0){ rec.cruise.heading += (Math.random()-0.5)*0.7; rec.cruise.wait = 2.4+Math.random()*2.4; }
-          rec.cruise.x += Math.cos(rec.cruise.heading)*0.62*dt;
-          rec.cruise.z -= Math.sin(rec.cruise.heading)*0.62*dt;
+          rec.cruise.x += Math.cos(rec.cruise.heading)*0.28*dt;
+          rec.cruise.z -= Math.sin(rec.cruise.heading)*0.28*dt;
           if (rec.cruise.x>6.4 || rec.cruise.x<-6.4){ rec.cruise.heading = Math.PI-rec.cruise.heading; rec.cruise.x = Math.max(-6.4, Math.min(6.4, rec.cruise.x)); }
           if (rec.cruise.z>3 || rec.cruise.z<-3){ rec.cruise.heading = -rec.cruise.heading; rec.cruise.z = Math.max(-3, Math.min(3, rec.cruise.z)); }
           rec.group.position.set(rec.cruise.x, 2.05+Math.sin(t*1.1+rec.phase)*0.2, rec.cruise.z);
@@ -2536,8 +2539,22 @@ function startEvo(){
     var scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0e7490);
     var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 50);
-    camera.position.set(1.6, 1.5, 5.2);
-    camera.lookAt(0, 0.7, 0);
+    var evoTheta = 0.32, evoPhi = 1.22, evoRadius = 5.5;
+    function applyEvoCamera(){
+      evoPhi = Math.max(0.38, Math.min(1.42, evoPhi));
+      evoRadius = Math.max(2.2, Math.min(12, evoRadius));
+      var sp = Math.sin(evoPhi);
+      camera.position.set(evoRadius*sp*Math.sin(evoTheta), 0.55 + evoRadius*Math.cos(evoPhi), evoRadius*sp*Math.cos(evoTheta));
+      camera.lookAt(0, 0.72, 0);
+    }
+    function frameEvo(lv){
+      var asDragon = profile && profile.giftPet==="shark" && lv>=11;
+      if (asDragon) evoRadius = 5.4 + dragonShadeT(lv)*1.25;
+      else if (profile && profile.giftPet==="shark") evoRadius = 4.5 + petShadeT(lv)*1.1;
+      else evoRadius = 5.2;
+      applyEvoCamera();
+    }
+    applyEvoCamera();
     scene.add(new THREE.HemisphereLight(0xeaf7ff, 0x14532d, 1.15));
     var sun = new THREE.DirectionalLight(0xfff3d6, 1.3); sun.position.set(4, 8, 5); scene.add(sun);
     var sand = new THREE.Mesh(new THREE.CircleGeometry(3.2, 28), stdMat(0xd9bd8a,{roughness:1}));
@@ -2550,6 +2567,49 @@ function startEvo(){
       renderer.setSize(w, h); camera.aspect = w/h; camera.updateProjectionMatrix();
     }
     resize(); window.addEventListener("resize", resize);
+    var evoStage = $("evoStage");
+    evoStage.style.touchAction = "none";
+    var evoPointers = {}, evoDrag = null, evoPinch = 0;
+    evoStage.addEventListener("pointerdown", function(e){
+      if (e.target.closest && e.target.closest("button, a, input, select")) return;
+      evoPointers[e.pointerId] = { x:e.clientX, y:e.clientY };
+      try { evoStage.setPointerCapture(e.pointerId); } catch (err) {}
+      if (Object.keys(evoPointers).length===2){
+        var ps = Object.values(evoPointers);
+        evoPinch = Math.hypot(ps[0].x-ps[1].x, ps[0].y-ps[1].y);
+        evoDrag = null;
+        return;
+      }
+      evoDrag = { x:e.clientX, y:e.clientY };
+    });
+    evoStage.addEventListener("pointermove", function(e){
+      if (evoPointers[e.pointerId]) evoPointers[e.pointerId] = { x:e.clientX, y:e.clientY };
+      if (Object.keys(evoPointers).length===2){
+        var ps = Object.values(evoPointers);
+        var d = Math.hypot(ps[0].x-ps[1].x, ps[0].y-ps[1].y);
+        if (evoPinch) evoRadius -= (d-evoPinch)*0.012;
+        evoPinch = d;
+        applyEvoCamera();
+        return;
+      }
+      if (!evoDrag) return;
+      evoTheta -= (e.clientX-evoDrag.x)*0.01;
+      evoPhi -= (e.clientY-evoDrag.y)*0.008;
+      evoDrag = { x:e.clientX, y:e.clientY };
+      applyEvoCamera();
+    });
+    function endEvoPointer(e){
+      delete evoPointers[e.pointerId];
+      if (Object.keys(evoPointers).length<2) evoPinch = 0;
+      evoDrag = null;
+    }
+    evoStage.addEventListener("pointerup", endEvoPointer);
+    evoStage.addEventListener("pointercancel", endEvoPointer);
+    evoStage.addEventListener("wheel", function(e){
+      e.preventDefault();
+      evoRadius += e.deltaY>0 ? 0.42 : -0.42;
+      applyEvoCamera();
+    }, { passive:false });
     (function loop(){
       raf = requestAnimationFrame(loop);
       if (!running) return;
@@ -2578,6 +2638,7 @@ function startEvo(){
         petRoot.rotation.y = 0.4;
         var asDragon = profile.giftPet==="shark" && lv>=11;
         petRoot.position.y = profile.giftPet==="shark" ? (asDragon ? 1.2 : 0.92) : 0;
+        frameEvo(lv);
         function swap(group, lift){
           if (token!==evoToken) return;
           petRoot.remove(mesh); mesh = group; petRoot.add(group);
@@ -2588,9 +2649,6 @@ function startEvo(){
             if (token!==evoToken) return;
             var built = makeDragonGroup(gltf, lv);
             swap(built.group, Math.max(0.95, built.height*0.42 + 0.18));
-            var dist = 5.15 + dragonShadeT(lv)*1.35;
-            camera.position.set(1.45, 1.35, dist);
-            camera.lookAt(0, 0.85, 0);
             mixer = built.mixer;
           }).catch(function(){});
         } else if (profile.giftPet==="shark"){
@@ -2598,8 +2656,6 @@ function startEvo(){
             if (token!==evoToken) return;
             var built = makeSharkGroup(gltf, lv);
             swap(built.group, 0.92);
-            camera.position.set(1.6, 1.5, 5.2);
-            camera.lookAt(0, 0.7, 0);
             mixer = built.mixer;
           }).catch(function(){});
         } else if (profile.giftPet==="crab"){
