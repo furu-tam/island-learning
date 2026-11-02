@@ -64,44 +64,22 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 .light-sliders input[type=range]{width:100%;accent-color:#7dd3fc}
 .light-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .light-chip{border:none;border-radius:999px;padding:5px 10px;font-weight:800;font-size:13px;color:#12303f;cursor:pointer}
+.tank-pick{padding:8px 12px;border-radius:999px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-family:inherit;font-size:14px;font-weight:800}
+.fsbar .tank-pick{width:100%}
 .stage.fs .fsbar{display:flex}
 .stage.fs{position:fixed;inset:0;z-index:50;border-radius:0;height:100dvh!important}
-#typeHands{display:none;position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;pointer-events:none;align-items:flex-end;gap:16px;user-select:none;max-width:calc(100% - 16px);padding:8px 12px 6px;background:rgba(8,28,38,.82);border-radius:20px;box-shadow:0 8px 22px rgba(0,0,0,.28)}
-.stage.fs #typeHands{display:flex}
-.stage.fs #tankHint{bottom:168px !important}
-.stage.fs.arranging #typeHands{display:none}
-.stage.fs.arranging #tankHint{bottom:6px !important}
-.type-hand{position:relative;width:188px;height:124px}
-.type-side{position:absolute;left:0;right:0;top:0;text-align:center;color:#fff;font-size:12px;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.75)}
-.type-fingers{position:absolute;left:0;right:0;bottom:0;height:102px;display:flex;align-items:flex-end;justify-content:center;gap:4px}
-.palm{position:absolute;left:18px;right:18px;bottom:0;height:40px;background:linear-gradient(#f8d7b4,#e8b48c);border-radius:22px;box-shadow:0 3px 0 rgba(80,40,20,.18)}
-.type-hand.left .palm{left:10px;right:26px}
-.type-hand.right .palm{left:26px;right:10px}
-.finger{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:34px;opacity:.72}
-.finger.on{opacity:1}
-.finger-letters{min-height:20px;margin-bottom:3px;padding:1px 5px 2px;border-radius:999px;font-size:15px;font-weight:900;line-height:18px;color:#fff;white-space:nowrap}
-.finger.on .finger-letters{background:var(--c);color:#12303f;box-shadow:0 0 0 2px #fff}
-.fingertip{width:26px;height:26px;border-radius:50%;background:var(--c);box-shadow:inset 0 -3px 0 rgba(0,0,0,.16)}
-.finger.on .fingertip{box-shadow:0 0 0 3px #fff,0 0 14px var(--c)}
-.finger-shaft{width:16px;height:36px;margin-top:-8px;border-radius:0 0 9px 9px;background:linear-gradient(#f8d7b4,#e8b48c)}
-.finger[data-finger="lp"] .finger-shaft,.finger[data-finger="rp"] .finger-shaft{height:26px}
-.finger[data-finger="lr"] .finger-shaft,.finger[data-finger="rr"] .finger-shaft{height:36px}
-.finger[data-finger="lm"] .finger-shaft,.finger[data-finger="rm"] .finger-shaft{height:46px}
-.finger[data-finger="li"] .finger-shaft,.finger[data-finger="ri"] .finger-shaft{height:40px}
-.finger.thumb{width:28px;margin-bottom:8px}
-.finger.thumb .fingertip{width:22px;height:22px;background:#e8b48c}
-.finger.thumb .finger-shaft{width:24px;height:16px;border-radius:10px;margin-top:-4px}
-.type-hand.left .finger.thumb .finger-shaft{transform:rotate(32deg)}
-.type-hand.right .finger.thumb .finger-shaft{transform:rotate(-32deg)}
+#typeHands{display:none;position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;pointer-events:none;width:min(720px,calc(100% - 16px));height:210px;background:rgba(8,28,38,.82);border-radius:20px;box-shadow:0 8px 22px rgba(0,0,0,.28);overflow:hidden}
+.stage.fs.practice #typeHands{display:block}
+.stage.fs.practice #tankHint{bottom:230px !important}
+.stage.fs.practice.arranging #typeHands{display:none}
+.stage.fs.practice.arranging #tankHint{bottom:6px !important}
+#typeHands canvas{width:100%;height:calc(100% - 30px);margin-top:30px;display:block}
+#typeHandLetters{position:absolute;left:8px;right:8px;top:6px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+#typeHandLetters span{border-radius:999px;padding:1px 7px;font-size:15px;font-weight:900;line-height:18px;color:#12303f;box-shadow:0 0 0 2px #fff}
 .drop-key.fingered{border-radius:999px;padding:1px 5px;text-shadow:none;box-shadow:0 0 0 2px #fff}
 @media (max-width:720px),(max-height:560px){
-  .type-hand{width:150px;height:108px}
-  .finger{width:26px}
-  .fingertip{width:20px;height:20px}
-  .finger-shaft{width:13px}
-  .finger[data-finger="lm"] .finger-shaft,.finger[data-finger="rm"] .finger-shaft{height:36px}
-  #typeHands{bottom:6px;padding:4px 8px 4px;gap:8px}
-  .stage.fs #tankHint{bottom:132px !important}
+  #typeHands{height:156px;bottom:6px}
+  .stage.fs.practice #tankHint{bottom:172px !important}
 }
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px}
 .place-card{text-align:left;border:2px solid var(--line);background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
@@ -284,6 +262,12 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
       <span class="pill" id="xpChip">XP 0</span>
     </div>
     <div class="fsbar">
+      <select id="fsTankPick" class="tank-pick" hidden aria-label="Đổi hồ cá">
+        <option value="fresh">🌿 Hồ thủy sinh</option>
+        <option value="reef180">🪸 Hồ san hô 180</option>
+      </select>
+      <button class="btn small gold" id="fsPracticeBtn">✋ Tắt luyện</button>
+      <button class="btn small gold" id="fsSoundBtn">🔊 Nhạc</button>
       <button class="btn small gold" id="fsArrangeBtn">🧲 Sắp xếp</button>
       <button class="btn small" id="fsLightBtn">💡 Đèn</button>
       <button class="btn small" id="fsResetBtn">🔄 Góc nhìn mặc định</button>
@@ -311,30 +295,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
         <button type="button" class="light-chip" id="lightReset" style="background:#fff">Mặc định</button>
       </div>
     </div>
-    <div id="typeHands" aria-hidden="true">
-      <div class="type-hand left">
-        <div class="type-side">Tay trái</div>
-        <div class="type-fingers">
-          <div class="palm"></div>
-          <div class="finger" data-finger="lp" style="--c:#f472b6" title="Ngón út trái: q a z"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
-          <div class="finger" data-finger="lr" style="--c:#fb923c" title="Ngón áp út trái: w s x"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
-          <div class="finger" data-finger="lm" style="--c:#facc15" title="Ngón giữa trái: e d c"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
-          <div class="finger" data-finger="li" style="--c:#4ade80" title="Ngón trỏ trái: r t f g v b"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
-          <div class="finger thumb" title="Ngón cái trái"><span class="fingertip"></span><span class="finger-shaft"></span></div>
-        </div>
-      </div>
-      <div class="type-hand right">
-        <div class="type-side">Tay phải</div>
-        <div class="type-fingers">
-          <div class="palm"></div>
-          <div class="finger thumb" title="Ngón cái phải"><span class="fingertip"></span><span class="finger-shaft"></span></div>
-          <div class="finger" data-finger="ri" style="--c:#22d3ee" title="Ngón trỏ phải: y u h j n m"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
-          <div class="finger" data-finger="rm" style="--c:#60a5fa" title="Ngón giữa phải: i k"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
-          <div class="finger" data-finger="rr" style="--c:#a78bfa" title="Ngón áp út phải: o l"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
-          <div class="finger" data-finger="rp" style="--c:#fb7185" title="Ngón út phải: p"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
-        </div>
-      </div>
-    </div>
+    <div id="typeHands" aria-hidden="true"><div id="typeHandLetters"></div></div>
     <p id="tankHint" style="position:absolute;inset-inline:0;bottom:6px;text-align:center;color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.6);pointer-events:none;margin:0">Bấm chữ a–z ở giữa 🪙 💎, hoặc chạm, để nhặt nhé!</p>
   </div>
   <div class="toolbar">
@@ -344,7 +305,13 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <button class="btn small" id="arrangeBtn">🧲 Sắp xếp</button>
     <button class="btn small" id="lightBtn">💡 Đèn RGB</button>
     <button class="btn small" id="levelUpBtn">⬆️ Level Up bằng 💎</button>
+    <button class="btn small gold" id="practiceBtn">✋ Đang luyện</button>
+    <button class="btn small gold" id="soundBtn">🔊 Nhạc hồ</button>
     <button class="btn small ghost" id="fsBtn">⛶ Toàn màn hình</button>
+    <select id="tankPick" class="tank-pick" hidden aria-label="Đổi hồ cá">
+      <option value="fresh">🌿 Hồ thủy sinh</option>
+      <option value="reef180">🪸 Hồ san hô 180</option>
+    </select>
   </div>
   <div id="arrangeBar" style="display:none" class="card">
     <b>Chế độ sắp xếp:</b> kéo một món đồ trong hồ để dời chỗ, hoặc chọn món rồi dùng nút di chuyển.
@@ -357,7 +324,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
       <button class="btn small" id="arrangeDone">✓ Xong</button>
     </div>
   </div>
-  <p class="mut">Kéo trên vùng nước để xoay hồ 3D, chụm 2 ngón hoặc lăn chuột để phóng to. Nút Đèn RGB đổi màu hoặc tắt đèn. Trong toàn màn hình, nút Sắp xếp và Đèn nằm ở góc phải, và hai bàn tay hiện phía dưới: ngón đang sáng là ngón cần gõ.</p>
+  <p class="mut">Kéo trên vùng nước để xoay hồ 3D, chụm 2 ngón hoặc lăn chuột để phóng to. Nút Đèn RGB đổi màu hoặc tắt đèn. Nút Luyện ngón bật hoặc tắt bàn tay và xu, kim cương đang rơi. Nút Nhạc hồ bật nhạc nền và tiếng nhặt. Trong toàn màn hình, các nút nằm ở góc phải: ngón đang sáng là ngón cần gõ. Ở chế độ demo có thể đổi giữa hồ thủy sinh và hồ san hô 180.</p>
 </section>
 
 <!-- QUIZ -->
@@ -657,6 +624,20 @@ var DEMO = (function(){
   var v = (q.get("demo") || "").toLowerCase();
   return v === "" || v === "1" || v === "true" || v === "yes";
 })();
+var tankScapeId = "fresh";
+if (DEMO){
+  ["tankPick","fsTankPick"].forEach(function(id){ var el=$(id); if (el) el.hidden = false; });
+}
+function syncTankPick(id){
+  if ($("tankPick")) $("tankPick").value = id;
+  if ($("fsTankPick")) $("fsTankPick").value = id;
+}
+function chooseTankScape(id){
+  if (!DEMO || (id!=="fresh" && id!=="reef180")) return;
+  tankScapeId = id;
+  syncTankPick(id);
+  if (tankApi && tankApi.setScape) tankApi.setScape(id);
+}
 function saveProfile(immediate){
   if (!profile || DEMO) return;
   var doSave = function(){
@@ -1498,7 +1479,12 @@ function startTank(){
   var key = new THREE.DirectionalLight(0xffffff, 1.35); key.position.set(4,9,6); scene.add(key);
   var rim = new THREE.DirectionalLight(0x7dd3fc, 0.55); rim.position.set(-5,4,-4); scene.add(rim);
   var baseHemi = hemi.intensity, baseKey = key.intensity, baseRim = rim.intensity;
-  var TW = 15.2, TD = 8.6, TH = 6.6;
+  var TANK_SCAPES = {
+    fresh: { url:ASSET+"aquascape-layout.glb", w:15.2, d:8.6, h:6.6, pos:[-0.42,0.02,0.32], cam:14 },
+    reef180: { url:ASSET+"reef-layout.glb", w:18.4, d:7.4, h:6.6, pos:[0,0.02,0], cam:17 }
+  };
+  var spec0 = TANK_SCAPES[tankScapeId] || TANK_SCAPES.fresh;
+  var TW = spec0.w, TD = spec0.d, TH = spec0.h;
   var sand = new THREE.Mesh(new THREE.BoxGeometry(TW, 0.5, TD), stdMat(0xd7c094,{roughness:1}));
   sand.position.y = -0.24; scene.add(sand);
   var inside = new THREE.Mesh(new THREE.PlaneGeometry(TW-0.2, TH-0.3), stdMat(0x127a9a,{roughness:0.9}));
@@ -1507,46 +1493,79 @@ function startTank(){
     color: 0xd7f4ff, transparent: true, opacity: 0.16, roughness: 0.04,
     metalness: 0.02, side: THREE.DoubleSide, depthWrite: false
   });
-  function glassWall(w, h, x, y, z, rotY){
+  var walls = {};
+  function glassWall(name, w, h, x, y, z, rotY){
     var m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), glassMat);
     m.position.set(x, y, z);
     if (rotY) m.rotation.y = rotY;
     scene.add(m);
+    walls[name] = m;
   }
-  glassWall(TW, TH, 0, TH/2, -TD/2);
-  glassWall(TD, TH, -TW/2, TH/2, 0, Math.PI/2);
-  glassWall(TD, TH, TW/2, TH/2, 0, Math.PI/2);
-  glassWall(TW, TH, 0, TH/2, TD/2);
+  glassWall("back", TW, TH, 0, TH/2, -TD/2);
+  glassWall("left", TD, TH, -TW/2, TH/2, 0, Math.PI/2);
+  glassWall("right", TD, TH, TW/2, TH/2, 0, Math.PI/2);
+  glassWall("front", TW, TH, 0, TH/2, TD/2);
   var rimMat = stdMat(0x0c455c,{roughness:0.35, metalness:0.2});
-  function addRim(w, h, d, x, y, z){
+  var rimBoxes = {};
+  function addRim(name, w, h, d, x, y, z){
     var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), rimMat);
     m.position.set(x, y, z); scene.add(m);
+    rimBoxes[name] = m;
   }
-  addRim(TW+0.45, 0.28, 0.18, 0, TH, -TD/2);
-  addRim(TW+0.45, 0.28, 0.18, 0, TH, TD/2);
-  addRim(0.18, 0.28, TD, -TW/2, TH, 0);
-  addRim(0.18, 0.28, TD, TW/2, TH, 0);
+  addRim("back", TW+0.45, 0.28, 0.18, 0, TH, -TD/2);
+  addRim("front", TW+0.45, 0.28, 0.18, 0, TH, TD/2);
+  addRim("left", 0.18, 0.28, TD, -TW/2, TH, 0);
+  addRim("right", 0.18, 0.28, TD, TW/2, TH, 0);
   var water = new THREE.Mesh(new THREE.PlaneGeometry(TW-0.35, TD-0.35), new THREE.MeshPhysicalMaterial({
     color: 0x8fd4ee, transparent: true, opacity: 0.28, roughness: 0.08, metalness: 0.04,
     side: THREE.DoubleSide, depthWrite: false
   }));
   water.rotation.x = -Math.PI/2; water.position.y = TH-0.35; scene.add(water);
-  var scapeMixer = null;
-  gltfLoader2.loadAsync(ASSET+"aquascape-layout.glb").then(function(gltf){
-    var root = gltf.scene;
-    root.traverse(function(o){
-      if (!o.isMesh) return;
-      o.frustumCulled = false;
-      var list = Array.isArray(o.material) ? o.material : (o.material ? [o.material] : []);
-      list.forEach(function(m){ if (m && "vertexColors" in m) m.vertexColors = true; });
-    });
-    root.position.set(-0.42, 0.02, 0.32);
-    scene.add(root);
-    if (gltf.animations && gltf.animations.length){
-      scapeMixer = new THREE.AnimationMixer(root);
-      gltf.animations.forEach(function(clip){ scapeMixer.clipAction(clip).play(); });
+  function fitTankShell(spec){
+    TW = spec.w; TD = spec.d; TH = spec.h;
+    sand.geometry.dispose(); sand.geometry = new THREE.BoxGeometry(TW, 0.5, TD);
+    inside.geometry.dispose(); inside.geometry = new THREE.PlaneGeometry(TW-0.2, TH-0.3);
+    inside.position.set(0, TH*0.46, -TD/2+0.06);
+    function plane(mesh, w, h, x, y, z){
+      mesh.geometry.dispose(); mesh.geometry = new THREE.PlaneGeometry(w, h); mesh.position.set(x, y, z);
     }
-  }).catch(function(){});
+    plane(walls.back, TW, TH, 0, TH/2, -TD/2);
+    plane(walls.left, TD, TH, -TW/2, TH/2, 0);
+    plane(walls.right, TD, TH, TW/2, TH/2, 0);
+    plane(walls.front, TW, TH, 0, TH/2, TD/2);
+    function box(mesh, w, h, d, x, y, z){
+      mesh.geometry.dispose(); mesh.geometry = new THREE.BoxGeometry(w, h, d); mesh.position.set(x, y, z);
+    }
+    box(rimBoxes.back, TW+0.45, 0.28, 0.18, 0, TH, -TD/2);
+    box(rimBoxes.front, TW+0.45, 0.28, 0.18, 0, TH, TD/2);
+    box(rimBoxes.left, 0.18, 0.28, TD, -TW/2, TH, 0);
+    box(rimBoxes.right, 0.18, 0.28, TD, TW/2, TH, 0);
+    water.geometry.dispose(); water.geometry = new THREE.PlaneGeometry(TW-0.35, TD-0.35);
+    water.position.y = TH-0.35;
+  }
+  var scapeMixer = null, scapeRoot = null, scapeToken = 0, activeScape = spec0===TANK_SCAPES.reef180 ? "reef180" : "fresh";
+  function loadScape(spec){
+    var token = ++scapeToken;
+    if (scapeRoot){ scene.remove(scapeRoot); scapeRoot = null; scapeMixer = null; }
+    gltfLoader2.loadAsync(spec.url).then(function(gltf){
+      if (token !== scapeToken) return;
+      var root = gltf.scene;
+      root.traverse(function(o){
+        if (!o.isMesh) return;
+        o.frustumCulled = false;
+        var list = Array.isArray(o.material) ? o.material : (o.material ? [o.material] : []);
+        list.forEach(function(m){ if (m && "vertexColors" in m) m.vertexColors = true; });
+      });
+      root.position.set(spec.pos[0], spec.pos[1], spec.pos[2]);
+      scene.add(root);
+      scapeRoot = root;
+      if (gltf.animations && gltf.animations.length){
+        scapeMixer = new THREE.AnimationMixer(root);
+        gltf.animations.forEach(function(clip){ scapeMixer.clipAction(clip).play(); });
+      }
+    }).catch(function(){});
+  }
+  loadScape(spec0);
   var bubGeo = new THREE.SphereGeometry(0.06,8,6);
   var bubMat = new THREE.MeshBasicMaterial({ color:0xcfeeff, transparent:true, opacity:0.5 });
   var tankLamp = new THREE.PointLight(0xffffff, 0, 14, 2);
@@ -2000,6 +2019,16 @@ function startTank(){
     resume: function(){ running = true; resize(); applyTankLight(profile && profile.tankLight, profile && profile.tankLightsOff); },
     pause: function(){ running = false; },
     rebuild: function(){ buildPet(); buildDecos(); buildShopFish(); refreshWallets(); },
+    setScape: function(id){
+      var spec = TANK_SCAPES[id];
+      if (!spec || id===activeScape) return;
+      activeScape = id;
+      tankScapeId = id;
+      fitTankShell(spec);
+      loadScape(spec);
+      camRadius = spec.cam;
+      applyCamera();
+    },
     resetCamera: resetCamera,
     resize: resize,
     setLight: applyTankLight
@@ -2029,26 +2058,172 @@ var FINGER_OF = {
   p:"rp"
 };
 var FINGER_COLOR = {
-  lp:"#f472b6", lr:"#fb923c", lm:"#facc15", li:"#4ade80",
-  ri:"#22d3ee", rm:"#60a5fa", rr:"#a78bfa", rp:"#fb7185"
+  lp:"#a77bff", lr:"#3f9bff", lm:"#2fc48a", li:"#ff9f2e",
+  ri:"#ff9f2e", rm:"#2fc48a", rr:"#3f9bff", rp:"#a77bff"
 };
+var FINGER_MESH = {
+  lp:"L_pinky", lr:"L_ring", lm:"L_middle", li:"L_index",
+  ri:"R_index", rm:"R_middle", rr:"R_ring", rp:"R_pinky"
+};
+var typeHandApi = null;
+function syncTypeHandView(){
+  var stage = $("tankStage");
+  var on = !!(practiceOn && stage && stage.classList.contains("fs") && !stage.classList.contains("arranging"));
+  if (on){
+    ensureTypeHands();
+    if (typeHandApi){ typeHandApi.start(); typeHandApi.resize(); }
+  } else if (typeHandApi) typeHandApi.stop();
+}
+function ensureTypeHands(){
+  if (typeHandApi || !HAS_THREE) return;
+  var mount = $("typeHands");
+  var renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x000000, 0);
+  if (THREE.SRGBEncoding) renderer.outputEncoding = THREE.SRGBEncoding;
+  mount.appendChild(renderer.domElement);
+  var scene = new THREE.Scene();
+  var camera = new THREE.OrthographicCamera(-20, 20, 8, -8, 0.1, 200);
+  var frame = null;
+  function applyFrame(){
+    if (!frame) return;
+    var aspect = (mount.clientWidth / Math.max(1, mount.clientHeight)) || 3;
+    var halfW = frame.size.x * 0.56;
+    var needH = frame.size.z * 0.58;
+    if (halfW / aspect < needH) halfW = needH * aspect;
+    camera.left = -halfW;
+    camera.right = halfW;
+    camera.top = halfW / aspect;
+    camera.bottom = -halfW / aspect;
+    camera.position.set(0, 42, 10);
+    camera.lookAt(0, 0, -2.4);
+    camera.updateProjectionMatrix();
+  }
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x1c2836, 1.2));
+  var key = new THREE.DirectionalLight(0xffffff, 1.45);
+  key.position.set(0, 36, 24);
+  scene.add(key);
+  var fill = new THREE.DirectionalLight(0xc5d4e8, 0.55);
+  fill.position.set(-16, 8, -12);
+  scene.add(fill);
+  var fingerMats = {};
+  var mixer = null, actions = {}, playing = { L:null, R:null }, rest = [];
+  gltfLoader2.loadAsync(ASSET + "hands-typing.glb").then(function(gltf){
+    var root = gltf.scene;
+    root.traverse(function(o){
+      if (o.isMesh){
+        o.frustumCulled = false;
+        var src = Array.isArray(o.material) ? o.material : [o.material];
+        var cloned = src.map(function(m){
+          var c = m.clone();
+          c.color = new THREE.Color(0xd5dde6);
+          c.emissive = new THREE.Color(0x000000);
+          c.metalness = 0.55;
+          c.roughness = 0.42;
+          return c;
+        });
+        o.material = Array.isArray(o.material) ? cloned : cloned[0];
+        fingerMats[o.name] = cloned[0];
+      }
+      rest.push({ o:o, p:o.position.clone(), q:o.quaternion.clone(), s:o.scale.clone() });
+    });
+    scene.add(root);
+    // Fingertips sit near z 0 and wrists near z 15. Frame that pose so the long forearms stay out of view.
+    root.position.set(1.42, -2.2, -1.6);
+    frame = { size: { x: 22, z: 13 } };
+    mixer = new THREE.AnimationMixer(root);
+    (gltf.animations || []).forEach(function(clip){
+      var act = mixer.clipAction(clip);
+      act.setLoop(THREE.LoopRepeat, Infinity);
+      actions[clip.name] = act;
+    });
+    if (typeHandApi) typeHandApi.resize();
+    updateTypeHands();
+  }).catch(function(){});
+  function restoreSide(side){
+    rest.forEach(function(r){
+      if (!r.o.name || r.o.name.charAt(0) !== side) return;
+      r.o.position.copy(r.p);
+      r.o.quaternion.copy(r.q);
+      r.o.scale.copy(r.s);
+    });
+  }
+  function playSide(side, letter){
+    var name = letter ? "press_Key" + letter.toUpperCase() : null;
+    if (name && !actions[name]) return;
+    if (playing[side] === name) return;
+    if (playing[side] && actions[playing[side]]) actions[playing[side]].stop();
+    restoreSide(side);
+    playing[side] = name;
+    if (name) actions[name].reset().play();
+  }
+  var raf = 0, last = 0, running = false;
+  function resize(){
+    var w = mount.clientWidth, h = Math.max(2, mount.clientHeight - 30);
+    if (w < 2 || h < 2) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    applyFrame();
+  }
+  function loop(t){
+    raf = requestAnimationFrame(loop);
+    if (!running) return;
+    var dt = Math.min(0.05, last ? (t - last) / 1000 : 0);
+    last = t;
+    if (mixer) mixer.update(dt);
+    renderer.render(scene, camera);
+  }
+  window.addEventListener("resize", function(){ if (running) resize(); });
+  typeHandApi = {
+    start: function(){ running = true; resize(); if (!raf) loop(performance.now()); },
+    stop: function(){
+      running = false; last = 0;
+      if (raf){ cancelAnimationFrame(raf); raf = 0; }
+    },
+    resize: resize,
+    highlight: function(byFinger, lowest){
+      Object.keys(FINGER_MESH).forEach(function(id){
+        var mat = fingerMats[FINGER_MESH[id]];
+        if (!mat) return;
+        if ((byFinger[id] || []).length){
+          mat.color.set(FINGER_COLOR[id]);
+          mat.emissive.set(FINGER_COLOR[id]);
+          mat.metalness = 0.15;
+        } else {
+          mat.color.set(0xd5dde6);
+          mat.emissive.set(0x000000);
+          mat.metalness = 0.55;
+        }
+      });
+      playSide("L", lowest.L ? lowest.L.letter : null);
+      playSide("R", lowest.R ? lowest.R.letter : null);
+    }
+  };
+}
 function updateTypeHands(){
   var byFinger = {};
+  var lowest = { L:null, R:null };
   drops.forEach(function(d){
     var id = FINGER_OF[d.letter];
     if (!id) return;
     if (!byFinger[id]) byFinger[id] = [];
     byFinger[id].push(d.letter);
+    var side = id.charAt(0) === "l" ? "L" : "R";
+    if (!lowest[side] || d.y > lowest[side].y) lowest[side] = d;
   });
-  document.querySelectorAll("#typeHands .finger[data-finger]").forEach(function(el){
-    var letters = byFinger[el.getAttribute("data-finger")] || [];
-    el.classList.toggle("on", letters.length > 0);
-    var lab = el.querySelector(".finger-letters");
-    if (lab) lab.textContent = letters.join(" ");
-  });
+  var box = $("typeHandLetters");
+  if (box){
+    box.innerHTML = Object.keys(byFinger).map(function(id){
+      return byFinger[id].map(function(ch){
+        return '<span style="background:' + FINGER_COLOR[id] + '">' + ch + '</span>';
+      }).join("");
+    }).join("");
+  }
+  syncTypeHandView();
+  if (typeHandApi) typeHandApi.highlight(byFinger, lowest);
 }
 function startDrops(){
-  if (dropTimer || !profile) return;
+  if (!practiceOn || dropTimer || !profile) return;
   var rar = RARITIES[profile.rarity];
   var spawnMs = Math.max(1500, 3400/Math.max(1,(rar.goldMult+rar.diamondMult)/2));
   dropTimer = setInterval(function(){
@@ -2066,7 +2241,7 @@ function startDrops(){
       if (d.y>=96){ if (el) el.remove(); droppedOff = true; return false; }
       return true;
     });
-    if (droppedOff) updateTypeHands();
+    if (droppedOff || drops.length) updateTypeHands();
     var lowest = drops.slice().sort(function(a,b){ return b.y-a.y; })[0];
     tankState.chase = lowest ? { x:((lowest.x-50)/50)*6.6, z:0.4 } : null;
   }, 120);
@@ -2142,6 +2317,7 @@ function collectDrop(d, el){
   } else {
     profile.diamonds += 1; f.textContent = "+1 💎";
   }
+  playPickup(d.kind);
   layer.appendChild(f);
   setTimeout(function(){ f.remove(); }, 1150);
   var need = profile.level*40;
@@ -2170,9 +2346,30 @@ function syncTankHint(){
   var hint = $("tankHint");
   if (!hint) return;
   if (tankState.arranging) hint.textContent = "Kéo một món đồ trong hồ để dời chỗ nhé!";
+  else if (!practiceOn) hint.textContent = "Bấm Luyện ngón khi muốn chữ, xu và kim cương rơi xuống.";
   else if (tankState.fs) hint.textContent = "Nhìn ngón đang sáng, gõ chữ trên ngón đó để nhặt 🪙 💎";
   else hint.textContent = "Bấm chữ a–z ở giữa 🪙 💎, hoặc chạm, để nhặt nhé!";
 }
+var practiceOn = true;
+try { practiceOn = localStorage.getItem("island-practice") !== "0"; } catch (e) {}
+function setPractice(on){
+  practiceOn = !!on;
+  try { localStorage.setItem("island-practice", practiceOn ? "1" : "0"); } catch (e) {}
+  var stage = $("tankStage");
+  if (stage) stage.classList.toggle("practice", practiceOn);
+  $("practiceBtn").textContent = practiceOn ? "✋ Đang luyện" : "✋ Luyện ngón";
+  $("practiceBtn").classList.toggle("gold", practiceOn);
+  $("fsPracticeBtn").textContent = practiceOn ? "✋ Tắt luyện" : "✋ Luyện ngón";
+  $("fsPracticeBtn").classList.toggle("gold", practiceOn);
+  syncTankHint();
+  var onTank = $("scr-tank") && $("scr-tank").classList.contains("on");
+  if (practiceOn && onTank) startDrops();
+  else stopDrops();
+  syncTypeHandView();
+}
+setPractice(practiceOn);
+$("practiceBtn").onclick = function(){ setPractice(!practiceOn); };
+$("fsPracticeBtn").onclick = function(){ setPractice(!practiceOn); };
 function setArranging(on){
   tankState.arranging = on;
   $("tankStage").classList.toggle("arranging", !!on);
@@ -2180,6 +2377,7 @@ function setArranging(on){
   $("arrangeBtn").textContent = on ? "✓ Xong sắp xếp" : "🧲 Sắp xếp";
   $("fsArrangeBtn").textContent = on ? "✓ Xong" : "🧲 Sắp xếp";
   syncTankHint();
+  syncTypeHandView();
   if (on) refreshArrangeSelect();
 }
 $("arrangeBtn").onclick = function(){ setArranging(!tankState.arranging); };
@@ -2289,6 +2487,7 @@ function enterFullscreen(){
   var stage = $("tankStage");
   tankState.fs = true; stage.classList.add("fs");
   syncTankHint();
+  syncTypeHandView();
   if (stage.requestFullscreen) stage.requestFullscreen().catch(function(){});
   if (tankApi) setTimeout(tankApi.resize, 60);
 }
@@ -2296,10 +2495,14 @@ function exitFullscreen(){
   tankState.fs = false;
   $("tankStage").classList.remove("fs");
   syncTankHint();
+  syncTypeHandView();
   if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function(){});
   if (tankApi) setTimeout(tankApi.resize, 60);
 }
 $("fsBtn").onclick = enterFullscreen;
+["tankPick","fsTankPick"].forEach(function(id){
+  $(id).addEventListener("change", function(){ chooseTankScape(this.value); });
+});
 $("fsExitBtn").onclick = exitFullscreen;
 $("fsResetBtn").onclick = function(){ if (tankApi) tankApi.resetCamera(); };
 document.addEventListener("fullscreenchange", function(){
@@ -2307,6 +2510,7 @@ document.addEventListener("fullscreenchange", function(){
     // exited via Esc / system gesture
     tankState.fs = false; $("tankStage").classList.remove("fs");
     syncTankHint();
+    syncTypeHandView();
     if (tankApi) setTimeout(tankApi.resize, 60);
   }
 });
@@ -3097,12 +3301,145 @@ $("evoGrid").onclick = function(e){
   showEvoLevel(lv);
 };
 
+/* ============================== Tank audio ============================== */
+var soundOn = true;
+try { soundOn = localStorage.getItem("island-sound") !== "0"; } catch (e) {}
+var audioCtx = null, tankMusic = null;
+function audioContext(){
+  var AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  if (!audioCtx) audioCtx = new AC();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+function softTone(ctx, dest, freq, t, dur, vol, type){
+  var o = ctx.createOscillator();
+  var g = ctx.createGain();
+  o.type = type || "sine";
+  o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(Math.max(0.0002, vol), t + Math.min(0.08, dur * 0.3));
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(dest);
+  o.start(t); o.stop(t + dur + 0.03);
+}
+function playPickup(kind){
+  if (!soundOn) return;
+  var ctx = audioContext();
+  if (!ctx) return;
+  var t = ctx.currentTime;
+  if (kind === "diamond"){
+    softTone(ctx, ctx.destination, 1174, t, 0.16, 0.06, "sine");
+    softTone(ctx, ctx.destination, 1568, t + 0.07, 0.2, 0.05, "sine");
+    softTone(ctx, ctx.destination, 1975, t + 0.14, 0.28, 0.04, "triangle");
+  } else {
+    softTone(ctx, ctx.destination, 698, t, 0.1, 0.08, "triangle");
+    softTone(ctx, ctx.destination, 1046, t + 0.05, 0.26, 0.07, "sine");
+  }
+}
+function startTankMusic(){
+  if (!soundOn) return;
+  var ctx = audioContext();
+  if (!ctx || tankMusic) return;
+  var dry = ctx.createGain();
+  dry.gain.setValueAtTime(0.0001, ctx.currentTime);
+  dry.gain.exponentialRampToValueAtTime(0.55, ctx.currentTime + 1.4);
+  var wet = ctx.createGain();
+  wet.gain.value = 0.4;
+  var low = ctx.createBiquadFilter();
+  low.type = "lowpass";
+  low.frequency.value = 1600;
+  dry.connect(low); low.connect(ctx.destination);
+  var seconds = ctx.sampleRate * 2;
+  var impulse = ctx.createBuffer(2, seconds, ctx.sampleRate);
+  for (var c = 0; c < 2; c++){
+    var ch = impulse.getChannelData(c);
+    for (var i = 0; i < seconds; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / seconds, 2.6);
+  }
+  var reverb = ctx.createConvolver();
+  reverb.buffer = impulse;
+  dry.connect(reverb); reverb.connect(wet); wet.connect(low);
+  function hold(freq, vol){
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    o.type = "sine";
+    o.frequency.value = freq;
+    g.gain.value = vol;
+    o.connect(g); g.connect(dry);
+    o.start();
+    return o;
+  }
+  var oscs = [hold(110, 0.03), hold(110.6, 0.02), hold(164.81, 0.016), hold(220, 0.008)];
+  var noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+  var nd = noiseBuf.getChannelData(0);
+  for (var n = 0; n < nd.length; n++) nd[n] = Math.random() * 2 - 1;
+  var noise = ctx.createBufferSource();
+  noise.buffer = noiseBuf; noise.loop = true;
+  var bp = ctx.createBiquadFilter();
+  bp.type = "bandpass"; bp.frequency.value = 640; bp.Q.value = 0.6;
+  var ng = ctx.createGain(); ng.gain.value = 0.01;
+  noise.connect(bp); bp.connect(ng); ng.connect(dry);
+  noise.start();
+  oscs.push(noise);
+  var lfo = ctx.createOscillator();
+  var lg = ctx.createGain();
+  lfo.frequency.value = 0.06; lg.gain.value = 180;
+  lfo.connect(lg); lg.connect(bp.frequency);
+  lfo.start();
+  oscs.push(lfo);
+  var notes = [220, 261.63, 293.66, 329.63, 392, 329.63, 293.66, 246.94];
+  var step = 0, timers = [];
+  function bell(){
+    if (!tankMusic) return;
+    var now = ctx.currentTime;
+    var freq = notes[step % notes.length];
+    softTone(ctx, dry, freq, now, 1.5, 0.04, "sine");
+    if (step % 4 === 0) softTone(ctx, dry, freq * 1.5, now + 0.18, 1.1, 0.018, "triangle");
+    step++;
+    timers.push(setTimeout(bell, 1600));
+  }
+  tankMusic = { oscs: oscs, timers: timers, dry: dry };
+  bell();
+}
+function stopTankMusic(){
+  if (!tankMusic) return;
+  tankMusic.timers.forEach(function(id){ clearTimeout(id); });
+  tankMusic.oscs.forEach(function(o){ try { o.stop(); } catch (e) {} });
+  try { tankMusic.dry.disconnect(); } catch (e) {}
+  tankMusic = null;
+}
+function syncSoundButtons(){
+  $("soundBtn").textContent = soundOn ? "🔊 Nhạc hồ" : "🔇 Nhạc tắt";
+  $("soundBtn").classList.toggle("gold", soundOn);
+  $("fsSoundBtn").textContent = soundOn ? "🔊 Nhạc" : "🔇 Nhạc";
+  $("fsSoundBtn").classList.toggle("gold", soundOn);
+}
+function setSound(on){
+  soundOn = !!on;
+  try { localStorage.setItem("island-sound", soundOn ? "1" : "0"); } catch (e) {}
+  syncSoundButtons();
+  var onTank = $("scr-tank") && $("scr-tank").classList.contains("on");
+  if (soundOn && onTank) startTankMusic();
+  else stopTankMusic();
+}
+setSound(soundOn);
+$("soundBtn").onclick = function(){ setSound(!soundOn); };
+$("fsSoundBtn").onclick = function(){ setSound(!soundOn); };
+document.addEventListener("visibilitychange", function(){
+  if (document.visibilityState === "hidden") stopTankMusic();
+  else if (soundOn && $("scr-tank") && $("scr-tank").classList.contains("on")) startTankMusic();
+});
+document.addEventListener("pointerdown", function(){
+  if (soundOn && $("scr-tank") && $("scr-tank").classList.contains("on")) startTankMusic();
+});
+
 /* Hook drops into show(): start when entering tank, stop when leaving */
 (function(){
   var origShow = show;
   show = function(screen){
     origShow(screen);
-    if (screen==="tank") startDrops(); else stopDrops();
+    if (screen==="tank"){ startDrops(); startTankMusic(); }
+    else { stopDrops(); stopTankMusic(); }
     if (screen==="evo") startEvo(); else stopEvo();
   };
 })();
