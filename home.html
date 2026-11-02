@@ -531,10 +531,7 @@ var DECO_KINDS = [
   { id:"glow", label:"Rạn phát sáng", emoji:"✨", max:2, price:8, currency:"diamond", tab:"deco" },
   { id:"goldChest", label:"Rương Vàng", emoji:"👑", max:1, price:10, currency:"diamond", tab:"deco" },
   { id:"cluster", label:"Cụm cây & nấm biển", emoji:"🍄", max:1, price:10, currency:"diamond", tab:"deco" },
-  { id:"crown", label:"Vương miện vỏ sò & sao biển", emoji:"👑", max:1, price:12, currency:"diamond", tab:"deco" },
-  { id:"aquaneon", label:"Đàn cá neon", emoji:"🐟", max:2, price:60, currency:"gold", tab:"fish" },
-  { id:"cherryshrimp", label:"Tép cherry", emoji:"🦐", max:3, price:40, currency:"gold", tab:"deco" },
-  { id:"applesnail", label:"Ốc táo", emoji:"🐌", max:2, price:40, currency:"gold", tab:"deco" }
+  { id:"crown", label:"Vương miện vỏ sò & sao biển", emoji:"👑", max:1, price:12, currency:"diamond", tab:"deco" }
 ];
 var LEVEL_UP_COSTS = {1:3,2:5,3:8,4:12,5:17,6:23,7:30,8:38,9:47};
 (function(){
@@ -1473,6 +1470,22 @@ function startTank(){
     side: THREE.DoubleSide, depthWrite: false
   }));
   water.rotation.x = -Math.PI/2; water.position.y = TH-0.35; scene.add(water);
+  var scapeMixer = null;
+  gltfLoader2.loadAsync(ASSET+"aquascape-layout.glb").then(function(gltf){
+    var root = gltf.scene;
+    root.traverse(function(o){
+      if (!o.isMesh) return;
+      o.frustumCulled = false;
+      var list = Array.isArray(o.material) ? o.material : (o.material ? [o.material] : []);
+      list.forEach(function(m){ if (m && "vertexColors" in m) m.vertexColors = true; });
+    });
+    root.position.set(-0.42, 0.02, 0.32);
+    scene.add(root);
+    if (gltf.animations && gltf.animations.length){
+      scapeMixer = new THREE.AnimationMixer(root);
+      gltf.animations.forEach(function(clip){ scapeMixer.clipAction(clip).play(); });
+    }
+  }).catch(function(){});
   var bubGeo = new THREE.SphereGeometry(0.06,8,6);
   var bubMat = new THREE.MeshBasicMaterial({ color:0xcfeeff, transparent:true, opacity:0.5 });
   var tankLamp = new THREE.PointLight(0xffffff, 0, 14, 2);
@@ -1559,7 +1572,7 @@ function startTank(){
       var mode = def ? (def.mode||"floor") : "floor";
       var grp = makeProceduralDeco(d.kind);
       var holder = new THREE.Group(); holder.add(grp);
-      holder.position.set(d.x, mode==="float" ? 4.35 : (mode==="swim" ? 2.2 : (mode==="graze" || mode==="crawl" ? 0.02 : 0)), d.z);
+      holder.position.set(d.x, mode==="float" ? 4.35 : (mode==="swim" ? 2.2 : (mode==="graze" ? 0.02 : 0)), d.z);
       holder.traverse(function(o){ o.userData.decoKey = d.key; });
       decoGroup.add(holder);
       decoObjs[d.key] = { group: holder, kind: d.kind, mode: mode, phase: Math.random()*6.28, anchor:{x:d.x, z:d.z} };
@@ -1609,6 +1622,29 @@ function startTank(){
     });
   }
   function spawnFauna(){
+    var i;
+    for (i=0;i<16;i++){
+      addFauna("aquaneon", 0, 3, 0, {
+        mode:"school",
+        off:{ x:(Math.random()-0.5)*1.8, y:(Math.random()-0.5)*0.8, z:(Math.random()-0.5)*1.3 },
+        lag: Math.random()*0.8,
+        ph: Math.random()*6.28
+      }, 0.8);
+    }
+    for (i=0;i<9;i++){
+      var sx = -5 + Math.random()*10, sz = -2 + Math.random()*4.5;
+      addFauna("cherryshrimp", sx, 0.01, sz, {
+        mode:"bottom", speed:0.13, wait: Math.random()*3, yaw: Math.random()*6.28,
+        target: faunaBottomTarget(sx, sz)
+      }, 1.2);
+    }
+    for (i=0;i<4;i++){
+      var nx = -5 + Math.random()*10, nz = -1.5 + Math.random()*4;
+      addFauna("applesnail", nx, 0.01, nz, {
+        mode:"bottom", speed:0.045, wait: Math.random()*2, yaw: Math.random()*6.28,
+        target: faunaBottomTarget(nx, nz)
+      }, 2);
+    }
   }
   var faunaA = {x:0,y:0,z:0}, faunaB = {x:0,y:0,z:0};
   function faunaSchoolPoint(time, out){
@@ -1847,7 +1883,7 @@ function startTank(){
       f.group.rotation.z = Math.sin(t*3+f.phase)*0.08;
       if (f.mixer) f.mixer.update(dt);
     });
-    // shop creatures: swim, graze, and crawl
+    // decos and the tank's own neon school and shrimp
     function stepCreature(rec){
       if (rec.mixer) rec.mixer.update(dt);
       if (rec.mode==="swim"){
@@ -1872,13 +1908,12 @@ function startTank(){
           rec.group.rotation.y = rec.cruise.heading;
           rec.group.rotation.z = Math.sin(t*1.5+rec.phase)*0.05;
         }
-      } else if (rec.mode==="graze" || rec.mode==="crawl"){
-        var floorSpeed = rec.mode==="crawl" ? 0.05 : 0.16;
+      } else if (rec.mode==="graze"){
         if (!rec.cruise) rec.cruise = { x: rec.anchor.x, z: rec.anchor.z, heading: rec.phase*2, wait: 0.8 };
         rec.cruise.wait -= dt;
         if (rec.cruise.wait<=0){ rec.cruise.heading += (Math.random()-0.5)*1.1; rec.cruise.wait = 1.6+Math.random()*2.2; }
-        rec.cruise.x += Math.cos(rec.cruise.heading)*floorSpeed*dt;
-        rec.cruise.z -= Math.sin(rec.cruise.heading)*floorSpeed*dt;
+        rec.cruise.x += Math.cos(rec.cruise.heading)*0.16*dt;
+        rec.cruise.z -= Math.sin(rec.cruise.heading)*0.16*dt;
         if (rec.cruise.x>5.2 || rec.cruise.x<-5.2){ rec.cruise.heading = Math.PI-rec.cruise.heading; rec.cruise.x = Math.max(-5.2, Math.min(5.2, rec.cruise.x)); }
         if (rec.cruise.z>2.4 || rec.cruise.z<-2.4){ rec.cruise.heading = -rec.cruise.heading; rec.cruise.z = Math.max(-2.4, Math.min(2.4, rec.cruise.z)); }
         rec.group.position.set(rec.cruise.x, 0.02, rec.cruise.z);
@@ -1896,6 +1931,7 @@ function startTank(){
       if (bm.position.y > TH-0.7) bm.position.y = 0.2;
     });
     water.position.y = (TH-0.35) + Math.sin(t*0.8)*0.03;
+    if (scapeMixer) scapeMixer.update(dt);
     renderer.render(scene, camera);
   })();
   buildPet(); buildDecos(); buildShopFish(); spawnFauna(); applyCamera();
