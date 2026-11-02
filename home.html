@@ -66,6 +66,43 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 .light-chip{border:none;border-radius:999px;padding:5px 10px;font-weight:800;font-size:13px;color:#12303f;cursor:pointer}
 .stage.fs .fsbar{display:flex}
 .stage.fs{position:fixed;inset:0;z-index:50;border-radius:0;height:100dvh!important}
+#typeHands{display:none;position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;pointer-events:none;align-items:flex-end;gap:16px;user-select:none;max-width:calc(100% - 16px);padding:8px 12px 6px;background:rgba(8,28,38,.82);border-radius:20px;box-shadow:0 8px 22px rgba(0,0,0,.28)}
+.stage.fs #typeHands{display:flex}
+.stage.fs #tankHint{bottom:168px !important}
+.stage.fs.arranging #typeHands{display:none}
+.stage.fs.arranging #tankHint{bottom:6px !important}
+.type-hand{position:relative;width:188px;height:124px}
+.type-side{position:absolute;left:0;right:0;top:0;text-align:center;color:#fff;font-size:12px;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.75)}
+.type-fingers{position:absolute;left:0;right:0;bottom:0;height:102px;display:flex;align-items:flex-end;justify-content:center;gap:4px}
+.palm{position:absolute;left:18px;right:18px;bottom:0;height:40px;background:linear-gradient(#f8d7b4,#e8b48c);border-radius:22px;box-shadow:0 3px 0 rgba(80,40,20,.18)}
+.type-hand.left .palm{left:10px;right:26px}
+.type-hand.right .palm{left:26px;right:10px}
+.finger{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:34px;opacity:.72}
+.finger.on{opacity:1}
+.finger-letters{min-height:20px;margin-bottom:3px;padding:1px 5px 2px;border-radius:999px;font-size:15px;font-weight:900;line-height:18px;color:#fff;white-space:nowrap}
+.finger.on .finger-letters{background:var(--c);color:#12303f;box-shadow:0 0 0 2px #fff}
+.fingertip{width:26px;height:26px;border-radius:50%;background:var(--c);box-shadow:inset 0 -3px 0 rgba(0,0,0,.16)}
+.finger.on .fingertip{box-shadow:0 0 0 3px #fff,0 0 14px var(--c)}
+.finger-shaft{width:16px;height:36px;margin-top:-8px;border-radius:0 0 9px 9px;background:linear-gradient(#f8d7b4,#e8b48c)}
+.finger[data-finger="lp"] .finger-shaft,.finger[data-finger="rp"] .finger-shaft{height:26px}
+.finger[data-finger="lr"] .finger-shaft,.finger[data-finger="rr"] .finger-shaft{height:36px}
+.finger[data-finger="lm"] .finger-shaft,.finger[data-finger="rm"] .finger-shaft{height:46px}
+.finger[data-finger="li"] .finger-shaft,.finger[data-finger="ri"] .finger-shaft{height:40px}
+.finger.thumb{width:28px;margin-bottom:8px}
+.finger.thumb .fingertip{width:22px;height:22px;background:#e8b48c}
+.finger.thumb .finger-shaft{width:24px;height:16px;border-radius:10px;margin-top:-4px}
+.type-hand.left .finger.thumb .finger-shaft{transform:rotate(32deg)}
+.type-hand.right .finger.thumb .finger-shaft{transform:rotate(-32deg)}
+.drop-key.fingered{border-radius:999px;padding:1px 5px;text-shadow:none;box-shadow:0 0 0 2px #fff}
+@media (max-width:720px),(max-height:560px){
+  .type-hand{width:150px;height:108px}
+  .finger{width:26px}
+  .fingertip{width:20px;height:20px}
+  .finger-shaft{width:13px}
+  .finger[data-finger="lm"] .finger-shaft,.finger[data-finger="rm"] .finger-shaft{height:36px}
+  #typeHands{bottom:6px;padding:4px 8px 4px;gap:8px}
+  .stage.fs #tankHint{bottom:132px !important}
+}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px}
 .place-card{text-align:left;border:2px solid var(--line);background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
 .place-card .emo{font-size:34px}
@@ -274,6 +311,30 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
         <button type="button" class="light-chip" id="lightReset" style="background:#fff">Mặc định</button>
       </div>
     </div>
+    <div id="typeHands" aria-hidden="true">
+      <div class="type-hand left">
+        <div class="type-side">Tay trái</div>
+        <div class="type-fingers">
+          <div class="palm"></div>
+          <div class="finger" data-finger="lp" style="--c:#f472b6" title="Ngón út trái: q a z"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
+          <div class="finger" data-finger="lr" style="--c:#fb923c" title="Ngón áp út trái: w s x"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
+          <div class="finger" data-finger="lm" style="--c:#facc15" title="Ngón giữa trái: e d c"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
+          <div class="finger" data-finger="li" style="--c:#4ade80" title="Ngón trỏ trái: r t f g v b"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
+          <div class="finger thumb" title="Ngón cái trái"><span class="fingertip"></span><span class="finger-shaft"></span></div>
+        </div>
+      </div>
+      <div class="type-hand right">
+        <div class="type-side">Tay phải</div>
+        <div class="type-fingers">
+          <div class="palm"></div>
+          <div class="finger thumb" title="Ngón cái phải"><span class="fingertip"></span><span class="finger-shaft"></span></div>
+          <div class="finger" data-finger="ri" style="--c:#22d3ee" title="Ngón trỏ phải: y u h j n m"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
+          <div class="finger" data-finger="rm" style="--c:#60a5fa" title="Ngón giữa phải: i k"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
+          <div class="finger" data-finger="rr" style="--c:#a78bfa" title="Ngón áp út phải: o l"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
+          <div class="finger" data-finger="rp" style="--c:#fb7185" title="Ngón út phải: p"><span class="finger-letters"></span><span class="fingertip"></span><span class="finger-shaft"></span></div>
+        </div>
+      </div>
+    </div>
     <p id="tankHint" style="position:absolute;inset-inline:0;bottom:6px;text-align:center;color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.6);pointer-events:none;margin:0">Bấm chữ a–z ở giữa 🪙 💎, hoặc chạm, để nhặt nhé!</p>
   </div>
   <div class="toolbar">
@@ -296,7 +357,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
       <button class="btn small" id="arrangeDone">✓ Xong</button>
     </div>
   </div>
-  <p class="mut">Kéo trên vùng nước để xoay hồ 3D, chụm 2 ngón hoặc lăn chuột để phóng to. Nút Đèn RGB đổi màu hoặc tắt đèn. Trong toàn màn hình, nút Sắp xếp và Đèn nằm ở góc phải.</p>
+  <p class="mut">Kéo trên vùng nước để xoay hồ 3D, chụm 2 ngón hoặc lăn chuột để phóng to. Nút Đèn RGB đổi màu hoặc tắt đèn. Trong toàn màn hình, nút Sắp xếp và Đèn nằm ở góc phải, và hai bàn tay hiện phía dưới: ngón đang sáng là ngón cần gõ.</p>
 </section>
 
 <!-- QUIZ -->
@@ -1957,6 +2018,35 @@ function refreshArrangeSelect(){
 
 /* ============================== Drops ============================== */
 var drops = [], dropTimer = null, fallTimer = null, dropSeq = 0;
+var FINGER_OF = {
+  q:"lp", a:"lp", z:"lp",
+  w:"lr", s:"lr", x:"lr",
+  e:"lm", d:"lm", c:"lm",
+  r:"li", t:"li", f:"li", g:"li", v:"li", b:"li",
+  y:"ri", u:"ri", h:"ri", j:"ri", n:"ri", m:"ri",
+  i:"rm", k:"rm",
+  o:"rr", l:"rr",
+  p:"rp"
+};
+var FINGER_COLOR = {
+  lp:"#f472b6", lr:"#fb923c", lm:"#facc15", li:"#4ade80",
+  ri:"#22d3ee", rm:"#60a5fa", rr:"#a78bfa", rp:"#fb7185"
+};
+function updateTypeHands(){
+  var byFinger = {};
+  drops.forEach(function(d){
+    var id = FINGER_OF[d.letter];
+    if (!id) return;
+    if (!byFinger[id]) byFinger[id] = [];
+    byFinger[id].push(d.letter);
+  });
+  document.querySelectorAll("#typeHands .finger[data-finger]").forEach(function(el){
+    var letters = byFinger[el.getAttribute("data-finger")] || [];
+    el.classList.toggle("on", letters.length > 0);
+    var lab = el.querySelector(".finger-letters");
+    if (lab) lab.textContent = letters.join(" ");
+  });
+}
 function startDrops(){
   if (dropTimer || !profile) return;
   var rar = RARITIES[profile.rarity];
@@ -1968,13 +2058,15 @@ function startDrops(){
     drops.push(d); renderDrop(d);
   }, spawnMs);
   fallTimer = setInterval(function(){
+    var droppedOff = false;
     drops = drops.filter(function(d){
       d.y += d.speed*0.55;
       var el = document.querySelector('[data-drop="'+d.id+'"]');
       if (el) el.style.top = d.y + "%";
-      if (d.y>=96){ if (el) el.remove(); return false; }
+      if (d.y>=96){ if (el) el.remove(); droppedOff = true; return false; }
       return true;
     });
+    if (droppedOff) updateTypeHands();
     var lowest = drops.slice().sort(function(a,b){ return b.y-a.y; })[0];
     tankState.chase = lowest ? { x:((lowest.x-50)/50)*6.6, z:0.4 } : null;
   }, 120);
@@ -1985,6 +2077,7 @@ function stopDrops(){
   dropTimer = null; fallTimer = null; drops = [];
   var layer = $("dropLayer"); if (layer) layer.innerHTML = "";
   tankState.chase = null;
+  updateTypeHands();
 }
 function rollDropLetter(){
   var used = {};
@@ -2010,11 +2103,18 @@ function renderDrop(d){
   var key = document.createElement("span");
   key.className = "drop-key";
   key.textContent = d.letter;
+  var fingerColor = FINGER_COLOR[FINGER_OF[d.letter]];
+  if (fingerColor){
+    key.classList.add("fingered");
+    key.style.background = fingerColor;
+    b.style.boxShadow = "0 0 0 3px " + fingerColor;
+  }
   b.appendChild(ico);
   b.appendChild(key);
   b.setAttribute("aria-label", (d.kind==="gold" ? "Nhặt xu vàng" : "Nhặt kim cương") + ", phím " + d.letter);
   b.onclick = function(){ collectDrop(d, b); };
   layer.appendChild(b);
+  updateTypeHands();
 }
 document.addEventListener("keydown", function(e){
   if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -2052,6 +2152,7 @@ function collectDrop(d, el){
     if (tankApi) tankApi.rebuild();
   } else if (profile.xp >= need){ profile.xp = need-1; }
   saveProfile(false); refreshWallets();
+  updateTypeHands();
 }
 
 /* ============================== Tank controls ============================== */
@@ -2065,12 +2166,20 @@ $("decoClose").onclick = function(){ $("decoOverlay").classList.remove("on"); };
     if (e.target === overlay) overlay.classList.remove("on");
   });
 });
+function syncTankHint(){
+  var hint = $("tankHint");
+  if (!hint) return;
+  if (tankState.arranging) hint.textContent = "Kéo một món đồ trong hồ để dời chỗ nhé!";
+  else if (tankState.fs) hint.textContent = "Nhìn ngón đang sáng, gõ chữ trên ngón đó để nhặt 🪙 💎";
+  else hint.textContent = "Bấm chữ a–z ở giữa 🪙 💎, hoặc chạm, để nhặt nhé!";
+}
 function setArranging(on){
   tankState.arranging = on;
+  $("tankStage").classList.toggle("arranging", !!on);
   $("arrangeBar").style.display = on ? "block" : "none";
   $("arrangeBtn").textContent = on ? "✓ Xong sắp xếp" : "🧲 Sắp xếp";
   $("fsArrangeBtn").textContent = on ? "✓ Xong" : "🧲 Sắp xếp";
-  $("tankHint").textContent = on ? "Kéo một món đồ trong hồ để dời chỗ nhé!" : "Bấm chữ a–z ở giữa 🪙 💎, hoặc chạm, để nhặt nhé!";
+  syncTankHint();
   if (on) refreshArrangeSelect();
 }
 $("arrangeBtn").onclick = function(){ setArranging(!tankState.arranging); };
@@ -2179,12 +2288,14 @@ $("levelUpBtn").onclick = function(){
 function enterFullscreen(){
   var stage = $("tankStage");
   tankState.fs = true; stage.classList.add("fs");
+  syncTankHint();
   if (stage.requestFullscreen) stage.requestFullscreen().catch(function(){});
   if (tankApi) setTimeout(tankApi.resize, 60);
 }
 function exitFullscreen(){
   tankState.fs = false;
   $("tankStage").classList.remove("fs");
+  syncTankHint();
   if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function(){});
   if (tankApi) setTimeout(tankApi.resize, 60);
 }
@@ -2195,6 +2306,7 @@ document.addEventListener("fullscreenchange", function(){
   if (!document.fullscreenElement && tankState.fs){
     // exited via Esc / system gesture
     tankState.fs = false; $("tankStage").classList.remove("fs");
+    syncTankHint();
     if (tankApi) setTimeout(tankApi.resize, 60);
   }
 });
