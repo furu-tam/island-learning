@@ -1214,8 +1214,10 @@ function makeDragonGroup(gltf, level){
   var holder = new THREE.Group();
   holder.add(inst);
   var mixer = null;
-  var clip = gltf.animations && THREE.AnimationClip && THREE.AnimationClip.findByName(gltf.animations, "KimLongFly");
-  if (clip){
+  var srcClip = gltf.animations && THREE.AnimationClip && THREE.AnimationClip.findByName(gltf.animations, "KimLongSwim");
+  if (srcClip){
+    var tracks = srcClip.tracks.filter(function(tr){ return tr.name.indexOf(".position") < 0; });
+    var clip = new THREE.AnimationClip(srcClip.name, srcClip.duration, tracks);
     mixer = new THREE.AnimationMixer(inst);
     mixer.clipAction(clip).play();
     mixer.update(0.016);
