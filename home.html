@@ -144,7 +144,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 <!-- REGISTER -->
 <section class="screen" id="scr-register">
   <h1>🎁 Chào bạn nhỏ!</h1>
-  <p class="sub">Đặt tên cho mình, chọn lớp đang học, rồi mở hộp quà để nhận ngẫu nhiên cá mập hoặc cua nhé.</p>
+  <p class="sub">Đặt tên cho mình, chọn lớp đang học, rồi mở hộp quà để nhận ngẫu nhiên cá chép hoặc cua nhé.</p>
   <div class="card">
     <label for="nameInput" style="font-weight:800">Biệt danh trong game — không cần tên thật</label>
     <input type="text" id="nameInput" maxlength="30" placeholder="Ví dụ: Bạn nhỏ" autocomplete="off" style="margin:8px 0 14px" />
@@ -162,11 +162,11 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 <section class="screen" id="scr-gift">
   <div class="center">
     <h1>Hộp quà của bạn!</h1>
-    <p class="sub">Chạm vào hộp quà để xem bạn nhận cá mập hay cua nhé.</p>
+    <p class="sub">Chạm vào hộp quà để xem bạn nhận cá chép hay cua nhé.</p>
     <button class="giftbox" id="giftBox" aria-label="Mở hộp quà">🎁</button>
     <div id="giftReveal" style="display:none">
-      <div style="font-size:96px" id="giftEmoji">🦈</div>
-      <h2 id="giftName">Cá mập</h2>
+      <div style="font-size:96px" id="giftEmoji">🐟</div>
+      <h2 id="giftName">Cá chép</h2>
       <p><span class="rarity" id="giftRarity">Thường</span></p>
       <p class="sub" id="giftDetail"></p>
       <button class="btn" id="giftGo">🏝️ Vào Đảo Học Vui</button>
@@ -207,7 +207,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
   <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
     <h2>🌳 Nhà tiến hóa</h2>
   </div>
-  <p class="sub" id="evoIntro">Cùng một dạng từ Lv.1 đến Lv.10, to dần và đậm màu dần. Lv.11 đến Lv.30 còn khóa.</p>
+  <p class="sub" id="evoIntro">Cá chép: Lv.1–10 to dần và đậm màu dần. Từ Lv.11 hóa rồng vàng đến Lv.30.</p>
   <div class="stage" id="evoStage">
     <div id="evoMount" style="position:absolute;inset:0"></div>
     <div id="evoLock" style="display:none;position:absolute;inset:0;z-index:3;background:rgba(8,30,40,.94);color:#fff;align-items:center;justify-content:center;text-align:center;padding:18px">
@@ -233,7 +233,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <div id="tankMount" style="position:absolute;inset:0"></div>
     <div id="dropLayer" style="position:absolute;inset:0;overflow:hidden"></div>
     <div class="hud">
-      <span class="pill" id="petChip">🦈 Cá mập · Lv.1</span>
+      <span class="pill" id="petChip">🐟 Cá chép · Lv.1</span>
       <span class="pill" id="xpChip">XP 0</span>
     </div>
     <div class="fsbar">
@@ -417,19 +417,26 @@ var RARITIES = {
   legendary: { label:"Huyền thoại", emoji:"🟠", startLevel:6, goldMult:3.5, diamondMult:5, color:"#ea580c", bg:"#ffedd5" }
 };
 var PETS = {
-  shark:  { label:"Cá mập", emoji:"🦈" },
+  shark:  { label:"Cá chép", emoji:"🐟" },
   crab:   { label:"Cua", emoji:"🦀" },
   shrimp: { label:"Tôm", emoji:"🦐" },
   snake:  { label:"Rắn → Rồng", emoji:"🐉" }
 };
 var PET_NAMES = {
-  shark:["Mập Bột","Mập Con","Mập Nhí","Mập Teen","Mập Khỏe","Mập Vua"],
+  shark:["Chép Bột","Chép Con","Chép Nhí","Chép Lửa","Chép Vàng"],
   crab:["Cua Bột","Cua Con","Cua Nhí","Cua Càng To","Cua Chúa","Cua Vua"],
   shrimp:["Tôm Bột","Tôm Con","Tôm Nhí","Tôm Nhảy","Tôm Chúa","Tôm Vua"],
   snake:["Rắn Con","Rắn Nhí","Rắn Dài","Rắn Mạnh","Rồng Con","Rồng Vua"]
 };
+var DRAGON_NAMES = ["Rồng Con","Rồng Nhí","Rồng Bay","Kim Long","Kim Long Vua"];
+function petLevelMax(pet){ return pet==="shark" ? 30 : 10; }
+function petEmoji(pet, level){
+  if (pet==="shark" && level>=11) return "🐉";
+  return (PETS[pet] && PETS[pet].emoji) || "🐾";
+}
 function petDisplayName(pet, level){
   if (pet==="snake" && level>=5) return "Rồng biển";
+  if (pet==="shark" && level>=11) return DRAGON_NAMES[Math.min(DRAGON_NAMES.length-1, Math.floor((level-11)/4))];
   var list = PET_NAMES[pet] || [PETS[pet].label];
   var idx = Math.min(list.length-1, Math.max(0, Math.ceil(level/2)-1));
   return list[idx];
@@ -493,6 +500,10 @@ var DECO_KINDS = [
   { id:"crown", label:"Vương miện vỏ sò & sao biển", emoji:"👑", max:1, price:12, currency:"diamond", tab:"deco" }
 ];
 var LEVEL_UP_COSTS = {1:3,2:5,3:8,4:12,5:17,6:23,7:30,8:38,9:47};
+(function(){
+  var cost = 47, step = 10;
+  for (var lv=10; lv<=29; lv++){ cost += step; step += 1; LEVEL_UP_COSTS[lv] = cost; }
+})();
 var QUIZ_REWARDS = {1:5, 2:8, 3:12};
 var DEFAULT_DECO_COUNTS = {};
 var DEFAULT_POS = {};
@@ -579,7 +590,7 @@ function refreshWallets(){
     $("tankName").textContent = profile.name;
     $("gradeChip").textContent = "📚 Đang học Lớp " + profile.grade;
     var rar = RARITIES[profile.rarity];
-    $("petChip").textContent = PETS[profile.giftPet].emoji + " " + petDisplayName(profile.giftPet, profile.level) + " · " + rar.label + " · Lv." + profile.level;
+    $("petChip").textContent = petEmoji(profile.giftPet, profile.level) + " " + petDisplayName(profile.giftPet, profile.level) + " · " + rar.label + " · Lv." + profile.level;
     $("xpChip").textContent = "XP " + profile.xp + " / " + (profile.level*40);
     var bank = profile.grade===1 ? QUIZ1 : QUIZ6;
     var totalLevels = bank.topics.length*3;
@@ -593,10 +604,13 @@ function refreshWallets(){
     $("vanCardDesc").textContent = "2 dàn ý · 2 bài mẫu · 20 câu · " + vanPassed + "/2 bài đã qua" + (vanMiss ? " · còn " + vanMiss + " câu sai" : "");
     var examBest = profile.quizBest["exam:toan6"];
     $("examCardDesc").textContent = "Toán 6 · 20 câu · 30 phút" + (profile.quizPassed.indexOf("exam:toan6")>=0 ? " · đã qua" : "") + (examBest!=null ? " · kỷ lục " + examBest + "%" : "");
-    $("evoCardDesc").textContent = PETS[profile.giftPet].emoji + " đang Lv." + profile.level + " · xem dạng 1–10 · 11–30 khóa";
-    $("petCardDesc").textContent = PETS[profile.giftPet].emoji + " " + petDisplayName(profile.giftPet, profile.level) + " (" + PETS[profile.giftPet].label + ", " + rar.label + " Lv." + profile.level + ") đang chờ trong hồ";
-    var cost = LEVEL_UP_COSTS[profile.level];
-    $("levelUpBtn").textContent = cost ? ("⬆️ Level Up · " + cost + " 💎") : "👑 Đã Lv.10 tối đa";
+    var maxLv = petLevelMax(profile.giftPet);
+    $("evoCardDesc").textContent = profile.giftPet==="shark"
+      ? (petEmoji(profile.giftPet, profile.level) + " đang Lv." + profile.level + " · Lv.1–10 cá chép · Lv.11–30 rồng")
+      : (PETS[profile.giftPet].emoji + " đang Lv." + profile.level + " · xem dạng 1–10 · 11–30 khóa");
+    $("petCardDesc").textContent = petEmoji(profile.giftPet, profile.level) + " " + petDisplayName(profile.giftPet, profile.level) + " (" + (profile.giftPet==="shark" && profile.level>=11 ? "Rồng vàng" : PETS[profile.giftPet].label) + ", " + rar.label + " Lv." + profile.level + ") đang chờ trong hồ";
+    var cost = profile.level < maxLv ? LEVEL_UP_COSTS[profile.level] : 0;
+    $("levelUpBtn").textContent = cost ? ("⬆️ Level Up · " + cost + " 💎") : ("👑 Đã Lv." + maxLv + " tối đa");
   }
 }
 
@@ -1177,6 +1191,52 @@ function makeSharkGroup(gltf, level){
   }
   return { group: holder, inst: inst, mixer: mixer };
 }
+function dragonShadeT(level){
+  var lv = Math.max(11, Math.min(30, level));
+  return (lv - 11) / 19;
+}
+function makeDragonGroup(gltf, level){
+  var inst = gltf.scene;
+  var t = dragonShadeT(level);
+  var shade = 1.06 - t*0.4;
+  inst.traverse(function(o){
+    if (!o.isMesh || !o.material) return;
+    o.frustumCulled = false;
+    var list = Array.isArray(o.material) ? o.material : [o.material];
+    var cloned = list.map(function(m){
+      var c = m.clone();
+      if (c.color) c.color.multiplyScalar(shade);
+      if (typeof c.emissiveIntensity==="number") c.emissiveIntensity *= (1.08 - t*0.35);
+      return c;
+    });
+    o.material = Array.isArray(o.material) ? cloned : cloned[0];
+  });
+  var holder = new THREE.Group();
+  holder.add(inst);
+  var mixer = null;
+  var clip = gltf.animations && THREE.AnimationClip && THREE.AnimationClip.findByName(gltf.animations, "KimLongFly");
+  if (clip){
+    mixer = new THREE.AnimationMixer(inst);
+    mixer.clipAction(clip).play();
+    mixer.update(0.016);
+  }
+  holder.updateMatrixWorld(true);
+  var box = new THREE.Box3();
+  var v = new THREE.Vector3();
+  inst.traverse(function(o){ if (o.isBone){ o.getWorldPosition(v); box.expandByPoint(v); } });
+  if (box.isEmpty()) box.setFromObject(holder);
+  var size = new THREE.Vector3(); box.getSize(size);
+  var maxDim = Math.max(size.x, size.y, size.z) || 1;
+  var fit = 3.1 + t*2.0;
+  inst.scale.multiplyScalar(fit / maxDim);
+  holder.updateMatrixWorld(true);
+  box.makeEmpty();
+  inst.traverse(function(o){ if (o.isBone){ o.getWorldPosition(v); box.expandByPoint(v); } });
+  var center = new THREE.Vector3(); box.getCenter(center);
+  inst.position.sub(center);
+  box.getSize(size);
+  return { group: holder, inst: inst, mixer: mixer, height: size.y || fit*0.5 };
+}
 function makeCrabGroup(gltf, level){
   var map = loadTex(ASSET+"cc0-japanese-freshwater-crab/textures/texture2048_0.jpeg", true);
   var mat = new THREE.MeshStandardMaterial({ map: map, roughness: 0.78, metalness: 0.04, skinning: true, side: THREE.DoubleSide });
@@ -1349,13 +1409,14 @@ function startTank(){
     sharkMixer = null; sharkIdle = null; sharkSpeed = null;
     petInner = makePetMesh(profile.giftPet, profile.level);
     petGroup.add(petInner);
-    var lvNow = Math.max(1, Math.min(10, profile.level));
+    var lvNow = Math.max(1, Math.min(petLevelMax(profile.giftPet), profile.level));
     if (profile.giftPet==="shark"){
       var expectShark = petInner;
-      gltfLoader2.loadAsync(ASSET+"carp-dragon-gold.glb").then(function(gltf){
+      var dragonNow = lvNow >= 11;
+      gltfLoader2.loadAsync(ASSET+(dragonNow ? "golden-dragon.glb" : "carp-dragon-gold.glb")).then(function(gltf){
         if (petInner !== expectShark || !petInner.userData.isFallbackShark) return;
         try {
-          var built = makeSharkGroup(gltf, lvNow);
+          var built = dragonNow ? makeDragonGroup(gltf, lvNow) : makeSharkGroup(gltf, lvNow);
           petGroup.remove(petInner); petInner = built.group; petGroup.add(built.group);
           sharkMixer = built.mixer;
         } catch(e){ /* keep fallback */ }
@@ -1701,7 +1762,7 @@ function collectDrop(d, el){
   setTimeout(function(){ f.remove(); }, 1150);
   var need = profile.level*40;
   profile.xp += 5;
-  if (profile.xp >= need && profile.level < 10){
+  if (profile.xp >= need && profile.level < petLevelMax(profile.giftPet)){
     profile.xp -= need; profile.level += 1;
     toast("🎉 " + petDisplayName(profile.giftPet, profile.level) + " lên cấp " + profile.level + "!");
     if (tankApi) tankApi.rebuild();
@@ -1747,13 +1808,16 @@ document.querySelectorAll("[data-nudge]").forEach(function(b){
   });
 });
 $("levelUpBtn").onclick = function(){
-  var cost = LEVEL_UP_COSTS[profile.level];
-  if (!cost){ toast("👑 Bạn thú đã đạt Lv.10 tối đa rồi!"); return; }
+  var maxLv = petLevelMax(profile.giftPet);
+  var cost = profile.level < maxLv ? LEVEL_UP_COSTS[profile.level] : 0;
+  if (!cost){ toast("👑 Bạn thú đã đạt Lv." + maxLv + " tối đa rồi!"); return; }
   if (profile.diamonds < cost){ toast("Chưa đủ kim cương 💎 — lên Lv." + (profile.level+1) + " cần " + cost + " 💎, ví còn " + profile.diamonds + " 💎"); return; }
   profile.diamonds -= cost; profile.level += 1;
   saveProfile(true); refreshWallets();
   if (tankApi) tankApi.rebuild();
-  var extra = (profile.giftPet==="shark" || profile.giftPet==="crab") ? " To và đậm màu hơn rồi!" : "";
+  var extra = "";
+  if (profile.giftPet==="shark" && profile.level===11) extra = " Hóa thành rồng vàng rồi!";
+  else if (profile.giftPet==="shark" || profile.giftPet==="crab") extra = " To và đậm màu hơn rồi!";
   toast("🎉 " + petDisplayName(profile.giftPet, profile.level) + " lên Lv." + profile.level + "!" + extra + " Đã trừ " + cost + " 💎");
 };
 function enterFullscreen(){
@@ -2366,15 +2430,15 @@ function finishQuiz(){
 $("resBack").onclick = function(){ openQuizHome(); };
 
 /* ============================== Evolution house ============================== */
-var PET_LEVEL_OPEN = 10;
 var PET_LEVEL_TOTAL = 30;
 var evoApi = null;
 var evoToken = 0;
 var evoSel = 1;
 function renderEvoGrid(){
   var html = "";
+  var openMax = petLevelMax(profile.giftPet);
   for (var lv=1; lv<=PET_LEVEL_TOTAL; lv++){
-    var open = lv<=PET_LEVEL_OPEN;
+    var open = lv<=openMax;
     var cls = "evo-lv" + (lv===profile.level?" now":"") + (lv===evoSel?" sel":"") + (open?"":" lock");
     html += '<button type="button" class="' + cls + '" data-lv="' + lv + '">' + (open?lv:("🔒"+lv)) + '</button>';
   }
@@ -2384,23 +2448,27 @@ function showEvoLevel(lv){
   evoSel = lv;
   renderEvoGrid();
   var pet = profile.giftPet;
-  var open = lv<=PET_LEVEL_OPEN;
+  var open = lv<=petLevelMax(pet);
   var lock = $("evoLock");
   lock.style.display = open ? "none" : "flex";
-    if (!open){
+  if (!open){
       $("evoLockText").textContent = "Lv." + lv + " chưa mở";
       $("evoName").textContent = "🔒 Lv." + lv + " đang khóa";
       if (evoApi) evoApi.clear();
       return;
     }
-  $("evoName").textContent = PETS[pet].emoji + " " + petDisplayName(pet, lv) + " · Lv." + lv + (lv===profile.level?" · đang nuôi":"");
+  $("evoName").textContent = petEmoji(pet, lv) + " " + petDisplayName(pet, lv) + " · Lv." + lv + (lv===profile.level?" · đang nuôi":"");
   if (evoApi) evoApi.setLevel(lv);
 }
 function startEvo(){
   if (!profile) return;
   var pet = PETS[profile.giftPet];
-  $("evoIntro").textContent = pet.emoji + " " + pet.label + " đang Lv." + profile.level + ". Cùng một dạng từ Lv.1 đến Lv.10, to dần và đậm màu dần. Lv.11–30 còn khóa.";
-  evoSel = Math.max(1, Math.min(PET_LEVEL_OPEN, profile.level||1));
+  if (profile.giftPet==="shark"){
+    $("evoIntro").textContent = "🐟 Cá chép đang Lv." + profile.level + ". Lv.1–10 là cá chép, to dần và đậm màu dần. Từ Lv.11 hóa rồng vàng, tiếp tục to và đậm đến Lv.30.";
+  } else {
+    $("evoIntro").textContent = pet.emoji + " " + pet.label + " đang Lv." + profile.level + ". Cùng một dạng từ Lv.1 đến Lv.10, to dần và đậm màu dần. Lv.11–30 còn khóa.";
+  }
+  evoSel = Math.max(1, Math.min(petLevelMax(profile.giftPet), profile.level||1));
   if (!HAS_THREE){
     renderEvoGrid();
     showEvoLevel(evoSel);
@@ -2452,16 +2520,30 @@ function startEvo(){
         var mesh = makePetMesh(profile.giftPet, lv);
         petRoot.add(mesh);
         petRoot.rotation.y = 0.4;
-        petRoot.position.y = profile.giftPet==="shark" ? 0.92 : 0;
-        function swap(group){
+        var asDragon = profile.giftPet==="shark" && lv>=11;
+        petRoot.position.y = profile.giftPet==="shark" ? (asDragon ? 1.2 : 0.92) : 0;
+        function swap(group, lift){
           if (token!==evoToken) return;
           petRoot.remove(mesh); mesh = group; petRoot.add(group);
+          if (lift) petRoot.position.y = lift;
         }
-        if (profile.giftPet==="shark"){
+        if (asDragon){
+          gltfLoader2.loadAsync(ASSET+"golden-dragon.glb").then(function(gltf){
+            if (token!==evoToken) return;
+            var built = makeDragonGroup(gltf, lv);
+            swap(built.group, Math.max(0.95, built.height*0.42 + 0.18));
+            var dist = 5.15 + dragonShadeT(lv)*1.35;
+            camera.position.set(1.45, 1.35, dist);
+            camera.lookAt(0, 0.85, 0);
+            mixer = built.mixer;
+          }).catch(function(){});
+        } else if (profile.giftPet==="shark"){
           gltfLoader2.loadAsync(ASSET+"carp-dragon-gold.glb").then(function(gltf){
             if (token!==evoToken) return;
             var built = makeSharkGroup(gltf, lv);
-            swap(built.group);
+            swap(built.group, 0.92);
+            camera.position.set(1.6, 1.5, 5.2);
+            camera.lookAt(0, 0.7, 0);
             mixer = built.mixer;
           }).catch(function(){});
         } else if (profile.giftPet==="crab"){
@@ -2486,7 +2568,7 @@ $("evoGrid").onclick = function(e){
   var b = e.target.closest("[data-lv]");
   if (!b || !profile) return;
   var lv = parseInt(b.getAttribute("data-lv"), 10);
-  if (lv>PET_LEVEL_OPEN) toast("Lv." + lv + " còn khóa. Hiện chỉ mở đến Lv.10.");
+  if (lv>petLevelMax(profile.giftPet)) toast("Lv." + lv + " còn khóa. Hiện chỉ mở đến Lv." + petLevelMax(profile.giftPet) + ".");
   showEvoLevel(lv);
 };
 
