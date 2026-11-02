@@ -797,8 +797,9 @@ var REAL_DECO = {
   neontetra:{ url:ASSET+"swim-neon.glb", size:1.15, mode:"swim", centerY:true, makeMat:function(){ return new THREE.MeshStandardMaterial({ map:loadTex(ASSET+"neon-diffuse.png",true), normalMap:loadTex(ASSET+"neon-normal.jpg",false), normalScale:new THREE.Vector2(0.6,0.6), roughness:0.5, metalness:0.05, alphaTest:0.3, side:THREE.DoubleSide }); } },
   bluejelly:{ url:ASSET+"blue-jellyfish/jellyfish.glb", size:1.85, mode:"swim", centerY:true, pulse:true, makeMat:function(){ var map=loadTex(ASSET+"blue-jellyfish/Jellyfish2.png",true); return new THREE.MeshStandardMaterial({ map:map, emissive:0x60a5fa, emissiveMap:map, emissiveIntensity:0.18, roughness:0.35, metalness:0.02, transparent:true, opacity:0.94, side:THREE.DoubleSide, depthWrite:false }); } },
   colorjelly:{ url:ASSET+"colorful-jellyfish/jellyfish.glb", size:1.85, mode:"swim", centerY:true, pulse:true, makeMat:function(){ var map=loadTex(ASSET+"colorful-jellyfish/Jellyfish1_albedo.jpeg",true); return new THREE.MeshStandardMaterial({ map:map, emissive:0xff7aa2, emissiveMap:map, emissiveIntensity:0.16, roughness:0.4, metalness:0.02, transparent:true, opacity:0.92, side:THREE.DoubleSide, depthWrite:false }); } },
-  aquaneon:{ url:ASSET+"fauna-neon-tetra.glb", size:2.6, mode:"swim", centerY:true, keepMat:true, swimClip:"Swim" },
-  cherryshrimp:{ url:ASSET+"fauna-cherry-shrimp.glb", size:1.8, mode:"graze", keepMat:true, swimClip:"Graze" },
+  aquaneon:{ url:ASSET+"fauna-neon-tetra.glb", size:1.15, mode:"swim", centerY:true, keepMat:true, swimClip:"Swim" },
+  cherryshrimp:{ url:ASSET+"fauna-cherry-shrimp.glb", size:0.85, mode:"graze", keepMat:true, swimClip:"Graze" },
+  applesnail:{ url:ASSET+"fauna-apple-snail.glb", size:1.45, mode:"crawl", keepMat:true, swimClip:"Crawl" },
   boat:    { url:ASSET+"decor-boat.glb", size:3.2, mode:"float", yaw:Math.PI/2, keepMat:true },
   fisherboat:{ url:ASSET+"decor-fisherboat.glb", size:3.4, mode:"float", makeMat:function(){ return decorMat(ASSET+"fisherboat-diffuse.jpg", ASSET+"fisherboat-normal.jpg", 0.6); } },
   crown:   { url:ASSET+"decor-crown.glb", size:2.4, keepMat:true }
@@ -852,8 +853,10 @@ function buildRealInstance(kind, tpl){
       var clip = THREE.AnimationClip.findByName(clipCache[kind], def.swimClip);
       if (clip){
         var mixer = new THREE.AnimationMixer(inner);
-        mixer.clipAction(clip).play();
+        var action = mixer.clipAction(clip);
+        action.play();
         holder.userData.mixer = mixer;
+        holder.userData.action = action;
         inner.traverse(function(o){ if (o.isMesh) o.frustumCulled = false; });
       }
     } catch (e) { /* keep the mesh even if the swim clip cannot play */ }
@@ -925,6 +928,11 @@ function makeProceduralDeco(kind){
   } else if (REAL_DECO[kind] && REAL_DECO[kind].mode==="graze"){
     var sh = new THREE.Mesh(new THREE.SphereGeometry(0.16,10,8), stdMat(0xef4444,{roughness:0.4}));
     sh.scale.set(1.8,0.5,0.7); sh.position.y = 0.08; g.add(sh);
+  } else if (kind==="applesnail"){
+    var shell = new THREE.Mesh(new THREE.SphereGeometry(0.22,10,8), stdMat(0xf5c542,{roughness:0.35}));
+    shell.position.set(-0.04, 0.18, 0); g.add(shell);
+    var foot = new THREE.Mesh(new THREE.SphereGeometry(0.1,8,6), stdMat(0xf6e7c1,{roughness:0.5}));
+    foot.scale.set(1.6,0.45,0.8); foot.position.set(0.12,0.05,0); g.add(foot);
   } else if (REAL_DECO[kind] && REAL_DECO[kind].mode==="float"){
     var hull = new THREE.Mesh(new THREE.BoxGeometry(2.0,0.5,0.95), stdMat(0xb45309,{roughness:0.7}));
     hull.position.y = 0.25; g.add(hull);
@@ -1572,34 +1580,108 @@ function startTank(){
   }
   var faunaGroup = new THREE.Group(); scene.add(faunaGroup);
   var faunaObjs = [];
+  function faunaBottomTarget(x, z){
+    return {
+      x: Math.max(-5.6, Math.min(5.6, x + (Math.random()-0.5)*3)),
+      z: Math.max(-2.6, Math.min(2.6, z + (Math.random()-0.5)*2))
+    };
+  }
+  function addFauna(kind, x, y, z, rec, clipLen){
+    var holder = new THREE.Group();
+    holder.rotation.order = "YZX";
+    var fb = makeProceduralDeco(kind);
+    holder.add(fb);
+    holder.position.set(x, y, z);
+    if (rec.yaw!=null) holder.rotation.y = rec.yaw;
+    faunaGroup.add(holder);
+    rec.group = holder;
+    rec.kind = kind;
+    faunaObjs.push(rec);
+    loadTemplate(kind).then(function(tpl){
+      if (!tpl) return;
+      var real = buildRealInstance(kind, tpl);
+      if (!real) return;
+      holder.remove(fb); holder.add(real);
+      rec.mixer = real.userData.mixer || null;
+      rec.action = real.userData.action || null;
+      if (rec.action){
+        rec.action.time = Math.random() * clipLen;
+        rec.action.timeScale = 0.85 + Math.random()*0.35;
+      }
+    });
+  }
   function spawnFauna(){
-    var school = [
-      { kind:"aquaneon", x:-2.2, z:-0.4 },
-      { kind:"aquaneon", x:-0.8, z:0.7 },
-      { kind:"aquaneon", x:1.1, z:-0.6 },
-      { kind:"aquaneon", x:2.4, z:0.5 },
-      { kind:"cherryshrimp", x:-2.4, z:1.1 },
-      { kind:"cherryshrimp", x:-1.1, z:-0.8 },
-      { kind:"cherryshrimp", x:0.2, z:1.2 },
-      { kind:"cherryshrimp", x:1.6, z:-1.0 },
-      { kind:"cherryshrimp", x:2.6, z:0.9 }
-    ];
-    school.forEach(function(s){
-      var def = REAL_DECO[s.kind];
-      var holder = new THREE.Group();
-      var fb = makeProceduralDeco(s.kind);
-      holder.add(fb);
-      holder.position.set(s.x, def.mode==="graze" ? 0.02 : 2.2, s.z);
-      faunaGroup.add(holder);
-      var rec = { group: holder, kind: s.kind, mode: def.mode, phase: Math.random()*6.28, anchor:{ x:s.x, z:s.z } };
-      faunaObjs.push(rec);
-      loadTemplate(s.kind).then(function(tpl){
-        if (!tpl) return;
-        var real = buildRealInstance(s.kind, tpl);
-        if (!real) return;
-        holder.remove(fb); holder.add(real);
-        if (real.userData.mixer) rec.mixer = real.userData.mixer;
-      });
+    var i;
+    for (i=0;i<16;i++){
+      addFauna("aquaneon", 0, 3, 0, {
+        mode:"school",
+        off:{ x:(Math.random()-0.5)*1.8, y:(Math.random()-0.5)*0.8, z:(Math.random()-0.5)*1.3 },
+        lag: Math.random()*0.8,
+        ph: Math.random()*6.28
+      }, 0.8);
+    }
+    for (i=0;i<9;i++){
+      var sx = -5 + Math.random()*10, sz = -2 + Math.random()*4.5;
+      addFauna("cherryshrimp", sx, 0.01, sz, {
+        mode:"bottom", speed:0.13, wait: Math.random()*3, yaw: Math.random()*6.28,
+        target: faunaBottomTarget(sx, sz)
+      }, 1.2);
+    }
+    for (i=0;i<4;i++){
+      var nx = -5 + Math.random()*10, nz = -1.5 + Math.random()*4;
+      addFauna("applesnail", nx, 0.01, nz, {
+        mode:"bottom", speed:0.045, wait: Math.random()*2, yaw: Math.random()*6.28,
+        target: faunaBottomTarget(nx, nz)
+      }, 2);
+    }
+  }
+  var faunaA = {x:0,y:0,z:0}, faunaB = {x:0,y:0,z:0};
+  function faunaSchoolPoint(time, out){
+    out.x = 4.2 * Math.sin(time * 0.13);
+    out.y = 3.0 + 0.7 * Math.sin(time * 0.21 + 1);
+    out.z = 1.4 * Math.sin(time * 0.27);
+  }
+  function updateTankFauna(dt, t){
+    faunaObjs.forEach(function(f){
+      if (f.mixer) f.mixer.update(dt);
+      if (f.mode==="school"){
+        faunaSchoolPoint(t - f.lag, faunaA);
+        faunaSchoolPoint(t - f.lag + 0.05, faunaB);
+        var spread = 1 + 0.18 * Math.sin(t * 0.9 + f.ph);
+        var spread2 = 1 + 0.18 * Math.sin((t + 0.05) * 0.9 + f.ph);
+        var x = faunaA.x + f.off.x * spread;
+        var y = faunaA.y + f.off.y * spread;
+        var z = faunaA.z + f.off.z * spread;
+        var vx = (faunaB.x + f.off.x * spread2) - x;
+        var vy = (faunaB.y + f.off.y * spread2) - y;
+        var vz = (faunaB.z + f.off.z * spread2) - z;
+        f.group.position.set(x, y, z);
+        f.group.rotation.set(0, Math.atan2(-vz, vx), Math.atan2(vy, Math.hypot(vx, vz) || 1));
+        return;
+      }
+      var o = f.group;
+      if (f.wait > 0){
+        f.wait -= dt;
+        if (f.action) f.action.timeScale = 0.35;
+        return;
+      }
+      if (f.action) f.action.timeScale = 1;
+      var dx = f.target.x - o.position.x, dz = f.target.z - o.position.z;
+      var dist = Math.hypot(dx, dz);
+      if (dist < 0.05){
+        f.wait = 1 + Math.random() * 4;
+        f.target = faunaBottomTarget(o.position.x, o.position.z);
+        return;
+      }
+      var want = Math.atan2(-dz, dx);
+      var diff = Math.atan2(Math.sin(want - o.rotation.y), Math.cos(want - o.rotation.y));
+      o.rotation.y += diff * Math.min(1, dt * f.speed * 18);
+      if (Math.abs(diff) < 0.6){
+        var step = Math.min(dist, dt * f.speed);
+        o.position.x += dx / dist * step;
+        o.position.z += dz / dist * step;
+        o.position.y = 0.01;
+      }
     });
   }
   var fishGroup = new THREE.Group(); scene.add(fishGroup);
@@ -1820,7 +1902,7 @@ function startTank(){
       }
     }
     Object.keys(decoObjs).forEach(function(k){ stepCreature(decoObjs[k]); });
-    faunaObjs.forEach(stepCreature);
+    updateTankFauna(dt, t);
     bubbles.forEach(function(bm){
       bm.position.y += bm.userData.speed*dt;
       if (bm.position.y > TH-0.7) bm.position.y = 0.2;
