@@ -510,8 +510,8 @@ var DEFAULT_DECO_COUNTS = {};
 var DEFAULT_POS = {};
 (function(){
   var kinds = DECO_KINDS.map(function(k){return k.id;});
-  kinds.forEach(function(k,i){ for (var n=0;n<3;n++){ DEFAULT_POS[k+"-"+n] = { x:-6.4+((i*2+n*3)%7)*2.1, z:-2.6+((i+n)%3)*1.7 }; } });
-  SHOP_DECOS.forEach(function(k,i){ DEFAULT_POS["shop-"+k.id] = { x:-5.4+i*3.4, z:2.4 }; });
+  kinds.forEach(function(k,i){ for (var n=0;n<3;n++){ DEFAULT_POS[k+"-"+n] = { x:-4.4+((i*2+n*3)%6)*1.5, z:-1.6+((i+n)%3)*1.15 }; } });
+  SHOP_DECOS.forEach(function(k,i){ DEFAULT_POS["shop-"+k.id] = { x:-3.6+i*2.2, z:1.5 }; });
 })();
 
 var QUIZ6 = {"topics": [{"id": 1, "name": "Tập hợp và số tự nhiên", "emoji": "🔢"}, {"id": 2, "name": "Phép tính, lũy thừa, thứ tự thực hiện", "emoji": "✖️"}, {"id": 3, "name": "Chia hết, ước và bội, ƯCLN và BCNN", "emoji": "➗"}, {"id": 4, "name": "Số nguyên", "emoji": "🧮"}, {"id": 5, "name": "Hình học trực quan, chu vi và diện tích", "emoji": "📐"}], "questions": [{"id": "1.1", "topic": 1, "level": 1, "text": "Cho A = {1; 2; 3}. Số nào thuộc tập hợp A?", "options": ["0", "4", "2", "5"], "correct": 2, "explanation": "2 có trong danh sách của A."}, {"id": "1.2", "topic": 1, "level": 1, "text": "Số liền sau của 99 là:", "options": ["98", "100", "101", "90"], "correct": 1, "explanation": "Liền sau là cộng thêm 1."}, {"id": "1.3", "topic": 1, "level": 1, "text": "Tập hợp các số tự nhiên nhỏ hơn 4 là:", "options": ["{1; 2; 3}", "{0; 1; 2; 3}", "{0; 1; 2; 3; 4}", "{1; 2; 3; 4}"], "correct": 1, "explanation": "Nhỏ hơn 4, và 0 cũng là số tự nhiên."}, {"id": "1.4", "topic": 1, "level": 1, "text": "So sánh 2025 và 2052:", "options": ["2025 > 2052", "2025 < 2052", "2025 = 2052", "Không so sánh được"], "correct": 1, "explanation": "Cùng 4 chữ số, so sánh từ hàng nghìn sang, 2025 nhỏ hơn."}, {"id": "1.5", "topic": 1, "level": 1, "text": "Tập hợp {2; 4; 6; 8} có bao nhiêu phần tử?", "options": ["3", "4", "5", "8"], "correct": 1, "explanation": "Đếm trực tiếp được 4 phần tử."}, {"id": "1.6", "topic": 1, "level": 2, "text": "Viết tập hợp các số lẻ nhỏ hơn 10 bằng cách liệt kê:", "options": ["{1; 3; 5; 7; 9}", "{2; 4; 6; 8}", "{1; 3; 5; 7; 9; 11}", "{0; 2; 4; 6; 8}"], "correct": 0, "explanation": "Số lẻ nhỏ hơn 10 là 1, 3, 5, 7, 9."}, {"id": "1.7", "topic": 1, "level": 2, "text": "Tập hợp D = {x thuộc N | 5 ≤ x < 9} có bao nhiêu phần tử?", "options": ["3", "4", "5", "9"], "correct": 1, "explanation": "D = {5; 6; 7; 8}, chú ý 9 không được lấy vì x < 9."}, {"id": "1.8", "topic": 1, "level": 2, "text": "Sắp xếp các số 102, 99, 1001, 89 theo thứ tự tăng dần:", "options": ["89; 99; 102; 1001", "99; 89; 102; 1001", "1001; 102; 99; 89", "89; 102; 99; 1001"], "correct": 0, "explanation": "Số có ít chữ số hơn thì nhỏ hơn, rồi so sánh từng hàng."}, {"id": "1.9", "topic": 1, "level": 2, "text": "Số lớn nhất có 3 chữ số khác nhau là:", "options": ["999", "987", "978", "900"], "correct": 1, "explanation": "999 có các chữ số giống nhau nên không thỏa điều kiện khác nhau."}, {"id": "1.10", "topic": 1, "level": 2, "text": "Cho A = {1; 2}, B = {1; 2; 3}. Khẳng định nào đúng?", "options": ["A thuộc B", "B là tập con của A", "A là tập con của B", "3 là tập con của B"], "correct": 2, "explanation": "Mọi phần tử của A đều có trong B."}, {"id": "1.11", "topic": 1, "level": 3, "text": "Có bao nhiêu số có 2 chữ số mà chữ số hàng chục gấp đôi chữ số hàng đơn vị?", "options": ["3", "4", "5", "9"], "correct": 1, "explanation": "Các số là 21, 42, 63, 84."}, {"id": "1.12", "topic": 1, "level": 3, "text": "Tập hợp các số tự nhiên x thỏa mãn 12 < x ≤ 15 và x là số chẵn có bao nhiêu phần tử?", "options": ["0", "1", "2", "3"], "correct": 1, "explanation": "Chỉ có 14 thỏa cả hai điều kiện."}, {"id": "1.13", "topic": 1, "level": 3, "text": "Số phần tử của tập hợp các số tự nhiên từ 10 đến 25 là:", "options": ["14", "15", "16", "25"], "correct": 2, "explanation": "25 - 10 + 1 = 16, nhớ cộng 1 khi đếm cả hai đầu."}, {"id": "2.1", "topic": 2, "level": 1, "text": "25 + 37 = ?", "options": ["52", "62", "72", "60"], "correct": 1, "explanation": "25 + 37 = 62."}, {"id": "2.2", "topic": 2, "level": 1, "text": "12 x 8 = ?", "options": ["84", "88", "96", "108"], "correct": 2, "explanation": "12 x 8 = 96."}, {"id": "2.3", "topic": 2, "level": 1, "text": "3^2 = ?", "options": ["6", "8", "9", "12"], "correct": 2, "explanation": "3^2 = 3 x 3 = 9, không phải 3 x 2."}, {"id": "2.4", "topic": 2, "level": 1, "text": "100 - 45 = ?", "options": ["45", "55", "65", "155"], "correct": 1, "explanation": "100 - 45 = 55."}, {"id": "2.5", "topic": 2, "level": 1, "text": "Tính chất a + b = b + a được gọi là tính chất gì?", "options": ["Kết hợp", "Phân phối", "Giao hoán", "Không có tên"], "correct": 2, "explanation": "Đổi chỗ hai số hạng mà tổng không đổi là tính chất giao hoán."}, {"id": "2.6", "topic": 2, "level": 2, "text": "2^3 x 2^2 = ?", "options": ["2^5 = 32", "2^6 = 64", "4^5", "2^1"], "correct": 0, "explanation": "Nhân cùng cơ số thì cộng số mũ: 3 + 2 = 5."}, {"id": "2.7", "topic": 2, "level": 2, "text": "10 + 2 x 3 = ?", "options": ["36", "16", "30", "26"], "correct": 1, "explanation": "Nhân trước, cộng sau: 10 + 6 = 16."}, {"id": "2.8", "topic": 2, "level": 2, "text": "5^3 : 5 = ?", "options": ["5", "25", "125", "15"], "correct": 1, "explanation": "125 : 5 = 25, cũng là 5^2."}, {"id": "2.9", "topic": 2, "level": 2, "text": "Tính nhanh: 15 + 27 + 85 = ?", "options": ["112", "127", "117", "100"], "correct": 1, "explanation": "15 + 85 = 100, cộng thêm 27 được 127."}, {"id": "2.10", "topic": 2, "level": 2, "text": "7 + 3 x (10 - 4) = ?", "options": ["25", "37", "30", "21"], "correct": 0, "explanation": "Trong ngoặc trước: 10 - 4 = 6, rồi 3 x 6 = 18, cộng 7 được 25."}, {"id": "2.11", "topic": 2, "level": 3, "text": "Tìm x, biết 2x + 5 = 17:", "options": ["5", "6", "7", "11"], "correct": 1, "explanation": "2x = 12 nên x = 6."}, {"id": "2.12", "topic": 2, "level": 3, "text": "100 - [20 + (30 - 10) : 2] = ?", "options": ["60", "70", "80", "90"], "correct": 1, "explanation": "(30 - 10) : 2 = 10, rồi 20 + 10 = 30, 100 - 30 = 70."}, {"id": "2.13", "topic": 2, "level": 3, "text": "So sánh 2^5 và 5^2:", "options": ["2^5 < 5^2", "2^5 = 5^2", "2^5 > 5^2", "Không so sánh được"], "correct": 2, "explanation": "2^5 = 32, 5^2 = 25, nên 32 > 25."}, {"id": "3.1", "topic": 3, "level": 1, "text": "Số nào chia hết cho 2?", "options": ["125", "133", "124", "147"], "correct": 2, "explanation": "Chữ số tận cùng là số chẵn."}, {"id": "3.2", "topic": 3, "level": 1, "text": "Số nào chia hết cho 5?", "options": ["232", "235", "237", "239"], "correct": 1, "explanation": "Chữ số tận cùng là 0 hoặc 5."}, {"id": "3.3", "topic": 3, "level": 1, "text": "Số nào chia hết cho 3?", "options": ["121", "122", "123", "124"], "correct": 2, "explanation": "1 + 2 + 3 = 6, 6 chia hết cho 3."}, {"id": "3.4", "topic": 3, "level": 1, "text": "Số nào là số nguyên tố?", "options": ["15", "17", "21", "27"], "correct": 1, "explanation": "17 chỉ có hai ước là 1 và chính nó."}, {"id": "3.5", "topic": 3, "level": 1, "text": "Số nào là ước của 12?", "options": ["5", "7", "3", "11"], "correct": 2, "explanation": "12 : 3 = 4, không dư."}, {"id": "3.6", "topic": 3, "level": 2, "text": "Số nào chia hết cho cả 2 và 3?", "options": ["131", "132", "133", "135"], "correct": 1, "explanation": "132 là số chẵn và 1 + 3 + 2 = 6 chia hết cho 3."}, {"id": "3.7", "topic": 3, "level": 2, "text": "Phân tích 36 ra thừa số nguyên tố, kết quả đúng là:", "options": ["2 x 18", "2^2 x 3^2", "4 x 9", "6 x 6"], "correct": 1, "explanation": "36 = 4 x 9 = 2^2 x 3^2."}, {"id": "3.8", "topic": 3, "level": 2, "text": "ƯCLN(12, 18) = ?", "options": ["3", "6", "12", "36"], "correct": 1, "explanation": "12 = 2^2 x 3, 18 = 2 x 3^2, lấy chung với số mũ nhỏ nhất: 2 x 3 = 6."}, {"id": "3.9", "topic": 3, "level": 2, "text": "BCNN(4, 6) = ?", "options": ["10", "12", "24", "6"], "correct": 1, "explanation": "Bội chung nhỏ nhất khác 0 của 4 và 6 là 12."}, {"id": "3.10", "topic": 3, "level": 2, "text": "Số nào chia hết cho 9?", "options": ["721", "729", "732", "735"], "correct": 1, "explanation": "7 + 2 + 9 = 18, 18 chia hết cho 9."}, {"id": "3.11", "topic": 3, "level": 3, "text": "Cô có 24 cây bút và 36 quyển vở, muốn chia thành nhiều phần bằng nhau nhất, không thừa. Mỗi phần có:", "options": ["2 bút, 3 vở", "3 bút, 2 vở", "4 bút, 6 vở", "6 bút, 6 vở"], "correct": 0, "explanation": "ƯCLN(24, 36) = 12 phần, mỗi phần 24 : 12 = 2 bút và 36 : 12 = 3 vở."}, {"id": "3.12", "topic": 3, "level": 3, "text": "Hai xe cùng xuất phát, xe A chạy một chuyến hết 12 phút, xe B hết 18 phút. Sau bao lâu hai xe lại cùng xuất phát?", "options": ["24 phút", "30 phút", "36 phút", "54 phút"], "correct": 2, "explanation": "BCNN(12, 18) = 36."}, {"id": "3.13", "topic": 3, "level": 3, "text": "Số tự nhiên nhỏ nhất lớn hơn 20 và chia hết cho cả 4 và 6 là:", "options": ["22", "24", "28", "30"], "correct": 1, "explanation": "BCNN(4, 6) = 12, bội của 12 lớn hơn 20 đầu tiên là 24."}, {"id": "4.1", "topic": 4, "level": 1, "text": "Số đối của -7 là:", "options": ["-7", "0", "7", "14"], "correct": 2, "explanation": "Số đối đổi dấu."}, {"id": "4.2", "topic": 4, "level": 1, "text": "|-8| = ?", "options": ["-8", "0", "8", "-16"], "correct": 2, "explanation": "Giá trị tuyệt đối là khoảng cách đến 0, luôn không âm."}, {"id": "4.3", "topic": 4, "level": 1, "text": "So sánh -3 và -7:", "options": ["-3 < -7", "-3 > -7", "-3 = -7", "Không so sánh được"], "correct": 1, "explanation": "Trên trục số, -3 nằm bên phải -7 nên lớn hơn."}, {"id": "4.4", "topic": 4, "level": 1, "text": "Số nguyên âm lớn nhất là:", "options": ["-10", "-5", "-1", "0"], "correct": 2, "explanation": "0 không phải số âm, trong các số âm thì -1 gần 0 nhất."}, {"id": "4.5", "topic": 4, "level": 1, "text": "Trong các số -4, -1, 0, 3, số nhỏ nhất là:", "options": ["-1", "0", "-4", "3"], "correct": 2, "explanation": "Càng nằm bên trái trục số càng nhỏ."}, {"id": "4.6", "topic": 4, "level": 2, "text": "(-5) + (-3) = ?", "options": ["-8", "-2", "2", "8"], "correct": 0, "explanation": "Cùng dấu âm, cộng giá trị tuyệt đối và giữ dấu âm."}, {"id": "4.7", "topic": 4, "level": 2, "text": "(-5) + 8 = ?", "options": ["-13", "-3", "3", "13"], "correct": 2, "explanation": "Khác dấu, lấy 8 - 5 = 3, giữ dấu của 8."}, {"id": "4.8", "topic": 4, "level": 2, "text": "5 - 9 = ?", "options": ["-4", "4", "14", "-14"], "correct": 0, "explanation": "5 - 9 = 5 + (-9) = -4."}, {"id": "4.9", "topic": 4, "level": 2, "text": "(-4) - (-6) = ?", "options": ["-10", "-2", "2", "10"], "correct": 2, "explanation": "(-4) - (-6) = (-4) + 6 = 2."}, {"id": "4.10", "topic": 4, "level": 2, "text": "10 - (5 - 3) = ?", "options": ["2", "8", "12", "18"], "correct": 1, "explanation": "Bỏ ngoặc có dấu trừ phía trước thì đổi dấu: 10 - 5 + 3 = 8."}, {"id": "4.11", "topic": 4, "level": 3, "text": "(-3) x 4 = ?", "options": ["-12", "-7", "7", "12"], "correct": 0, "explanation": "Khác dấu thì tích mang dấu âm."}, {"id": "4.12", "topic": 4, "level": 3, "text": "(-24) : (-6) = ?", "options": ["-4", "-30", "4", "30"], "correct": 2, "explanation": "Cùng dấu âm thì thương mang dấu dương."}, {"id": "4.13", "topic": 4, "level": 3, "text": "Tìm x, biết x + (-7) = -2:", "options": ["-9", "-5", "5", "9"], "correct": 2, "explanation": "x = -2 - (-7) = -2 + 7 = 5."}, {"id": "4.14", "topic": 4, "level": 3, "text": "Tính nhanh: (-12) + 15 + (-8) + 5 = ?", "options": ["-10", "0", "10", "20"], "correct": 1, "explanation": "Nhóm (-12) + (-8) = -20, nhóm 15 + 5 = 20, tổng bằng 0."}, {"id": "5.1", "topic": 5, "level": 1, "text": "Hình vuông cạnh 4 cm có chu vi là:", "options": ["8 cm", "12 cm", "16 cm", "20 cm"], "correct": 2, "explanation": "4 x 4 = 16."}, {"id": "5.2", "topic": 5, "level": 1, "text": "Tam giác đều có mấy trục đối xứng?", "options": ["1", "2", "3", "6"], "correct": 2, "explanation": "Mỗi đường cao cũng là trục đối xứng, có 3 đường."}, {"id": "5.3", "topic": 5, "level": 1, "text": "Hình nào có 4 cạnh bằng nhau?", "options": ["Hình chữ nhật", "Hình thoi", "Hình thang cân", "Hình tam giác"], "correct": 1, "explanation": "Hình thoi có 4 cạnh bằng nhau."}, {"id": "5.4", "topic": 5, "level": 1, "text": "Hình bình hành có tính chất nào đúng?", "options": ["Các cạnh đối song song và bằng nhau", "Có 4 góc vuông", "Hai đường chéo vuông góc", "Có 3 cạnh bằng nhau"], "correct": 0, "explanation": "Hình bình hành có các cạnh đối song song và bằng nhau."}, {"id": "5.5", "topic": 5, "level": 1, "text": "Lục giác đều có mấy cạnh bằng nhau?", "options": ["4", "5", "6", "3"], "correct": 2, "explanation": "Lục giác đều có 6 cạnh bằng nhau."}, {"id": "5.6", "topic": 5, "level": 2, "text": "Hình chữ nhật dài 8 cm, rộng 5 cm có diện tích là:", "options": ["13 cm2", "26 cm2", "40 cm2", "80 cm2"], "correct": 2, "explanation": "8 x 5 = 40, đáp án 26 là chu vi, dễ nhầm."}, {"id": "5.7", "topic": 5, "level": 2, "text": "Hình bình hành có đáy 10 cm, chiều cao 6 cm thì diện tích là:", "options": ["16 cm2", "30 cm2", "60 cm2", "120 cm2"], "correct": 2, "explanation": "Diện tích = đáy x chiều cao, không dùng cạnh xiên."}, {"id": "5.8", "topic": 5, "level": 2, "text": "Hình thoi có hai đường chéo 8 cm và 6 cm thì diện tích là:", "options": ["14 cm2", "24 cm2", "28 cm2", "48 cm2"], "correct": 1, "explanation": "(8 x 6) : 2 = 24."}, {"id": "5.9", "topic": 5, "level": 2, "text": "Hình thang có đáy lớn 10 cm, đáy nhỏ 6 cm, chiều cao 4 cm thì diện tích là:", "options": ["24 cm2", "32 cm2", "40 cm2", "64 cm2"], "correct": 1, "explanation": "(10 + 6) x 4 : 2 = 32."}, {"id": "5.10", "topic": 5, "level": 2, "text": "Hình vuông cạnh 7 cm có diện tích là:", "options": ["14 cm2", "28 cm2", "49 cm2", "70 cm2"], "correct": 2, "explanation": "7 x 7 = 49."}, {"id": "5.11", "topic": 5, "level": 3, "text": "Sân hình chữ nhật dài 12 m, rộng 8 m, muốn rào xung quanh thì cần hàng rào dài bao nhiêu?", "options": ["20 m", "40 m", "96 m", "48 m"], "correct": 1, "explanation": "Rào xung quanh là chu vi: 2 x (12 + 8) = 40."}, {"id": "5.12", "topic": 5, "level": 3, "text": "Mảnh đất hình chữ nhật 12 m x 9 m, cắt đi một góc hình vuông 3 m x 3 m thì diện tích còn lại là:", "options": ["99 m2", "108 m2", "117 m2", "81 m2"], "correct": 0, "explanation": "12 x 9 = 108, trừ đi 3 x 3 = 9, còn 99."}, {"id": "5.13", "topic": 5, "level": 3, "text": "Hình vuông cạnh 10 cm, bên trong có một tam giác đáy 10 cm, cao 6 cm. Diện tích phần còn lại là:", "options": ["30 cm2", "60 cm2", "70 cm2", "100 cm2"], "correct": 2, "explanation": "Hình vuông 100 trừ tam giác (10 x 6 : 2 = 30) còn 70."}]};
@@ -1132,13 +1132,13 @@ function currentDecos(){
         var ang = i * 2.4;
         pos = { x: Math.cos(ang) * (1.8 + (i % 5) * 0.7), z: Math.sin(ang) * (1.3 + (i % 4) * 0.55) };
       }
-      list.push({ key:key, kind:k.id, x:pos.x, z:pos.z });
+      list.push({ key:key, kind:k.id, x:Math.max(-5.8, Math.min(5.8, pos.x)), z:Math.max(-2.7, Math.min(2.7, pos.z)) });
     }
   });
   (profile.ownedDecorations||[]).forEach(function(id){
     var key = "shop-" + id;
     var pos = profile.positions[key] || DEFAULT_POS[key] || {x:0,z:2};
-    list.push({ key:key, kind:id, x:pos.x, z:pos.z });
+    list.push({ key:key, kind:id, x:Math.max(-5.8, Math.min(5.8, pos.x)), z:Math.max(-2.7, Math.min(2.7, pos.z)) });
   });
   return list;
 }
@@ -1360,25 +1360,25 @@ function startTank(){
   scene.background = new THREE.Color(0x0b5e7d);
   scene.fog = new THREE.Fog(0x0b5e7d, 24, 52);
   var camera = new THREE.PerspectiveCamera(52, 1, 0.1, 100);
-  var camTarget = new THREE.Vector3(0, 1.7, 0);
-  var camTheta = 0.62, camPhi = 0.96, camRadius = 15;
+  var camTarget = new THREE.Vector3(0, 1.9, 0);
+  var camTheta = 0.55, camPhi = 1.02, camRadius = 14;
   function applyCamera(){
     camTheta = Math.max(-2.6, Math.min(2.6, camTheta));
     camPhi = Math.max(0.58, Math.min(1.25, camPhi));
-    camRadius = Math.max(8, Math.min(24, camRadius));
+    camRadius = Math.max(8, Math.min(20, camRadius));
     var sp = Math.sin(camPhi);
     camera.position.set(camTarget.x + camRadius*sp*Math.sin(camTheta), camTarget.y + camRadius*Math.cos(camPhi), camTarget.z + camRadius*sp*Math.cos(camTheta));
     camera.lookAt(camTarget);
   }
-  function resetCamera(){ camTheta = 0.62; camPhi = 0.96; camRadius = (camera.aspect<0.9?17:15); applyCamera(); }
-  scene.add(new THREE.HemisphereLight(0xcdf3ff, 0x0b3a4d, 1.0));
-  var key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(5,10,6); scene.add(key);
-  var rim = new THREE.DirectionalLight(0x7dd3fc, 0.6); rim.position.set(-6,4,-6); scene.add(rim);
-  var TW = 16.2, TD = 8.4, TH = 6.1;
-  var sand = new THREE.Mesh(new THREE.BoxGeometry(TW, 0.42, TD), stdMat(0xd9bd8a,{roughness:1}));
-  sand.position.y = -0.2; scene.add(sand);
-  var inside = new THREE.Mesh(new THREE.PlaneGeometry(TW-0.2, TH-0.3), stdMat(0x0e6d94,{roughness:0.9}));
-  inside.position.set(0, TH*0.46, -TD/2+0.08); scene.add(inside);
+  function resetCamera(){ camTheta = 0.55; camPhi = 1.02; camRadius = (camera.aspect<0.9?16:14); applyCamera(); }
+  scene.add(new THREE.HemisphereLight(0xcdf3ff, 0x0b3a4d, 1.05));
+  var key = new THREE.DirectionalLight(0xffffff, 1.35); key.position.set(4,9,6); scene.add(key);
+  var rim = new THREE.DirectionalLight(0x7dd3fc, 0.55); rim.position.set(-5,4,-4); scene.add(rim);
+  var TW = 15.2, TD = 8.6, TH = 6.6;
+  var sand = new THREE.Mesh(new THREE.BoxGeometry(TW, 0.5, TD), stdMat(0xd7c094,{roughness:1}));
+  sand.position.y = -0.24; scene.add(sand);
+  var inside = new THREE.Mesh(new THREE.PlaneGeometry(TW-0.2, TH-0.3), stdMat(0x127a9a,{roughness:0.9}));
+  inside.position.set(0, TH*0.46, -TD/2+0.06); scene.add(inside);
   var glassMat = new THREE.MeshPhysicalMaterial({
     color: 0xd7f4ff, transparent: true, opacity: 0.16, roughness: 0.04,
     metalness: 0.02, side: THREE.DoubleSide, depthWrite: false
@@ -1406,24 +1406,29 @@ function startTank(){
     color: 0x8fd4ee, transparent: true, opacity: 0.28, roughness: 0.08, metalness: 0.04,
     side: THREE.DoubleSide, depthWrite: false
   }));
-  water.rotation.x = -Math.PI/2; water.position.y = TH-0.55; scene.add(water);
-  var pebbleGeo = new THREE.DodecahedronGeometry(0.14);
-  var pebbles = new THREE.InstancedMesh(pebbleGeo, stdMat(0xb8a888,{roughness:1}), 46);
-  var dummy = new THREE.Object3D();
-  for (var i=0;i<46;i++){
-    dummy.position.set((Math.random()-0.5)*15.5, 0.08, (Math.random()-0.5)*7.4);
-    dummy.rotation.set(Math.random()*3, Math.random()*3, Math.random()*3);
-    dummy.scale.setScalar(0.6+Math.random()*0.9); dummy.updateMatrix();
-    pebbles.setMatrixAt(i, dummy.matrix);
-  }
-  scene.add(pebbles);
-  // bubbles
-  var bubGeo = new THREE.SphereGeometry(0.07,8,6);
+  water.rotation.x = -Math.PI/2; water.position.y = TH-0.35; scene.add(water);
+  var scapeMixer = null;
+  gltfLoader2.loadAsync(ASSET+"aquascape-layout.glb").then(function(gltf){
+    var root = gltf.scene;
+    root.traverse(function(o){
+      if (!o.isMesh) return;
+      o.frustumCulled = false;
+      var list = Array.isArray(o.material) ? o.material : (o.material ? [o.material] : []);
+      list.forEach(function(m){ if (m && "vertexColors" in m) m.vertexColors = true; });
+    });
+    root.position.set(-0.42, 0.02, 0.32);
+    scene.add(root);
+    if (gltf.animations && gltf.animations.length){
+      scapeMixer = new THREE.AnimationMixer(root);
+      gltf.animations.forEach(function(clip){ scapeMixer.clipAction(clip).play(); });
+    }
+  }).catch(function(){});
+  var bubGeo = new THREE.SphereGeometry(0.06,8,6);
   var bubMat = new THREE.MeshBasicMaterial({ color:0xcfeeff, transparent:true, opacity:0.5 });
   var bubbles = [];
   for (var b=0;b<26;b++){
     var bm = new THREE.Mesh(bubGeo, bubMat);
-    bm.position.set((Math.random()-0.5)*15, Math.random()*5, (Math.random()-0.5)*7);
+    bm.position.set((Math.random()-0.5)*12.4, 0.4+Math.random()*5.2, (Math.random()-0.5)*6.2);
     bm.userData.speed = 0.4+Math.random()*0.8;
     scene.add(bm); bubbles.push(bm);
   }
@@ -1566,7 +1571,7 @@ function startTank(){
       var hit = new THREE.Vector3();
       if (ray.ray.intersectPlane(floorPlane, hit)){
         var rec = decoObjs[dragDeco]; if (!rec) return;
-        var nx = Math.max(-7.4, Math.min(7.4, hit.x)), nz = Math.max(-3.4, Math.min(3.4, hit.z));
+        var nx = Math.max(-6.2, Math.min(6.2, hit.x)), nz = Math.max(-2.9, Math.min(2.9, hit.z));
         rec.group.position.x = nx; rec.group.position.z = nz;
         rec.anchor.x = nx; rec.anchor.z = nz;
         profile.positions[dragDeco] = { x: Math.round(nx*100)/100, z: Math.round(nz*100)/100 };
@@ -1617,8 +1622,8 @@ function startTank(){
       var ahead = petAngle + (Math.random()-0.5)*1.3;
       var reach = 4.5 + Math.random()*5;
       wanderTarget = {
-        x: Math.max(-6.2, Math.min(6.2, petPos.x + Math.cos(ahead)*reach)),
-        z: Math.max(-2.6, Math.min(2.6, petPos.z - Math.sin(ahead)*reach))
+        x: Math.max(-5.4, Math.min(5.4, petPos.x + Math.cos(ahead)*reach)),
+        z: Math.max(-2.4, Math.min(2.4, petPos.z - Math.sin(ahead)*reach))
       };
       wanderT = 4.5 + Math.random()*4;
       dx = wanderTarget.x - petPos.x; dz = wanderTarget.z - petPos.z; dist = Math.hypot(dx, dz);
@@ -1644,8 +1649,8 @@ function startTank(){
       if (sharkSpeed) sharkSpeed.setEffectiveWeight(0);
       if (sharkIdle) sharkIdle.setEffectiveWeight(1);
     }
-    var clampedX = Math.max(-7.2, Math.min(7.2, petPos.x));
-    var clampedZ = Math.max(-3.1, Math.min(3.1, petPos.z));
+    var clampedX = Math.max(-6.1, Math.min(6.1, petPos.x));
+    var clampedZ = Math.max(-2.8, Math.min(2.8, petPos.z));
     if (clampedX!==petPos.x || clampedZ!==petPos.z) wanderT = 0;
     petPos.x = clampedX; petPos.z = clampedZ;
     petPos.y = profile.giftPet==="crab" ? 0.08 : (2.0 + Math.sin(t*1.3)*0.18);
@@ -1657,7 +1662,7 @@ function startTank(){
     // shop fish wander freely
     shopFishObjs.forEach(function(f){
       f.phase -= dt;
-      if (f.phase<=0){ f.tx = (Math.random()-0.5)*13; f.tz = (Math.random()-0.5)*5.5; f.ty = 1.2+Math.random()*2.8; f.phase = 3+Math.random()*3; }
+      if (f.phase<=0){ f.tx = (Math.random()-0.5)*10; f.tz = (Math.random()-0.5)*4.4; f.ty = 1.3+Math.random()*2.4; f.phase = 3+Math.random()*3; }
       var p = f.group.position;
       var ddx = f.tx-p.x, ddz = f.tz-p.z, ddy = f.ty-p.y;
       var dd = Math.hypot(ddx,ddz,ddy)||1;
@@ -1686,8 +1691,8 @@ function startTank(){
           if (rec.cruise.wait<=0){ rec.cruise.heading += (Math.random()-0.5)*0.7; rec.cruise.wait = 2.4+Math.random()*2.4; }
           rec.cruise.x += Math.cos(rec.cruise.heading)*0.28*dt;
           rec.cruise.z -= Math.sin(rec.cruise.heading)*0.28*dt;
-          if (rec.cruise.x>6.4 || rec.cruise.x<-6.4){ rec.cruise.heading = Math.PI-rec.cruise.heading; rec.cruise.x = Math.max(-6.4, Math.min(6.4, rec.cruise.x)); }
-          if (rec.cruise.z>3 || rec.cruise.z<-3){ rec.cruise.heading = -rec.cruise.heading; rec.cruise.z = Math.max(-3, Math.min(3, rec.cruise.z)); }
+          if (rec.cruise.x>5.6 || rec.cruise.x<-5.6){ rec.cruise.heading = Math.PI-rec.cruise.heading; rec.cruise.x = Math.max(-5.6, Math.min(5.6, rec.cruise.x)); }
+          if (rec.cruise.z>2.6 || rec.cruise.z<-2.6){ rec.cruise.heading = -rec.cruise.heading; rec.cruise.z = Math.max(-2.6, Math.min(2.6, rec.cruise.z)); }
           rec.group.position.set(rec.cruise.x, 2.05+Math.sin(t*1.1+rec.phase)*0.2, rec.cruise.z);
           rec.group.rotation.y = rec.cruise.heading;
           rec.group.rotation.z = Math.sin(t*1.5+rec.phase)*0.05;
@@ -1699,9 +1704,10 @@ function startTank(){
     });
     bubbles.forEach(function(bm){
       bm.position.y += bm.userData.speed*dt;
-      if (bm.position.y > 5.4) bm.position.y = 0.15;
+      if (bm.position.y > TH-0.7) bm.position.y = 0.2;
     });
-    water.position.y = (TH-0.55) + Math.sin(t*0.8)*0.04;
+    water.position.y = (TH-0.35) + Math.sin(t*0.8)*0.03;
+    if (scapeMixer) scapeMixer.update(dt);
     renderer.render(scene, camera);
   })();
   buildPet(); buildDecos(); buildShopFish(); applyCamera();
@@ -1852,8 +1858,8 @@ document.querySelectorAll("[data-nudge]").forEach(function(b){
     var key = tankState.selectedKey || $("arrangeSel").value;
     if (!key || !profile.positions) { if (!key) return; }
     var cur = profile.positions[key] || DEFAULT_POS[key] || {x:0,z:0};
-    var nx = Math.max(-7.4, Math.min(7.4, cur.x + parseFloat(parts[0])));
-    var nz = Math.max(-3.4, Math.min(3.4, cur.z + parseFloat(parts[1])));
+    var nx = Math.max(-6.2, Math.min(6.2, cur.x + parseFloat(parts[0])));
+    var nz = Math.max(-2.9, Math.min(2.9, cur.z + parseFloat(parts[1])));
     profile.positions[key] = { x:Math.round(nx*100)/100, z:Math.round(nz*100)/100 };
     tankState.selectedKey = key;
     saveProfile(false);
