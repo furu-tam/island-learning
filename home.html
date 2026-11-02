@@ -736,7 +736,7 @@ var REAL_DECO = {
   orangefish:{ url:ASSET+"swim-orange.glb", size:1.5, mode:"swim", centerY:true, yaw:Math.PI/2, makeMat:function(){ return new THREE.MeshStandardMaterial({ map:loadTex(ASSET+"orange-diffuse.jpg",true), normalMap:loadTex(ASSET+"orange-normal.jpg",false), normalScale:new THREE.Vector2(0.7,0.7), roughnessMap:loadTex(ASSET+"orange-rough.jpg",false), roughness:1, metalness:0.02 }); } },
   seafish: { url:ASSET+"swim-sea.glb", size:1.5, mode:"swim", centerY:true, rotX:-Math.PI/2, keepMat:true },
   glowfish:{ url:ASSET+"swim-glow.glb", size:1.5, mode:"swim", centerY:true, yaw:Math.PI/2, makeMat:function(){ var t=loadTex(ASSET+"glowfish-diffuse.jpg",true); return new THREE.MeshStandardMaterial({ map:t, emissive:0x9fd8ff, emissiveMap:t, emissiveIntensity:0.55, roughness:0.45, metalness:0.05 }); } },
-  dragoncarp:{ url:ASSET+"carp-dragon-gold.glb", size:1.7, mode:"swim", centerY:true, keepMat:true },
+  dragoncarp:{ url:ASSET+"carp-dragon-gold.glb", size:2.3, mode:"swim", centerY:true, keepMat:true, swimClip:"KoiSwim", rotX:5*Math.PI/180, yaw:25*Math.PI/180, rotZ:-50*Math.PI/180 },
   mudskipper:{ url:ASSET+"swim-mud.glb", size:1.6, mode:"swim", centerY:true, yaw:Math.PI/2, makeMat:function(){ return decorMat(ASSET+"mudskipper-diffuse.jpg", null, 0.6); } },
   neontetra:{ url:ASSET+"swim-neon.glb", size:1.15, mode:"swim", centerY:true, makeMat:function(){ return new THREE.MeshStandardMaterial({ map:loadTex(ASSET+"neon-diffuse.png",true), normalMap:loadTex(ASSET+"neon-normal.jpg",false), normalScale:new THREE.Vector2(0.6,0.6), roughness:0.5, metalness:0.05, alphaTest:0.3, side:THREE.DoubleSide }); } },
   bluejelly:{ url:ASSET+"blue-jellyfish/jellyfish.glb", size:1.85, mode:"swim", centerY:true, pulse:true, makeMat:function(){ var map=loadTex(ASSET+"blue-jellyfish/Jellyfish2.png",true); return new THREE.MeshStandardMaterial({ map:map, emissive:0x60a5fa, emissiveMap:map, emissiveIntensity:0.18, roughness:0.35, metalness:0.02, transparent:true, opacity:0.94, side:THREE.DoubleSide, depthWrite:false }); } },
@@ -747,12 +747,16 @@ var REAL_DECO = {
 };
 var gltfLoader2 = HAS_THREE ? new THREE.GLTFLoader() : null;
 var tplCache = {};
+var clipCache = {};
 function loadTemplate(kind){
   if (!HAS_THREE) return Promise.resolve(null);
   if (!tplCache[kind]){
     var def = REAL_DECO[kind];
     if (!def) return Promise.resolve(null);
-    tplCache[kind] = gltfLoader2.loadAsync(def.url).then(function(g){ return g.scene; }).catch(function(){ return null; });
+    tplCache[kind] = gltfLoader2.loadAsync(def.url).then(function(g){
+      clipCache[kind] = g.animations || [];
+      return g.scene;
+    }).catch(function(){ return null; });
   }
   return tplCache[kind];
 }
@@ -765,6 +769,7 @@ function buildRealInstance(kind, tpl){
   }
   if (def.rotX) inner.rotation.x += def.rotX;
   if (def.yaw) inner.rotation.y += def.yaw;
+  if (def.rotZ) inner.rotation.z += def.rotZ;
   var holder = new THREE.Group(); holder.add(inner);
   if (def.nativeBox){
     var nb = def.nativeBox;
@@ -783,6 +788,16 @@ function buildRealInstance(kind, tpl){
     inner.position.x -= (box2.min.x+box2.max.x)/2;
     inner.position.z -= (box2.min.z+box2.max.z)/2;
     inner.position.y -= def.centerY ? (box2.min.y+box2.max.y)/2 : box2.min.y;
+  }
+  if (def.swimClip && clipCache[kind] && THREE.AnimationClip){
+    try {
+      var clip = THREE.AnimationClip.findByName(clipCache[kind], def.swimClip);
+      if (clip){
+        var mixer = new THREE.AnimationMixer(inner);
+        mixer.clipAction(clip).play();
+        holder.userData.mixer = mixer;
+      }
+    } catch (e) { /* keep the mesh even if the swim clip cannot play */ }
   }
   return holder;
 }
@@ -1371,6 +1386,7 @@ function startTank(){
           var real = buildRealInstance(d.kind, tpl);
           if (!real) return;
           holder.remove(grp); holder.add(real);
+          if (real.userData.mixer) decoObjs[d.key].mixer = real.userData.mixer;
           holder.traverse(function(o){ o.userData.decoKey = d.key; });
         });
       }
@@ -1396,6 +1412,7 @@ function startTank(){
         var real = buildRealInstance(id, tpl);
         if (!real) return;
         holder.remove(fb); holder.add(real);
+        if (real.userData.mixer) rec.mixer = real.userData.mixer;
       });
     });
   }
@@ -1534,10 +1551,12 @@ function startTank(){
       p.x += ddx/dd*f.speed*dt*1.6; p.y += ddy/dd*f.speed*dt*1.6; p.z += ddz/dd*f.speed*dt*1.6;
       f.group.rotation.y = -Math.atan2(-ddz, ddx);
       f.group.rotation.z = Math.sin(t*3+f.phase)*0.08;
+      if (f.mixer) f.mixer.update(dt);
     });
     // decos motion
     Object.keys(decoObjs).forEach(function(k){
       var rec = decoObjs[k];
+      if (rec.mixer) rec.mixer.update(dt);
       if (rec.mode==="swim"){
         var jelly = REAL_DECO[rec.kind] && REAL_DECO[rec.kind].pulse;
         var a = t*(jelly?0.28:0.55) + rec.phase;
