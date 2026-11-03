@@ -2524,18 +2524,20 @@ function ensurePrizeStage(){
     var center = new THREE.Vector3(); box.getCenter(center);
     root.position.sub(center);
   }
-  function playClip(root, gltf, name){
+  function playClip(root, gltf, name, speed){
     if (!gltf.animations || !gltf.animations.length || !THREE.AnimationClip) return;
     var clip = THREE.AnimationClip.findByName(gltf.animations, name) || gltf.animations[0];
     var mixer = new THREE.AnimationMixer(root);
-    mixer.clipAction(clip).play();
+    var action = mixer.clipAction(clip);
+    action.timeScale = speed;
+    action.play();
     mixers.push(mixer);
   }
   gltfLoader2.loadAsync(ASSET + "gold-coin.glb").then(function(gltf){
-    var root = gltf.scene; prep(root); fitNamed(root, "coin_mesh", 2.15); coinRoot.add(root); playClip(root, gltf, "Spin");
+    var root = gltf.scene; prep(root); fitNamed(root, "coin_mesh", 2.15); coinRoot.add(root); playClip(root, gltf, "Spin", 0.22);
   }).catch(function(){});
   gltfLoader2.loadAsync(ASSET + "diamond.glb").then(function(gltf){
-    var root = gltf.scene; prep(root); fitNamed(root, "diamond_mesh", 1.85); gemRoot.add(root); playClip(root, gltf, "Tumble");
+    var root = gltf.scene; prep(root); fitNamed(root, "diamond_mesh", 1.85); gemRoot.add(root); playClip(root, gltf, "Tumble", 0.35);
   }).catch(function(){});
   var goldFrame = document.createElement("canvas"); goldFrame.width = goldFrame.height = 160;
   var gemFrame = document.createElement("canvas"); gemFrame.width = gemFrame.height = 160;
