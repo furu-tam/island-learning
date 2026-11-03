@@ -147,6 +147,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 .lvbtn{border-radius:12px;border:2px solid var(--line);background:var(--card);padding:10px 14px;font-weight:800;color:var(--ink)}
 .lvbtn.passed{border-color:var(--good);background:rgba(22,163,74,.12)}
 .lvbtn:disabled{opacity:.45}
+#qEssay{width:100%;min-height:140px;margin-top:12px;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-family:inherit;font-size:16px;line-height:1.5}
 .qtext{font-size:22px;font-weight:800;line-height:1.4}
 .qtext.big{font-size:30px}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
@@ -237,7 +238,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <button class="place-card" data-place="math"><div class="emo">🔢</div><div class="nm">Toán học</div><div class="ds" id="mathCardDesc">Quiz Toán · 66 câu</div></button>
     <button class="place-card" data-place="english"><div class="emo">🔤</div><div class="nm">Tiếng Anh</div><div class="ds">Sắp có bài học</div></button>
     <button class="place-card" data-place="it"><div class="emo">📖</div><div class="nm">Ngữ văn</div><div class="ds" id="vanCardDesc">2 dàn ý · 2 bài mẫu · 20 câu</div></button>
-    <button class="place-card" data-place="exam"><div class="emo">🏯</div><div class="nm">Phó Bản</div><div class="ds" id="examCardDesc">Toán 6 · 20 câu · 30 phút</div></button>
+    <button class="place-card" data-place="exam"><div class="emo">🏯</div><div class="nm">Phó Bản</div><div class="ds" id="examCardDesc">Toán 6 · Tin học 6</div></button>
     <button class="place-card" data-place="evo"><div class="emo">🌳</div><div class="nm">Tiến hóa</div><div class="ds" id="evoCardDesc">Xem dạng thú · mở đến Lv.10</div></button>
   </div>
 </section>
@@ -376,6 +377,8 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
         <div class="mut" id="hintBox" style="display:none;margin:8px 0 0;font-size:15px;line-height:1.5"></div>
       </div>
       <div class="opts" id="qOpts"></div>
+      <textarea id="qEssay" style="display:none" placeholder="Viết ý của em vào đây, rồi bấm Xem đáp án để tự chấm."></textarea>
+      <div id="qGuide" class="van-box" style="display:none;text-align:left"></div>
       <div class="feedback" id="qFeed"></div>
       <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">
         <button class="btn ghost small" id="qQuit">Thoát</button>
@@ -712,8 +715,8 @@ function refreshWallets(){
     var vanPassed = profile.quizPassed.filter(function(k){ return k.indexOf("van:")===0; }).length;
     var vanMiss = (profile.vanMissed||[]).length;
     $("vanCardDesc").textContent = "2 dàn ý · 2 bài mẫu · 20 câu · " + vanPassed + "/2 bài đã qua" + (vanMiss ? " · còn " + vanMiss + " câu sai" : "");
-    var examBest = profile.quizBest["exam:toan6"];
-    $("examCardDesc").textContent = "Toán 6 · 20 câu · 30 phút" + (profile.quizPassed.indexOf("exam:toan6")>=0 ? " · đã qua" : "") + (examBest!=null ? " · kỷ lục " + examBest + "%" : "");
+    var examDone = ["toan6", "tinhoc6"].filter(function(id){ return profile.quizPassed.indexOf("exam:" + id)>=0; }).length;
+    $("examCardDesc").textContent = "Toán 6 · Tin học 6" + (examDone ? " · đã qua " + examDone + "/2" : "");
     var maxLv = petLevelMax(profile.giftPet);
     $("evoCardDesc").textContent = profile.giftPet==="shark"
       ? (petEmoji(profile.giftPet, profile.level) + " đang Lv." + profile.level + " · Lv.1–10 rùa biển · Lv.11–30 rồng")
@@ -3023,8 +3026,8 @@ var QUIZ_VAN = {
   ]
 };
 
-/* Phó Bản: 20 câu tổng hợp Toán 6, làm trong 30 phút. */
-var QUIZ_EXAM = { minutes: 30, pass: 16, reward: 15, questions: [
+/* Phó Bản: Toán 6 (30 phút) và Tin học 6 giữa kì 1 (45 phút). */
+var QUIZ_EXAM = { id:"toan6", title:"Toán lớp 6", minutes: 30, pass: 16, reward: 15, questions: [
   { text: "Tập hợp A = {x thuộc N | x < 5} có bao nhiêu phần tử?", options: ["4", "5", "6", "3"], correct: 1, explanation: "0 cũng là số tự nhiên, nên A = {0; 1; 2; 3; 4}, có 5 phần tử." },
   { text: "Số lớn nhất có 3 chữ số khác nhau và chia hết cho 5 là:", options: ["980", "985", "975", "990"], correct: 1, explanation: "Chia hết cho 5 thì tận cùng 0 hoặc 5. 985 có các chữ số khác nhau và lớn hơn 980, 975. 990 có hai chữ số 9." },
   { text: "Tập các số tự nhiên x thỏa mãn 20 < x ≤ 24 và x chẵn là:", options: ["{22; 24}", "{20; 22; 24}", "{22}", "{21; 23}"], correct: 0, explanation: "20 không được lấy vì x > 20. Các số chẵn còn lại là 22 và 24." },
@@ -3046,6 +3049,48 @@ var QUIZ_EXAM = { minutes: 30, pass: 16, reward: 15, questions: [
   { text: "Hình thang có đáy lớn 12 cm, đáy nhỏ 8 cm, chiều cao 5 cm thì diện tích là:", options: ["50 cm2", "100 cm2", "60 cm2", "25 cm2"], correct: 0, explanation: "(12 + 8) × 5 : 2 = 50." },
   { text: "Sân hình chữ nhật dài 20 m, rộng 12 m. Muốn rào xung quanh thì cần hàng rào dài bao nhiêu?", options: ["64 m", "32 m", "240 m", "240 m2"], correct: 0, explanation: "Rào xung quanh là chu vi: 2 × (20 + 12) = 64. 240 là diện tích sân." }
 ]};
+
+/* Tin học 6 — Kiểm tra giữa học kì 1. Trắc nghiệm 14 câu × 0,5 điểm. Tự luận tự chấm theo đáp án. */
+var QUIZ_TIN = { id:"tinhoc6", title:"Tin học lớp 6", minutes: 45, pass: 12, reward: 12,
+  study: [
+    "Thông tin là những gì đem lại hiểu biết cho con người về thế giới xung quanh và về chính mình.",
+    "Dữ liệu là thông tin đã được đưa vào máy tính, tức là đã được mã hoá để máy xử lí được.",
+    "Vật mang tin: sách, vở, bảng, USB, đĩa CD, thẻ nhớ, sóng âm thanh, sóng điện từ.",
+    "Xử lí thông tin gồm: thu nhận, xử lí, lưu trữ, truyền thông tin.",
+    "Máy tính lưu trữ và xử lí thông tin dưới dạng dãy bit. Mỗi bit chỉ nhận 0 hoặc 1.",
+    "1 byte = 8 bit. 1 KB = 1024 byte. 1 MB = 1024 KB. 1 GB = 1024 MB. 1 TB = 1024 GB.",
+    "Mạng máy tính là các máy được nối với nhau để chia sẻ dữ liệu và dùng chung thiết bị.",
+    "LAN là mạng cục bộ, phạm vi hẹp như một phòng, một trường. WAN là mạng diện rộng.",
+    "Thiết bị mạng: cáp, card mạng, modem, router, switch, điểm truy cập không dây (wifi).",
+    "Internet là mạng toàn cầu. Dịch vụ: web, email, tìm kiếm, học trực tuyến, mạng xã hội.",
+    "An toàn: không chia sẻ mật khẩu và thông tin cá nhân, không mở liên kết lạ, kiểm chứng thông tin."
+  ],
+  questions: [
+    { text: "Thông tin là gì?", options: ["Những gì đem lại hiểu biết cho con người về thế giới xung quanh và về chính mình.", "Chỉ là các con số trong máy tính.", "Chỉ là hình ảnh trên mạng Internet.", "Là thiết bị lưu trữ như USB."], correct: 0, explanation: "Thông tin giúp con người hiểu thêm về thế giới và về chính mình. Con số trong máy là dữ liệu, USB là vật mang tin." },
+    { text: "Đâu là ví dụ về dữ liệu?", options: ["Tiếng chim hót ngoài sân trường.", "Điểm kiểm tra đã được nhập vào máy tính để tính điểm trung bình.", "Mùi thơm của hoa trong vườn.", "Cảm giác vui khi được điểm tốt."], correct: 1, explanation: "Dữ liệu là thông tin đã đưa vào máy tính. Tiếng chim, mùi hoa và cảm giác vui chưa được mã hoá cho máy xử lí." },
+    { text: "Vật nào sau đây KHÔNG phải là vật mang tin?", options: ["Quyển sách.", "USB.", "Chiếc bàn học.", "Đĩa CD."], correct: 2, explanation: "Sách, USB và đĩa CD dùng để mang tin. Chiếc bàn học không dùng để mang tin." },
+    { text: "Hoạt động nào sau đây thuộc quá trình xử lí thông tin?", options: ["Nghe thầy cô giảng bài.", "Ngủ trưa.", "Chơi đá bóng.", "Ăn cơm trưa."], correct: 0, explanation: "Nghe giảng là thu nhận thông tin. Ngủ, chơi bóng và ăn cơm không phải hoạt động xử lí thông tin." },
+    { text: "Thứ tự đúng của các hoạt động xử lí thông tin thường là:", options: ["Lưu trữ - Thu nhận - Xử lí - Truyền.", "Thu nhận - Xử lí - Lưu trữ - Truyền.", "Truyền - Lưu trữ - Xử lí - Thu nhận.", "Xử lí - Truyền - Thu nhận - Lưu trữ."], correct: 1, explanation: "Thường gặp thông tin trước (thu nhận), rồi xử lí, lưu trữ và truyền cho người khác." },
+    { text: "Đơn vị nhỏ nhất dùng để lưu trữ thông tin trong máy tính là:", options: ["Byte.", "Bit.", "KB.", "MB."], correct: 1, explanation: "Bit là đơn vị nhỏ nhất. Mỗi bit chỉ nhận một trong hai giá trị 0 hoặc 1. 1 byte = 8 bit." },
+    { text: "1 byte bằng bao nhiêu bit?", options: ["2 bit.", "4 bit.", "8 bit.", "10 bit."], correct: 2, explanation: "1 byte = 8 bit." },
+    { text: "1 KB bằng bao nhiêu byte?", options: ["100 byte.", "512 byte.", "1000 byte.", "1024 byte."], correct: 3, explanation: "Trong Tin học 6, 1 KB = 1024 byte, không phải 1000 byte." },
+    { text: "Dãy nào sau đây là dãy bit?", options: ["12345.", "101010.", "ABCDE.", "10,5."], correct: 1, explanation: "Dãy bit chỉ gồm chữ số 0 và 1. 101010 là dãy bit. 12345 có chữ số khác 0 và 1." },
+    { text: "Mạng máy tính là gì?", options: ["Một chiếc máy tính thật mạnh.", "Tập hợp các máy tính được kết nối với nhau để chia sẻ dữ liệu và dùng chung thiết bị.", "Một trang web bán hàng.", "Một phần mềm soạn thảo văn bản."], correct: 1, explanation: "Nhiều máy nối với nhau để chia sẻ dữ liệu và dùng chung máy in, phần mềm." },
+    { text: "Mạng LAN là mạng có phạm vi như thế nào?", options: ["Toàn thế giới.", "Một quốc gia.", "Phạm vi hẹp như một phòng học, một trường học.", "Ngoài vũ trụ."], correct: 2, explanation: "LAN là mạng cục bộ, trong một phòng hoặc một trường. Mạng rộng như một nước hay cả thế giới là WAN." },
+    { text: "Thiết bị nào sau đây dùng để phát wifi, giúp máy tính kết nối mạng không dây?", options: ["Máy in.", "Loa.", "Điểm truy cập không dây (Access Point).", "Bàn phím."], correct: 2, explanation: "Điểm truy cập không dây, hay Access Point, phát sóng wifi. Máy in, loa và bàn phím không phát wifi." },
+    { text: "Internet là gì?", options: ["Một trò chơi trên máy tính.", "Mạng máy tính toàn cầu, kết nối hàng triệu máy tính trên khắp thế giới.", "Một chiếc điện thoại thông minh.", "Một phần mềm diệt virus."], correct: 1, explanation: "Internet là mạng máy tính toàn cầu." },
+    { text: "Việc làm nào sau đây là an toàn khi sử dụng Internet?", options: ["Chia sẻ mật khẩu tài khoản cho bạn thân.", "Đăng ảnh thẻ học sinh và địa chỉ nhà lên mạng xã hội.", "Không mở liên kết lạ và không chia sẻ thông tin cá nhân, mật khẩu.", "Tin ngay mọi thông tin đọc được trên mạng."], correct: 2, explanation: "Giữ mật khẩu và thông tin cá nhân cho riêng mình, không mở liên kết lạ, và kiểm chứng thông tin trước khi tin." }
+  ],
+  essays: [
+    { text: "Câu 1 (1,0 điểm). Phân biệt thông tin và dữ liệu. Cho 1 ví dụ về thông tin và 1 ví dụ về dữ liệu.",
+      guide: "<h4>Đáp án gợi ý · 1,0 điểm</h4><ul><li>Thông tin là những gì đem lại hiểu biết cho con người về thế giới xung quanh và về chính mình. (0,25 điểm)</li><li>Dữ liệu là thông tin đã được đưa vào máy tính. (0,25 điểm)</li><li>Ví dụ thông tin: bảng điểm trên giấy, lời thầy cô giảng, tiếng chuông báo giờ ra chơi. (0,25 điểm)</li><li>Ví dụ dữ liệu: bảng điểm đã nhập vào máy, ảnh đã lưu trong USB, bài hát đã lưu trong điện thoại. (0,25 điểm)</li></ul><p>Ví dụ khác vẫn được điểm nếu đúng bản chất.</p>" },
+    { text: "Câu 2 (1,0 điểm). a) Đổi đơn vị: 2 KB = ...... byte; 3 MB = ...... KB. b) Vì sao nói máy tính chỉ xử lí được dãy bit 0 và 1?",
+      guide: "<h4>Đáp án gợi ý · 1,0 điểm</h4><ul><li>a) 2 KB = 2048 byte. Cách tính: 2 × 1024 = 2048. (0,25 điểm)</li><li>a) 3 MB = 3072 KB. Cách tính: 3 × 1024 = 3072. (0,25 điểm)</li><li>b) Máy tính được cấu tạo từ các mạch điện tử chỉ có 2 trạng thái đóng và mở, tương ứng với 0 và 1. Mọi thông tin đưa vào máy đều phải mã hoá thành dãy bit 0 và 1 thì máy mới xử lí được. (0,5 điểm)</li></ul>" },
+    { text: "Câu 3 (1,0 điểm). a) Nêu 2 lợi ích của mạng máy tính và Internet đối với việc học tập của học sinh. b) Nêu 2 việc em nên làm để bảo vệ bản thân và thông tin cá nhân khi sử dụng Internet.",
+      guide: "<h4>Đáp án gợi ý · 1,0 điểm</h4><p>a) Hai lợi ích, mỗi ý 0,25 điểm. Ví dụ: tìm tài liệu học nhanh; học trực tuyến và trao đổi bài với thầy cô, bạn bè; chia sẻ tài liệu, dùng chung máy in.</p><p>b) Hai việc nên làm, mỗi ý 0,25 điểm. Ví dụ: không chia sẻ mật khẩu, địa chỉ nhà, số điện thoại, ảnh cá nhân; không mở liên kết lạ và không tải phần mềm không rõ nguồn; kiểm chứng thông tin và hỏi người lớn khi gặp nội dung xấu.</p>" }
+  ]
+};
+var QUIZ_EXAMS = { toan6: QUIZ_EXAM, tinhoc6: QUIZ_TIN };
 
 /* ============================== Quiz ============================== */
 var quizCtx = null;
@@ -3071,13 +3116,13 @@ function startExamClock(){
     if (left<=0){
       quizCtx.timedOut = true;
       stopExamTimer();
-      toast("Hết 30 phút. Bài được nộp với những câu đã làm.");
+      toast("Hết " + (quizCtx.exam ? quizCtx.exam.minutes : 30) + " phút. Bài được nộp với những câu đã làm.");
       finishQuiz();
     }
   }, 250);
 }
 function quizKey(topic, level){
-  if (quizMode==="exam") return "exam:toan6";
+  if (quizMode==="exam") return "exam:" + topic;
   if (quizMode==="van") return "van:" + topic + "-" + level;
   return (profile.grade===1 ? "g1:" : "") + topic + "-" + level;
 }
@@ -3138,17 +3183,26 @@ function openQuizHome(){
         '<div class="lvrow">' + fullBtn + reviewBtn + '</div></div>';
     }).join("");
   } else if (quizMode==="exam"){
-    var ekey = "exam:toan6";
-    var ePassed = profile.quizPassed.indexOf(ekey)>=0;
-    var eBest = profile.quizBest[ekey];
-    $("quizTitle").textContent = "🏯 Phó Bản · Toán lớp 6";
-    $("quizIntro").textContent = "Bài thi tổng hợp 5 chủ đề đang học: tập hợp và số tự nhiên, phép tính và lũy thừa, chia hết – ước bội, số nguyên, hình học. 20 câu, làm trong 30 phút. Đúng từ 16/20 là qua và nhận 15 kim cương lần đầu.";
-    $("topicList").innerHTML = '<div class="topic"><b style="font-size:18px">⏱️ Kiểm tra 30 phút</b><div class="mut">' +
-      (ePassed ? "Đã qua Phó Bản." : "Chưa qua Phó Bản.") + (eBest!=null ? " Kỷ lục " + eBest + "%." : "") +
-      '</div><div class="lvrow"><button class="lvbtn' + (ePassed?" passed":"") + '" id="examStart">' +
-      (ePassed ? "✅ Làm lại bài thi" : "▶️ Bắt đầu bài thi") +
-      '<br><span class="mut">20 câu · 30 phút · Thưởng 15 💎 lần đầu</span></button></div></div>';
-    $("examStart").onclick = startExam;
+    $("quizTitle").textContent = "🏯 Phó Bản";
+    $("quizIntro").textContent = "Chọn một bài thi. Làm hết giờ thì bài tự nộp. Trắc nghiệm được chấm ngay. Phần tự luận em tự đối chiếu đáp án, điểm kim cương chỉ tính phần trắc nghiệm.";
+    $("topicList").innerHTML = ["toan6", "tinhoc6"].map(function(id){
+      var spec = QUIZ_EXAMS[id];
+      var ekey = "exam:" + id;
+      var ePassed = profile.quizPassed.indexOf(ekey)>=0;
+      var eBest = profile.quizBest[ekey];
+      var study = (spec.study||[]).length ? '<div class="van-box"><h4>Ôn nhanh trước khi làm</h4><ul>' + spec.study.map(function(line){ return "<li>" + line + "</li>"; }).join("") + "</ul></div>" : "";
+      var detail = id==="tinhoc6"
+        ? "14 câu trắc nghiệm · 3 câu tự luận · 45 phút · Đúng từ 12/14 là qua"
+        : "20 câu · 30 phút · Đúng từ 16/20 là qua";
+      return '<div class="topic"><b style="font-size:18px">' + (id==="tinhoc6" ? "💻 " : "⏱️ ") + spec.title + '</b><div class="mut">' +
+        (ePassed ? "Đã qua." : "Chưa qua.") + (eBest!=null ? " Kỷ lục " + eBest + "%." : "") + " " + detail +
+        '</div>' + study + '<div class="lvrow"><button class="lvbtn' + (ePassed?" passed":"") + '" data-exam="' + id + '">' +
+        (ePassed ? "✅ Làm lại bài thi" : "▶️ Bắt đầu bài thi") +
+        '<br><span class="mut">Thưởng ' + spec.reward + ' 💎 lần đầu</span></button></div></div>';
+    }).join("");
+    $("topicList").querySelectorAll("[data-exam]").forEach(function(b){
+      b.onclick = function(){ startExam(b.getAttribute("data-exam")); };
+    });
   } else {
     var bank = currentBank();
     $("quizTitle").textContent = "🔢 Quiz Toán Lớp " + profile.grade;
@@ -3260,8 +3314,15 @@ function startQuiz(topic, level, review){
   $("quizPlay").style.display = "block";
   renderQuestion();
 }
-function startExam(){
-  var prepared = QUIZ_EXAM.questions.map(function(q){
+function hideEssayBox(){
+  $("qEssay").style.display = "none";
+  $("qEssay").value = "";
+  $("qGuide").style.display = "none";
+  $("qGuide").innerHTML = "";
+}
+function startExam(id){
+  var spec = QUIZ_EXAMS[id] || QUIZ_EXAM;
+  var prepared = spec.questions.map(function(q){
     var order = shuffle([0,1,2,3]);
     return {
       id: "", part: "", text: q.text,
@@ -3270,10 +3331,11 @@ function startExam(){
       explanation: q.explanation, hints: null, drop: [], hintUsed: 0, points: 10
     };
   });
-  quizCtx = { topic: "toan6", level: 1, questions: prepared, idx: 0, correct: 0, score: 0, answered: false, wrongStreak: 0, review: false, endsAt: Date.now() + QUIZ_EXAM.minutes*60*1000, timedOut: false };
+  quizCtx = { topic: spec.id, level: 1, questions: prepared, idx: 0, correct: 0, score: 0, answered: false, wrongStreak: 0, review: false, exam: spec, essays: spec.essays || [], essayMode: false, essaySeen: false, endsAt: Date.now() + spec.minutes*60*1000, timedOut: false };
   $("quizHome").style.display = "none";
   $("quizResult").style.display = "none";
   $("quizPlay").style.display = "block";
+  hideEssayBox();
   startExamClock();
   renderQuestion();
 }
@@ -3292,7 +3354,7 @@ function speak(text){
 function qMetaText(){
   var ctx = quizCtx, q = ctx.questions[ctx.idx];
   var s = "Câu " + (ctx.idx+1) + " / " + ctx.questions.length + " · Đúng: " + ctx.correct;
-  if (quizMode==="exam") s += " · Cần " + QUIZ_EXAM.pass + "/" + ctx.questions.length + " để qua";
+  if (quizMode==="exam" && ctx.exam) s += " · Cần " + ctx.exam.pass + "/" + ctx.questions.length + " để qua";
   if (quizMode==="van") s += " · Phần " + q.part + " · Điểm câu này: " + q.points;
   return s;
 }
@@ -3309,6 +3371,7 @@ function renderQuestion(){
   $("speakBtn").style.display = big ? "inline-block" : "none";
   var feed = $("qFeed"); feed.className = "feedback"; feed.textContent = "";
   $("qNext").style.display = "none";
+  hideEssayBox();
   var hintRow = $("hintRow"), hintBtn = $("hintBtn"), hintBox = $("hintBox");
   if (quizMode==="van" && q.hints){
     q.hintUsed = 0; q.points = 10;
@@ -3396,13 +3459,55 @@ function answer(i, btn){
   }
   $("qMeta").textContent = qMetaText();
   $("qNext").style.display = "inline-block";
-  $("qNext").textContent = ctx.idx+1 >= ctx.questions.length ? "Xem kết quả 🏁" : "Câu tiếp theo ➡️";
+  var lastMc = ctx.idx+1 >= ctx.questions.length;
+  var moreEssay = lastMc && ctx.essays && ctx.essays.length;
+  $("qNext").textContent = moreEssay ? "Phần tự luận ➡️" : (lastMc ? "Xem kết quả 🏁" : "Câu tiếp theo ➡️");
+}
+function renderEssay(){
+  var ctx = quizCtx; if (!ctx) return;
+  var q = ctx.essays[ctx.idx];
+  ctx.essaySeen = false;
+  var total = ctx.questions.length + ctx.essays.length;
+  $("qProg").style.width = ((ctx.questions.length + ctx.idx)/total*100) + "%";
+  $("qMeta").textContent = "Tự luận " + (ctx.idx+1) + " / " + ctx.essays.length + " · Viết ý của em, rồi xem đáp án để tự chấm. Phần này không tính vào kim cương.";
+  $("qText").textContent = q.text;
+  $("qText").classList.remove("big");
+  $("speakBtn").style.display = "none";
+  $("hintRow").style.display = "none";
+  $("qOpts").innerHTML = "";
+  $("qFeed").className = "feedback";
+  $("qFeed").textContent = "";
+  $("qEssay").style.display = "block";
+  $("qEssay").value = "";
+  $("qGuide").style.display = "none";
+  $("qGuide").innerHTML = "";
+  $("qNext").style.display = "inline-block";
+  $("qNext").textContent = "Xem đáp án";
 }
 $("qNext").onclick = function(){
   var ctx = quizCtx; if (!ctx) return;
+  if (ctx.essayMode && !ctx.essaySeen){
+    ctx.essaySeen = true;
+    $("qGuide").style.display = "block";
+    $("qGuide").innerHTML = ctx.essays[ctx.idx].guide;
+    $("qNext").textContent = ctx.idx+1 >= ctx.essays.length ? "Xem kết quả 🏁" : "Câu tiếp theo ➡️";
+    return;
+  }
   ctx.idx++;
-  if (ctx.idx >= ctx.questions.length) finishQuiz();
-  else renderQuestion();
+  if (ctx.essayMode){
+    if (ctx.idx >= ctx.essays.length) finishQuiz();
+    else renderEssay();
+    return;
+  }
+  if (ctx.idx >= ctx.questions.length){
+    if (ctx.essays && ctx.essays.length){
+      ctx.essayMode = true;
+      ctx.idx = 0;
+      renderEssay();
+    } else finishQuiz();
+    return;
+  }
+  renderQuestion();
 };
 $("qQuit").onclick = function(){ stopExamTimer(); if (quizMode==="van") saveProfile(true); quizCtx = null; openQuizHome(); };
 function finishQuiz(){
@@ -3426,13 +3531,14 @@ function finishQuiz(){
     refreshWallets();
     return;
   }
-  var passed = exam ? ctx.correct >= QUIZ_EXAM.pass : ctx.correct/total >= 0.8;
+  var spec = ctx.exam;
+  var passed = exam ? ctx.correct >= spec.pass : ctx.correct/total >= 0.8;
   var key = quizKey(ctx.topic, ctx.level);
   var reward = 0;
   if (passed){
     if (profile.quizPassed.indexOf(key)<0){
       profile.quizPassed.push(key);
-      reward = exam ? QUIZ_EXAM.reward : (QUIZ_REWARDS[ctx.level] || 0);
+      reward = exam ? spec.reward : (QUIZ_REWARDS[ctx.level] || 0);
       profile.diamonds += reward;
     }
     if (!exam && (profile.quizBest[key]==null || percent > profile.quizBest[key])) profile.quizBest[key] = percent;
@@ -3453,12 +3559,13 @@ function finishQuiz(){
       " Giờ viết lại đoạn văn 15 phút theo dàn ý nhé, đừng nhìn văn mẫu.";
     $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua bài!") : "Đã nhận thưởng bài này rồi, chơi lại không cộng trùng nhé.") : "";
   } else if (exam){
-    var spent = QUIZ_EXAM.minutes*60*1000 - Math.max(0, (ctx.endsAt||0) - Date.now());
+    var spent = spec.minutes*60*1000 - Math.max(0, (ctx.endsAt||0) - Date.now());
     $("resTitle").textContent = passed ? "Qua Phó Bản rồi!" : "Chưa qua Phó Bản";
-    $("resText").textContent = "Bạn đúng " + ctx.correct + "/" + total + " câu (" + percent + "%)" +
-      (ctx.timedOut ? ", hết 30 phút." : (", làm trong " + formatLeft(spent) + ".")) +
-      (passed ? " Phó Bản đã qua." : (" Cần đúng từ " + QUIZ_EXAM.pass + "/" + total + " mới qua."));
-    $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua Phó Bản!") : "Đã nhận thưởng Phó Bản rồi, làm lại không cộng trùng nhé.") : "";
+    $("resText").textContent = spec.title + ": đúng " + ctx.correct + "/" + total + " câu trắc nghiệm (" + percent + "%)" +
+      (ctx.timedOut ? ", hết " + spec.minutes + " phút." : (", làm trong " + formatLeft(spent) + ".")) +
+      (passed ? " Bài đã qua." : (" Cần đúng từ " + spec.pass + "/" + total + " mới qua.")) +
+      (spec.essays && spec.essays.length ? " Ba câu tự luận, mỗi câu 1 điểm, em tự chấm theo đáp án. Phần đó không cộng kim cương." : "");
+    $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua bài này!") : "Đã nhận thưởng bài này rồi, làm lại không cộng trùng nhé.") : "";
   } else {
     $("resText").textContent = "Bạn đúng " + ctx.correct + "/" + total + " câu (" + percent + "%). " + (passed ? "Level tiếp theo đã mở." : "Cần đúng từ 80% trở lên mới qua bài, chơi lại nào!");
     $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua bài!") : "Đã nhận thưởng level này rồi, chơi lại không cộng trùng nhé.") : "";
