@@ -124,11 +124,8 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 @keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.05)}}
 .rarity{display:inline-block;padding:5px 14px;border-radius:999px;font-weight:800}
 .drop{position:absolute;width:46px;height:46px;margin-left:-23px;border-radius:50%;border:none;background:rgba(255,255,255,.25);font-size:27px;z-index:5;padding:0;line-height:46px}
-.drop.gold,.drop.diamond{width:92px;height:92px;margin-left:-46px;font-size:54px;line-height:92px}
-.drop.gold{background:radial-gradient(circle at 32% 30%, #fff4b8, #ffd23a 46%, #f0a000 80%)}
-.drop.diamond{background:radial-gradient(circle at 32% 30%, #f7fdff, #c8f1ff 40%, #49b7ea 78%)}
-.drop.gold .drop-ico,.drop.diamond .drop-ico{display:inline-block}
-.drop.gold .drop-ico{filter:sepia(1) saturate(7) hue-rotate(2deg) brightness(1.08)}
+.drop.gold,.drop.diamond{width:92px;height:92px;margin-left:-46px;background:transparent;line-height:0}
+.drop-ico{display:block;width:92px;height:92px;pointer-events:none}
 .drop-key{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:900;line-height:1;color:#12303f;pointer-events:none;text-shadow:0 0 3px #fff,0 0 3px #fff,0 1px 0 #fff;z-index:1}
 .drop.gold .drop-key,.drop.diamond .drop-key{font-size:24px}
 .floater{position:absolute;transform:translate(-50%,0);font-weight:900;color:#fde68a;text-shadow:0 2px 6px rgba(0,0,0,.5);animation:rise 1.1s forwards;pointer-events:none;z-index:5;font-size:18px}
@@ -2464,8 +2461,108 @@ function setPracticeLevel(level){
   try { localStorage.setItem("island-practice-level", String(practiceLevel)); } catch (e) {}
   syncPracticeLevelUi();
 }
+var prizeStage = null;
+function ensurePrizeStage(){
+  if (prizeStage || !HAS_THREE || !gltfLoader2) return;
+  var renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, preserveDrawingBuffer:true });
+  renderer.setPixelRatio(1);
+  renderer.setSize(160, 160, false);
+  renderer.setClearColor(0x000000, 0);
+  if (THREE.SRGBEncoding) renderer.outputEncoding = THREE.SRGBEncoding;
+  if (THREE.ACESFilmicToneMapping){ renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15; }
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(30, 1, 0.05, 40);
+  camera.position.set(0, 0.15, 4.8);
+  camera.lookAt(0, 0, 0);
+  scene.add(new THREE.HemisphereLight(0xfff6e4, 0x2a2118, 0.85));
+  var key = new THREE.DirectionalLight(0xfff4d2, 1.7); key.position.set(2.4, 3.2, 4); scene.add(key);
+  var fill = new THREE.DirectionalLight(0xd7ecff, 0.7); fill.position.set(-3, 1.2, 2); scene.add(fill);
+  var rim = new THREE.DirectionalLight(0xffffff, 0.55); rim.position.set(0, -2, -3); scene.add(rim);
+  var coinRoot = new THREE.Group(), gemRoot = new THREE.Group();
+  scene.add(coinRoot, gemRoot);
+  var mixers = [];
+  function prep(root){
+    root.traverse(function(o){
+      if (!o.isMesh) return;
+      o.frustumCulled = false;
+      var mats = Array.isArray(o.material) ? o.material : [o.material];
+      mats.forEach(function(m){
+        if (!m) return;
+        if (m.metalness > 0.5){ m.metalness = 0.62; m.roughness = Math.max(0.28, m.roughness || 0); }
+        var spark = (m.name || "").indexOf("sparkle") >= 0;
+        if (spark){
+          m.transparent = true;
+          m.depthWrite = false;
+          m.blending = THREE.AdditiveBlending;
+          m.side = THREE.DoubleSide;
+          return;
+        }
+        if ((m.name || "") === "diamond" || m.transmission > 0){
+          m.transmission = 0;
+          m.thickness = 0;
+          m.roughness = 0.08;
+          m.metalness = 0.12;
+          m.color.set(0x8fd4ff);
+          m.emissive.set(0x143e66);
+          m.emissiveIntensity = 0.35;
+          m.transparent = false;
+          m.opacity = 1;
+          m.blending = THREE.NormalBlending;
+          m.depthWrite = true;
+          if ("clearcoat" in m){ m.clearcoat = 1; m.clearcoatRoughness = 0.04; }
+        }
+      });
+    });
+  }
+  function fitNamed(root, name, target){
+    var mesh = root.getObjectByName(name) || root;
+    var box = new THREE.Box3().setFromObject(mesh);
+    var size = new THREE.Vector3(); box.getSize(size);
+    var maxDim = Math.max(size.x, size.y, size.z) || 1;
+    root.scale.multiplyScalar(target / maxDim);
+    box.setFromObject(mesh);
+    var center = new THREE.Vector3(); box.getCenter(center);
+    root.position.sub(center);
+  }
+  function playClip(root, gltf, name){
+    if (!gltf.animations || !gltf.animations.length || !THREE.AnimationClip) return;
+    var clip = THREE.AnimationClip.findByName(gltf.animations, name) || gltf.animations[0];
+    var mixer = new THREE.AnimationMixer(root);
+    mixer.clipAction(clip).play();
+    mixers.push(mixer);
+  }
+  gltfLoader2.loadAsync(ASSET + "gold-coin.glb").then(function(gltf){
+    var root = gltf.scene; prep(root); fitNamed(root, "coin_mesh", 2.15); coinRoot.add(root); playClip(root, gltf, "Spin");
+  }).catch(function(){});
+  gltfLoader2.loadAsync(ASSET + "diamond.glb").then(function(gltf){
+    var root = gltf.scene; prep(root); fitNamed(root, "diamond_mesh", 1.85); gemRoot.add(root); playClip(root, gltf, "Tumble");
+  }).catch(function(){});
+  var goldFrame = document.createElement("canvas"); goldFrame.width = goldFrame.height = 160;
+  var gemFrame = document.createElement("canvas"); gemFrame.width = gemFrame.height = 160;
+  var goldCtx = goldFrame.getContext("2d"), gemCtx = gemFrame.getContext("2d");
+  var raf = 0, last = 0, running = false;
+  function loop(t){
+    raf = requestAnimationFrame(loop);
+    if (!running) return;
+    var dt = Math.min(0.05, last ? (t - last) / 1000 : 0); last = t;
+    mixers.forEach(function(m){ m.update(dt); });
+    gemRoot.visible = false; coinRoot.visible = true; renderer.render(scene, camera); goldCtx.clearRect(0, 0, 160, 160); goldCtx.drawImage(renderer.domElement, 0, 0);
+    coinRoot.visible = false; gemRoot.visible = true; renderer.render(scene, camera); gemCtx.clearRect(0, 0, 160, 160); gemCtx.drawImage(renderer.domElement, 0, 0);
+    drops.forEach(function(d){
+      var canvas = document.querySelector('[data-drop="' + d.id + '"] canvas.drop-ico');
+      if (!canvas) return;
+      canvas.getContext("2d").drawImage(d.kind === "gold" ? goldFrame : gemFrame, 0, 0);
+    });
+  }
+  prizeStage = {
+    start: function(){ running = true; if (!raf) loop(performance.now()); },
+    stop: function(){ running = false; last = 0; if (raf){ cancelAnimationFrame(raf); raf = 0; } }
+  };
+}
 function startDrops(){
   if (!practiceOn || dropTimer || !profile) return;
+  ensurePrizeStage();
+  if (prizeStage) prizeStage.start();
   var rar = RARITIES[profile.rarity];
   var spawnMs = Math.max(1500, 3400/Math.max(1,(rar.goldMult+rar.diamondMult)/2));
   dropTimer = setInterval(function(){
@@ -2496,6 +2593,7 @@ function stopDrops(){
   if (dropTimer) clearInterval(dropTimer);
   if (fallTimer) clearInterval(fallTimer);
   dropTimer = null; fallTimer = null; drops = [];
+  if (prizeStage) prizeStage.stop();
   var layer = $("dropLayer"); if (layer) layer.innerHTML = "";
   tankState.chase = null;
   updateTypeHands();
@@ -2518,9 +2616,9 @@ function renderDrop(d){
   var b = document.createElement("button");
   b.className = "drop " + (d.kind==="gold" ? "gold" : "diamond"); b.setAttribute("data-drop", d.id); b.setAttribute("data-key", d.letter);
   b.style.left = d.x + "%"; b.style.top = d.y + "%";
-  var ico = document.createElement("span");
+  var ico = document.createElement("canvas");
   ico.className = "drop-ico";
-  ico.textContent = d.kind==="gold" ? "🪙" : "💎";
+  ico.width = 160; ico.height = 160;
   var key = document.createElement("span");
   key.className = "drop-key";
   key.textContent = d.letter;
