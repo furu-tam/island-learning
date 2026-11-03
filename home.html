@@ -1495,7 +1495,7 @@ function startTank(){
   scene.fog = new THREE.Fog(0x0b5e7d, 24, 52);
   var camera = new THREE.PerspectiveCamera(52, 1, 0.1, 100);
   var camTarget = new THREE.Vector3(0, 1.9, 0);
-  var camTheta = 0.55, camPhi = 1.02, camRadius = 14;
+  var camTheta = 0.55, camPhi = 1.02, camRadius = 13.5;
   function applyCamera(){
     camTheta = Math.max(-2.6, Math.min(2.6, camTheta));
     camPhi = Math.max(0.58, Math.min(1.25, camPhi));
@@ -1504,13 +1504,16 @@ function startTank(){
     camera.position.set(camTarget.x + camRadius*sp*Math.sin(camTheta), camTarget.y + camRadius*Math.cos(camPhi), camTarget.z + camRadius*sp*Math.cos(camTheta));
     camera.lookAt(camTarget);
   }
-  function resetCamera(){ camTheta = 0.55; camPhi = 1.02; camRadius = (camera.aspect<0.9?16:14); applyCamera(); }
+  function resetCamera(){
+    var spec = TANK_SCAPES[activeScape] || spec0;
+    camTheta = 0.55; camPhi = 1.02; camRadius = spec.cam + (camera.aspect<0.9 ? 2 : 0); applyCamera();
+  }
   var hemi = new THREE.HemisphereLight(0xcdf3ff, 0x0b3a4d, 1.05); scene.add(hemi);
   var key = new THREE.DirectionalLight(0xffffff, 1.35); key.position.set(4,9,6); scene.add(key);
   var rim = new THREE.DirectionalLight(0x7dd3fc, 0.55); rim.position.set(-5,4,-4); scene.add(rim);
   var baseHemi = hemi.intensity, baseKey = key.intensity, baseRim = rim.intensity;
   var TANK_SCAPES = {
-    fresh: { url:ASSET+"aquascape-layout.glb", w:15.2, d:8.6, h:6.6, pos:[-0.42,0.02,0.32], cam:14 },
+    fresh: { url:ASSET+"aquascape-layout.glb?v=20261103", w:14.2, d:7.6, h:6.55, pos:[-0.33,0.06,0.22], cam:13.5 },
     reef180: { url:ASSET+"reef-layout.glb", w:18.4, d:7.4, h:6.6, pos:[0,0.02,0], cam:17 }
   };
   var spec0 = TANK_SCAPES[tankScapeId] || TANK_SCAPES.fresh;
@@ -1574,18 +1577,36 @@ function startTank(){
     water.position.y = TH-0.35;
   }
   var scapeMixer = null, scapeRoot = null, scapeToken = 0, activeScape = spec0===TANK_SCAPES.reef180 ? "reef180" : "fresh";
+  function flowMat(fall){
+    return new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, side: fall ? THREE.DoubleSide : THREE.FrontSide,
+      uniforms: { uTime: { value: 0 } },
+      vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+      fragmentShader: fall
+        ? "uniform float uTime; varying vec2 vUv; float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); } float n(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.0-2.0*f); return mix(mix(h(i), h(i+vec2(1.0,0.0)), u.x), mix(h(i+vec2(0.0,1.0)), h(i+vec2(1.0,1.0)), u.x), u.y); } void main(){ float flow = vUv.y * 6.0 - uTime * 1.6; float s = n(vec2(vUv.x * 18.0, flow)) * 0.6 + n(vec2(vUv.x * 46.0, flow * 0.7)) * 0.4; float a = pow(sin(vUv.x * 3.14159), 0.6) * (0.45 + 0.55 * s) * smoothstep(0.0, 0.05, vUv.y); gl_FragColor = vec4(mix(vec3(0.86, 0.93, 0.97), vec3(1.0), s), clamp(a + smoothstep(0.85, 1.0, vUv.y) * 0.25, 0.0, 1.0) * 0.95); }"
+        : "uniform float uTime; varying vec2 vUv; float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); } float n(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.0-2.0*f); return mix(mix(h(i), h(i+vec2(1.0,0.0)), u.x), mix(h(i+vec2(0.0,1.0)), h(i+vec2(1.0,1.0)), u.x), u.y); } void main(){ float flow = vUv.y * 16.0 - uTime * 0.45; float s = n(vec2(vUv.x * 10.0, flow)) * 0.6 + n(vec2(vUv.x * 30.0, flow * 2.0)) * 0.4; float spark = smoothstep(0.93, 1.0, n(vec2(vUv.x * 80.0, vUv.y * 160.0 - uTime * 2.0))); float a = smoothstep(0.0, 0.25, sin(vUv.x * 3.14159)) * (0.8 + 0.2 * s); float bank = (1.0 - smoothstep(0.0, 0.14, abs(vUv.x - 0.12))) + (1.0 - smoothstep(0.0, 0.14, abs(vUv.x - 0.88))); vec3 c = mix(vec3(0.97, 0.98, 1.0) + vec3(0.03) * s, vec3(0.62, 0.56, 0.46), clamp(bank, 0.0, 1.0) * 0.65); gl_FragColor = vec4(c + spark * 0.35, a); }"
+    });
+  }
   function loadScape(spec){
     var token = ++scapeToken;
     if (scapeRoot){ scene.remove(scapeRoot); scapeRoot = null; scapeMixer = null; }
     gltfLoader2.loadAsync(spec.url).then(function(gltf){
       if (token !== scapeToken) return;
       var root = gltf.scene;
+      var flow = [];
       root.traverse(function(o){
         if (!o.isMesh) return;
         o.frustumCulled = false;
+        if (o.name === "waterfall" || o.name === "sand_river"){
+          o.material = flowMat(o.name === "waterfall");
+          o.renderOrder = 3;
+          flow.push(o.material);
+          return;
+        }
         var list = Array.isArray(o.material) ? o.material : (o.material ? [o.material] : []);
         list.forEach(function(m){ if (m && "vertexColors" in m) m.vertexColors = true; });
       });
+      root.userData.flowMats = flow;
       root.position.set(spec.pos[0], spec.pos[1], spec.pos[2]);
       scene.add(root);
       scapeRoot = root;
@@ -2121,6 +2142,9 @@ function startTank(){
     });
     water.position.y = (TH-0.35) + Math.sin(t*0.8)*0.03;
     if (scapeMixer) scapeMixer.update(dt);
+    if (scapeRoot && scapeRoot.userData.flowMats){
+      scapeRoot.userData.flowMats.forEach(function(m){ m.uniforms.uTime.value = t; });
+    }
     renderer.render(scene, camera);
   })();
   function dropFishFood(x, z){
