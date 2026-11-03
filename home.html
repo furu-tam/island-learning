@@ -72,9 +72,17 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 .stage.fs.viewing #typeHands,
 .stage.fs.viewing #dropLayer,
 .stage.fs.viewing #lightPanel,
+.stage.fs.viewing #practiceLevel,
 .stage.fs.viewing .fsbar > :not(#fsViewBtn){display:none !important}
 .stage.fs.viewing .fsbar{top:10px}
 .stage.fs{position:fixed;inset:0;z-index:50;border-radius:0;height:100dvh!important}
+.practice-level{display:none;position:absolute;left:10px;top:54px;z-index:6;align-items:center;gap:8px;max-width:min(420px,calc(100% - 20px));background:rgba(8,28,38,.86);color:#fff;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800}
+.stage.practice .practice-level{display:flex}
+.stage.arranging .practice-level{display:none !important}
+.stage.fs .practice-level{max-width:min(420px,calc(100% - 210px))}
+.practice-level label{white-space:nowrap}
+.practice-level input[type=range]{flex:1;min-width:48px;accent-color:#ffd23a}
+.practice-level .fall{white-space:nowrap}
 #typeHands{display:none;position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;pointer-events:none;width:min(720px,calc(100% - 16px));height:210px;background:rgba(8,28,38,.82);border-radius:20px;box-shadow:0 8px 22px rgba(0,0,0,.28);overflow:hidden}
 .stage.fs.practice #typeHands{display:block}
 .stage.fs.practice #tankHint{bottom:230px !important}
@@ -304,6 +312,11 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
         <button type="button" class="light-chip" id="lightReset" style="background:#fff">Mặc định</button>
       </div>
     </div>
+    <div class="practice-level" id="practiceLevel">
+      <label for="practiceLevelRange">Lv <b id="practiceLevelNum">1</b></label>
+      <input type="range" id="practiceLevelRange" min="1" max="100" step="1" value="1" aria-label="Cấp độ luyện ngón, từ 1 đến 100">
+      <span class="fall" id="practiceFallLabel">6,0 giây ⚡</span>
+    </div>
     <div id="typeHands" aria-hidden="true"><div id="typeHandLetters"></div></div>
     <p id="tankHint" style="position:absolute;inset-inline:0;bottom:6px;text-align:center;color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.6);pointer-events:none;margin:0">Bấm chữ a–z ở giữa 🪙 💎, hoặc chạm, để nhặt nhé!</p>
   </div>
@@ -334,7 +347,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
       <button class="btn small" id="arrangeDone">✓ Xong</button>
     </div>
   </div>
-  <p class="mut">Kéo trên vùng nước để xoay hồ 3D, chụm 2 ngón hoặc lăn chuột để phóng to. Nút Cho ăn, hoặc bấm đúp vào một chỗ trong hồ, thả thức ăn để cả bầy cá bơi về đó. Nút Đèn RGB đổi màu hoặc tắt đèn. Nút Luyện ngón bật hoặc tắt bàn tay và xu, kim cương đang rơi. Nút Nhạc hồ bật nhạc nền và tiếng nhặt. Trong toàn màn hình, nút Chỉ ngắm giấu hết nút để nhìn hồ; bấm Hiện menu để gọi lại. Ở chế độ demo có thể đổi giữa hồ thủy sinh và hồ san hô 180.</p>
+  <p class="mut">Kéo trên vùng nước để xoay hồ 3D, chụm 2 ngón hoặc lăn chuột để phóng to. Nút Cho ăn, hoặc bấm đúp vào một chỗ trong hồ, thả thức ăn để cả bầy cá bơi về đó. Nút Đèn RGB đổi màu hoặc tắt đèn. Nút Luyện ngón bật hoặc tắt bàn tay và xu, kim cương đang rơi. Thanh Lv 1–100 trên hồ chỉnh tốc độ rơi: 6 giây ở level 1, 1,5 giây ở level 100. Nút Nhạc hồ bật nhạc nền và tiếng nhặt. Trong toàn màn hình, nút Chỉ ngắm giấu hết nút để nhìn hồ; bấm Hiện menu để gọi lại. Ở chế độ demo có thể đổi giữa hồ thủy sinh và hồ san hô 180.</p>
 </section>
 
 <!-- QUIZ -->
@@ -2399,6 +2412,54 @@ function updateTypeHands(){
   syncTypeHandView();
   if (typeHandApi) typeHandApi.highlight(byFinger, lowest);
 }
+var FALL_ANCHORS = [1,6, 10,5.2, 20,4.6, 30,4.1, 40,3.6, 50,3.2, 60,2.8, 70,2.4, 80,2.1, 90,1.8, 100,1.5];
+var DROP_TOP = -6, DROP_BOTTOM = 96;
+function practiceFallSec(level){
+  var lv = Math.max(1, Math.min(100, level|0));
+  var i;
+  for (i = 0; i < FALL_ANCHORS.length - 2; i += 2){
+    if (FALL_ANCHORS[i + 2] >= lv) break;
+  }
+  var aLv = FALL_ANCHORS[i], aSec = FALL_ANCHORS[i + 1];
+  var bLv = FALL_ANCHORS[i + 2], bSec = FALL_ANCHORS[i + 3];
+  var t = (lv - aLv) / (bLv - aLv);
+  return aSec + (bSec - aSec) * t;
+}
+function practiceSpeedText(level){
+  var sec = practiceFallSec(level);
+  var bolts = Math.max(1, Math.min(5, Math.round(1 + (6 - sec) / 4.5 * 4)));
+  var marks = "";
+  var n;
+  for (n = 0; n < bolts; n++) marks += "⚡";
+  var shown = Math.round((sec + 1e-6) * 10) / 10;
+  return shown.toFixed(1).replace(".", ",") + " giây " + marks;
+}
+var practiceLevel = 1;
+try {
+  var savedLevel = parseInt(localStorage.getItem("island-practice-level"), 10);
+  if (savedLevel >= 1 && savedLevel <= 100) practiceLevel = savedLevel;
+} catch (e) {}
+function syncPracticeLevelUi(){
+  var range = $("practiceLevelRange");
+  var num = $("practiceLevelNum");
+  var label = $("practiceFallLabel");
+  if (range) range.value = String(practiceLevel);
+  if (num) num.textContent = String(practiceLevel);
+  if (label) label.textContent = practiceSpeedText(practiceLevel);
+}
+function setPracticeLevel(level){
+  var now = performance.now();
+  var oldDur = practiceFallSec(practiceLevel) * 1000;
+  var next = Math.max(1, Math.min(100, level|0));
+  var newDur = practiceFallSec(next) * 1000;
+  drops.forEach(function(d){
+    var progressed = Math.min(1, Math.max(0, (now - d.born) / oldDur));
+    d.born = now - progressed * newDur;
+  });
+  practiceLevel = next;
+  try { localStorage.setItem("island-practice-level", String(practiceLevel)); } catch (e) {}
+  syncPracticeLevelUi();
+}
 function startDrops(){
   if (!practiceOn || dropTimer || !profile) return;
   var rar = RARITIES[profile.rarity];
@@ -2406,16 +2467,20 @@ function startDrops(){
   dropTimer = setInterval(function(){
     if (drops.length>=5) return;
     var isDia = Math.random() < 0.14*rar.diamondMult;
-    var d = { id:++dropSeq, kind:isDia?"diamond":"gold", letter:rollDropLetter(), x:8+Math.random()*84, y:-6, speed:5.5+Math.random()*3.5 };
+    var d = { id:++dropSeq, kind:isDia?"diamond":"gold", letter:rollDropLetter(), x:8+Math.random()*84, y:DROP_TOP, born:performance.now() };
     drops.push(d); renderDrop(d);
   }, spawnMs);
   fallTimer = setInterval(function(){
+    var now = performance.now();
+    var dur = practiceFallSec(practiceLevel) * 1000;
+    var span = DROP_BOTTOM - DROP_TOP;
     var droppedOff = false;
     drops = drops.filter(function(d){
-      d.y += d.speed*0.55;
+      var t = (now - d.born) / dur;
+      d.y = DROP_TOP + span * Math.min(1, Math.max(0, t));
       var el = document.querySelector('[data-drop="'+d.id+'"]');
       if (el) el.style.top = d.y + "%";
-      if (d.y>=96){ if (el) el.remove(); droppedOff = true; return false; }
+      if (t >= 1){ if (el) el.remove(); droppedOff = true; return false; }
       return true;
     });
     if (droppedOff || drops.length) updateTypeHands();
@@ -2547,6 +2612,8 @@ function setPractice(on){
 setPractice(practiceOn);
 $("practiceBtn").onclick = function(){ setPractice(!practiceOn); };
 $("fsPracticeBtn").onclick = function(){ setPractice(!practiceOn); };
+syncPracticeLevelUi();
+$("practiceLevelRange").oninput = function(){ setPracticeLevel(this.value); };
 function feedFish(){
   if (!$("scr-tank") || !$("scr-tank").classList.contains("on")) return;
   if (!tankApi || !tankApi.feed){ toast("Hồ chưa sẵn sàng để cho ăn."); return; }
