@@ -1,0 +1,17 @@
+---
+description: Sau khi sửa xong project này, commit và push main để GitHub Pages cập nhật
+alwaysApply: true
+---
+
+# Đẩy git để trang public cập nhật
+
+Trang public là GitHub Pages, build từ nhánh `main` của repo này.
+
+Sau khi hoàn thành một thay đổi người dùng yêu cầu trong project này:
+
+1. Commit các file liên quan. Không commit file sao lưu (`*.bak*`), `.env`, hay bí mật.
+2. Message tiếng Việt, ngắn, nói vì sao đổi.
+3. Push `HEAD` lên `origin/main`. Không force-push, không sửa git config.
+4. Báo link hoặc commit đã đẩy.
+
+Nếu người dùng chỉ hỏi, hoặc chỉ muốn xem một đoạn code, không commit và không push.

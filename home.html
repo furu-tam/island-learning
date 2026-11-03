@@ -168,7 +168,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 <!-- REGISTER -->
 <section class="screen" id="scr-register">
   <h1>🎁 Chào bạn nhỏ!</h1>
-  <p class="sub">Đặt tên cho mình, chọn lớp đang học, rồi mở hộp quà để nhận ngẫu nhiên cá chép hoặc cua nhé.</p>
+  <p class="sub">Đặt tên cho mình, chọn lớp đang học, rồi mở hộp quà để nhận ngẫu nhiên rùa biển hoặc cua nhé.</p>
   <div class="card">
     <label for="nameInput" style="font-weight:800">Biệt danh trong game — không cần tên thật</label>
     <input type="text" id="nameInput" maxlength="30" placeholder="Ví dụ: Bạn nhỏ" autocomplete="off" style="margin:8px 0 14px" />
@@ -186,11 +186,11 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 <section class="screen" id="scr-gift">
   <div class="center">
     <h1>Hộp quà của bạn!</h1>
-    <p class="sub">Chạm vào hộp quà để xem bạn nhận cá chép hay cua nhé.</p>
+    <p class="sub">Chạm vào hộp quà để xem bạn nhận rùa biển hay cua nhé.</p>
     <button class="giftbox" id="giftBox" aria-label="Mở hộp quà">🎁</button>
     <div id="giftReveal" style="display:none">
       <div style="font-size:96px" id="giftEmoji">🐟</div>
-      <h2 id="giftName">Cá chép</h2>
+      <h2 id="giftName">Rùa biển</h2>
       <p><span class="rarity" id="giftRarity">Thường</span></p>
       <p class="sub" id="giftDetail"></p>
       <button class="btn" id="giftGo">🏝️ Vào Đảo Học Vui</button>
@@ -231,7 +231,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
   <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
     <h2>🌳 Nhà tiến hóa</h2>
   </div>
-  <p class="sub" id="evoIntro">Cá chép: Lv.1–10 to dần và đậm màu dần. Từ Lv.11 hóa rồng vàng đến Lv.30.</p>
+  <p class="sub" id="evoIntro">Rùa biển: Lv.1–5 rùa con, Lv.6–10 rùa trưởng thành. Từ Lv.11 hóa rồng vàng đến Lv.30.</p>
   <div class="stage" id="evoStage">
     <div id="evoMount" style="position:absolute;inset:0"></div>
     <div id="evoLock" style="display:none;position:absolute;inset:0;z-index:3;background:rgba(8,30,40,.94);color:#fff;align-items:center;justify-content:center;text-align:center;padding:18px">
@@ -258,7 +258,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <div id="tankMount" style="position:absolute;inset:0"></div>
     <div id="dropLayer" style="position:absolute;inset:0;overflow:hidden"></div>
     <div class="hud">
-      <span class="pill" id="petChip">🐟 Cá chép · Lv.1</span>
+      <span class="pill" id="petChip">🐢 Rùa biển · Lv.1</span>
       <span class="pill" id="xpChip">XP 0</span>
     </div>
     <div class="fsbar">
@@ -266,6 +266,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
         <option value="fresh">🌿 Hồ thủy sinh</option>
         <option value="reef180">🪸 Hồ san hô 180</option>
       </select>
+      <button class="btn small gold" id="fsFeedBtn">🍽️ Cho ăn</button>
       <button class="btn small gold" id="fsPracticeBtn">✋ Tắt luyện</button>
       <button class="btn small gold" id="fsSoundBtn">🔊 Nhạc</button>
       <button class="btn small gold" id="fsArrangeBtn">🧲 Sắp xếp</button>
@@ -305,6 +306,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <button class="btn small" id="arrangeBtn">🧲 Sắp xếp</button>
     <button class="btn small" id="lightBtn">💡 Đèn RGB</button>
     <button class="btn small" id="levelUpBtn">⬆️ Level Up bằng 💎</button>
+    <button class="btn small gold" id="feedBtn">🍽️ Cho ăn</button>
     <button class="btn small gold" id="practiceBtn">✋ Đang luyện</button>
     <button class="btn small gold" id="soundBtn">🔊 Nhạc hồ</button>
     <button class="btn small ghost" id="fsBtn">⛶ Toàn màn hình</button>
@@ -324,7 +326,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
       <button class="btn small" id="arrangeDone">✓ Xong</button>
     </div>
   </div>
-  <p class="mut">Kéo trên vùng nước để xoay hồ 3D, chụm 2 ngón hoặc lăn chuột để phóng to. Nút Đèn RGB đổi màu hoặc tắt đèn. Nút Luyện ngón bật hoặc tắt bàn tay và xu, kim cương đang rơi. Nút Nhạc hồ bật nhạc nền và tiếng nhặt. Trong toàn màn hình, các nút nằm ở góc phải: ngón đang sáng là ngón cần gõ. Ở chế độ demo có thể đổi giữa hồ thủy sinh và hồ san hô 180.</p>
+  <p class="mut">Kéo trên vùng nước để xoay hồ 3D, chụm 2 ngón hoặc lăn chuột để phóng to. Nút Cho ăn, hoặc bấm đúp vào một chỗ trong hồ, thả thức ăn để cả bầy cá bơi về đó. Nút Đèn RGB đổi màu hoặc tắt đèn. Nút Luyện ngón bật hoặc tắt bàn tay và xu, kim cương đang rơi. Nút Nhạc hồ bật nhạc nền và tiếng nhặt. Trong toàn màn hình, các nút nằm ở góc phải: ngón đang sáng là ngón cần gõ. Ở chế độ demo có thể đổi giữa hồ thủy sinh và hồ san hô 180.</p>
 </section>
 
 <!-- QUIZ -->
@@ -479,13 +481,13 @@ var RARITIES = {
   legendary: { label:"Huyền thoại", emoji:"🟠", startLevel:6, goldMult:3.5, diamondMult:5, color:"#ea580c", bg:"#ffedd5" }
 };
 var PETS = {
-  shark:  { label:"Cá chép", emoji:"🐟" },
+  shark:  { label:"Rùa biển", emoji:"🐢" },
   crab:   { label:"Cua", emoji:"🦀" },
   shrimp: { label:"Tôm", emoji:"🦐" },
   snake:  { label:"Rắn → Rồng", emoji:"🐉" }
 };
 var PET_NAMES = {
-  shark:["Chép Bột","Chép Con","Chép Nhí","Chép Lửa","Chép Vàng"],
+  shark:["Rùa Bột","Rùa Con","Rùa Nhí","Rùa Biển","Rùa Xanh"],
   crab:["Cua Bột","Cua Con","Cua Nhí","Cua Càng To","Cua Chúa","Cua Vua"],
   shrimp:["Tôm Bột","Tôm Con","Tôm Nhí","Tôm Nhảy","Tôm Chúa","Tôm Vua"],
   snake:["Rắn Con","Rắn Nhí","Rắn Dài","Rắn Mạnh","Rồng Con","Rồng Vua"]
@@ -692,7 +694,7 @@ function refreshWallets(){
     $("examCardDesc").textContent = "Toán 6 · 20 câu · 30 phút" + (profile.quizPassed.indexOf("exam:toan6")>=0 ? " · đã qua" : "") + (examBest!=null ? " · kỷ lục " + examBest + "%" : "");
     var maxLv = petLevelMax(profile.giftPet);
     $("evoCardDesc").textContent = profile.giftPet==="shark"
-      ? (petEmoji(profile.giftPet, profile.level) + " đang Lv." + profile.level + " · Lv.1–10 cá chép · Lv.11–30 rồng")
+      ? (petEmoji(profile.giftPet, profile.level) + " đang Lv." + profile.level + " · Lv.1–10 rùa biển · Lv.11–30 rồng")
       : (PETS[profile.giftPet].emoji + " đang Lv." + profile.level + " · xem dạng 1–10 · 11–30 khóa");
     $("petCardDesc").textContent = petEmoji(profile.giftPet, profile.level) + " " + petDisplayName(profile.giftPet, profile.level) + " (" + (profile.giftPet==="shark" && profile.level>=11 ? "Rồng vàng" : PETS[profile.giftPet].label) + ", " + rar.label + " Lv." + profile.level + ") đang chờ trong hồ";
     var cost = profile.level < maxLv ? LEVEL_UP_COSTS[profile.level] : 0;
@@ -1296,6 +1298,26 @@ function makeSharkGroup(gltf, level){
   }
   return { group: holder, inst: inst, mixer: mixer };
 }
+function turtleAsset(level){
+  return level < 6 ? "turtle-hatchling.glb" : "green-sea-turtle.glb";
+}
+function makeTurtleGroup(gltf, level){
+  var inst = gltf.scene;
+  var young = level < 6;
+  var t = petShadeT(level);
+  inst.traverse(function(o){ if (o.isMesh) o.frustumCulled = false; });
+  var holder = new THREE.Group();
+  holder.add(inst);
+  var fit = young ? (1.15 + t * 0.55) : (1.85 + t * 0.95);
+  inst.scale.setScalar(fit / (young ? 0.5 : 10));
+  var mixer = null;
+  var clip = gltf.animations && THREE.AnimationClip && THREE.AnimationClip.findByName(gltf.animations, "Swim");
+  if (clip){
+    mixer = new THREE.AnimationMixer(inst);
+    mixer.clipAction(clip).play();
+  }
+  return { group: holder, inst: inst, mixer: mixer };
+}
 function dragonShadeT(level){
   var lv = Math.max(11, Math.min(30, level));
   return (lv - 11) / 19;
@@ -1618,10 +1640,10 @@ function startTank(){
     if (profile.giftPet==="shark"){
       var expectShark = petInner;
       var dragonNow = lvNow >= 11;
-      gltfLoader2.loadAsync(ASSET+(dragonNow ? "golden-dragon.glb" : "carp-dragon-gold.glb")).then(function(gltf){
+      gltfLoader2.loadAsync(ASSET+(dragonNow ? "golden-dragon.glb" : turtleAsset(lvNow))).then(function(gltf){
         if (petInner !== expectShark || !petInner.userData.isFallbackShark) return;
         try {
-          var built = dragonNow ? makeDragonGroup(gltf, lvNow) : makeSharkGroup(gltf, lvNow);
+          var built = dragonNow ? makeDragonGroup(gltf, lvNow) : makeTurtleGroup(gltf, lvNow);
           petGroup.remove(petInner); petInner = built.group; petGroup.add(built.group);
           sharkMixer = built.mixer;
         } catch(e){ /* keep fallback */ }
@@ -1727,10 +1749,34 @@ function startTank(){
     }
   }
   var faunaA = {x:0,y:0,z:0}, faunaB = {x:0,y:0,z:0};
+  var feed = null;
+  var feedGroup = new THREE.Group(); scene.add(feedGroup);
+  var feedFlakeMat = new THREE.MeshStandardMaterial({ color:0xf6b23c, emissive:0xc47a12, emissiveIntensity:0.4, roughness:0.4 });
+  var feedRingMat = new THREE.MeshBasicMaterial({ color:0xffc14d, transparent:true, opacity:0.8, side:THREE.DoubleSide, depthWrite:false });
+  function feedAmount(time){
+    if (!feed) return 0;
+    var age = time - feed.t0;
+    if (age <= 0) return 0;
+    if (age < 1.15) return age / 1.15;
+    if (age >= feed.life) return 0;
+    if (age > feed.life - 1.5) return Math.max(0, (feed.life - age) / 1.5);
+    return 1;
+  }
   function faunaSchoolPoint(time, out){
-    out.x = 4.2 * Math.sin(time * 0.13);
-    out.y = 3.0 + 0.7 * Math.sin(time * 0.21 + 1);
-    out.z = 1.4 * Math.sin(time * 0.27);
+    var wanderX = 4.2 * Math.sin(time * 0.13);
+    var wanderY = 3.0 + 0.7 * Math.sin(time * 0.21 + 1);
+    var wanderZ = 1.4 * Math.sin(time * 0.27);
+    var k = feedAmount(time);
+    if (!k){
+      out.x = wanderX; out.y = wanderY; out.z = wanderZ;
+      return;
+    }
+    var eatX = feed.x + Math.sin(time * 1.7) * 0.55;
+    var eatY = feed.y + Math.sin(time * 2.2) * 0.22;
+    var eatZ = feed.z + Math.cos(time * 1.45) * 0.4;
+    out.x = wanderX * (1 - k) + eatX * k;
+    out.y = wanderY * (1 - k) + eatY * k;
+    out.z = wanderZ * (1 - k) + eatZ * k;
   }
   function updateTankFauna(dt, t){
     faunaObjs.forEach(function(f){
@@ -1738,8 +1784,9 @@ function startTank(){
       if (f.mode==="school"){
         faunaSchoolPoint(t - f.lag, faunaA);
         faunaSchoolPoint(t - f.lag + 0.05, faunaB);
-        var spread = 1 + 0.18 * Math.sin(t * 0.9 + f.ph);
-        var spread2 = 1 + 0.18 * Math.sin((t + 0.05) * 0.9 + f.ph);
+        var bunch = 1 - feedAmount(t - f.lag) * 0.55;
+        var spread = (1 + 0.18 * Math.sin(t * 0.9 + f.ph)) * bunch;
+        var spread2 = (1 + 0.18 * Math.sin((t + 0.05) * 0.9 + f.ph)) * bunch;
         var x = faunaA.x + f.off.x * spread;
         var y = faunaA.y + f.off.y * spread;
         var z = faunaA.z + f.off.z * spread;
@@ -1751,6 +1798,14 @@ function startTank(){
         return;
       }
       var o = f.group;
+      if (feed && feedAmount(t) > 0.15 && f.feedSeq !== feed.seq){
+        f.feedSeq = feed.seq;
+        f.wait = 0;
+        f.target = {
+          x: Math.max(-5.6, Math.min(5.6, feed.x + (Math.random()-0.5)*1.3)),
+          z: Math.max(-2.6, Math.min(2.6, feed.z + (Math.random()-0.5)*0.9))
+        };
+      }
       if (f.wait > 0){
         f.wait -= dt;
         if (f.action) f.action.timeScale = 0.35;
@@ -1768,7 +1823,8 @@ function startTank(){
       var diff = Math.atan2(Math.sin(want - o.rotation.y), Math.cos(want - o.rotation.y));
       o.rotation.y += diff * Math.min(1, dt * f.speed * 18);
       if (Math.abs(diff) < 0.6){
-        var step = Math.min(dist, dt * f.speed);
+        var hungry = (feed && f.feedSeq === feed.seq && feedAmount(t) > 0.1) ? 4 : 1;
+        var step = Math.min(dist, dt * f.speed * hungry);
         o.position.x += dx / dist * step;
         o.position.z += dz / dist * step;
         o.position.y = 0.01;
@@ -1893,12 +1949,15 @@ function startTank(){
     if (!running) return;
     var dt = Math.min(0.05, clock.getDelta());
     var t = clock.elapsedTime;
-    // pet swim: chase drop target or wander
-    var target = tankState.chase || wanderTarget;
-    if (!tankState.chase) wanderT -= dt;
+    // pet swim: chase a falling coin, then food, otherwise wander
+    var feedOn = !!(feed && feedAmount(t) > 0.2);
+    var feedTarget = feedOn ? { x: feed.x, z: feed.z } : null;
+    var target = tankState.chase || feedTarget || wanderTarget;
+    var chasing = !!(tankState.chase || feedTarget);
+    if (!chasing) wanderT -= dt;
     var dx = target.x - petPos.x, dz = target.z - petPos.z;
     var dist = Math.hypot(dx, dz);
-    if (!tankState.chase && wanderT<=0){
+    if (!chasing && wanderT<=0){
       var ahead = petAngle + (Math.random()-0.5)*1.3;
       var reach = 4.5 + Math.random()*5;
       wanderTarget = {
@@ -1916,9 +1975,9 @@ function startTank(){
       var diff = want - petAngle;
       while (diff > Math.PI) diff -= Math.PI*2;
       while (diff < -Math.PI) diff += Math.PI*2;
-      var turn = (tankState.chase ? 1.8 : 0.9) * dt;
+      var turn = (chasing ? 1.8 : 0.9) * dt;
       petAngle += Math.max(-turn, Math.min(turn, diff));
-      sp = (tankState.chase ? 2.4*chasePace : 1.25*pace) * (0.4 + 0.6*Math.max(0, Math.cos(diff)));
+      sp = (chasing ? 2.4*chasePace : 1.25*pace) * (0.4 + 0.6*Math.max(0, Math.cos(diff)));
       petPos.x += Math.cos(petAngle)*sp*dt;
       petPos.z -= Math.sin(petAngle)*sp*dt;
       if (sharkSpeed) sharkSpeed.setEffectiveWeight(0.7);
@@ -1954,11 +2013,24 @@ function startTank(){
     // shop fish wander freely
     shopFishObjs.forEach(function(f){
       f.phase -= dt;
-      if (f.phase<=0){ f.tx = (Math.random()-0.5)*10; f.tz = (Math.random()-0.5)*4.4; f.ty = 1.3+Math.random()*2.4; f.phase = 3+Math.random()*3; }
+      var eating = feed && feedAmount(t) > 0.15;
+      if (eating && f.feedSeq !== feed.seq){ f.feedSeq = feed.seq; f.phase = 0; }
+      if (f.phase<=0){
+        if (eating){
+          var ang = f.speed * 9 + f.tx;
+          f.tx = feed.x + Math.cos(ang)*0.7;
+          f.tz = feed.z + Math.sin(ang)*0.5;
+          f.ty = feed.y + Math.sin(ang)*0.25;
+          f.phase = 1.3;
+        } else {
+          f.tx = (Math.random()-0.5)*10; f.tz = (Math.random()-0.5)*4.4; f.ty = 1.3+Math.random()*2.4; f.phase = 3+Math.random()*3;
+        }
+      }
+      var rush = eating ? 2.6 : 1;
       var p = f.group.position;
       var ddx = f.tx-p.x, ddz = f.tz-p.z, ddy = f.ty-p.y;
       var dd = Math.hypot(ddx,ddz,ddy)||1;
-      p.x += ddx/dd*f.speed*dt*0.7; p.y += ddy/dd*f.speed*dt*0.7; p.z += ddz/dd*f.speed*dt*0.7;
+      p.x += ddx/dd*f.speed*dt*0.7*rush; p.y += ddy/dd*f.speed*dt*0.7*rush; p.z += ddz/dd*f.speed*dt*0.7*rush;
       f.group.rotation.y = Math.atan2(-ddz, ddx);
       f.group.rotation.z = Math.sin(t*3+f.phase)*0.08;
       if (f.mixer) f.mixer.update(dt);
@@ -1976,6 +2048,18 @@ function startTank(){
           rec.group.rotation.z = Math.sin(t*0.9+rec.phase)*0.05;
           var pulse = 1 + Math.sin(t*1.8+rec.phase)*0.08;
           rec.group.scale.set(pulse, 2-pulse, pulse);
+        } else if (feed && feedAmount(t) > 0.12){
+          if (!rec.cruise) rec.cruise = { x: rec.anchor.x, z: rec.anchor.z, heading: rec.phase*2, wait: 1.2 };
+          var ang = rec.phase * 2;
+          var tx = feed.x + Math.cos(ang) * 0.75;
+          var tz = feed.z + Math.sin(ang) * 0.5;
+          var px = rec.cruise.x, pz = rec.cruise.z;
+          rec.cruise.x += (tx - rec.cruise.x) * Math.min(1, dt * 1.7);
+          rec.cruise.z += (tz - rec.cruise.z) * Math.min(1, dt * 1.7);
+          rec.cruise.heading = Math.atan2(-(rec.cruise.z - pz), rec.cruise.x - px);
+          rec.group.position.set(rec.cruise.x, feed.y + Math.sin(t*2+rec.phase)*0.16, rec.cruise.z);
+          rec.group.rotation.y = rec.cruise.heading;
+          rec.group.rotation.z = Math.sin(t*2.4+rec.phase)*0.08;
         } else {
           if (!rec.cruise) rec.cruise = { x: rec.anchor.x, z: rec.anchor.z, heading: rec.phase*2, wait: 1.2 };
           rec.cruise.wait -= dt;
@@ -2006,6 +2090,23 @@ function startTank(){
     }
     Object.keys(decoObjs).forEach(function(k){ stepCreature(decoObjs[k]); });
     updateTankFauna(dt, t);
+    if (feed){
+      var age = t - feed.t0;
+      var fade = age > feed.life - 1.5 ? Math.max(0, (feed.life - age) / 1.5) : Math.min(1, age / 0.35);
+      feedRingMat.opacity = 0.85 * fade;
+      feedGroup.children.forEach(function(bit){
+        if (bit.userData.flake){
+          bit.position.y -= bit.userData.sink * dt;
+          if (bit.position.y < bit.userData.rest) bit.position.y = bit.userData.rest + Math.sin(t*3 + bit.userData.spin)*0.03;
+          bit.rotation.z += dt * 2;
+          bit.scale.setScalar(Math.max(0.05, fade));
+        }
+      });
+      if (age >= feed.life){
+        while (feedGroup.children.length) feedGroup.remove(feedGroup.children[0]);
+        feed = null;
+      }
+    }
     bubbles.forEach(function(bm){
       bm.position.y += bm.userData.speed*dt;
       if (bm.position.y > TH-0.7) bm.position.y = 0.2;
@@ -2014,6 +2115,49 @@ function startTank(){
     if (scapeMixer) scapeMixer.update(dt);
     renderer.render(scene, camera);
   })();
+  function dropFishFood(x, z){
+    var now = clock.elapsedTime;
+    if (feed && now - feed.t0 < feed.life - 0.8) return null;
+    while (feedGroup.children.length) feedGroup.remove(feedGroup.children[0]);
+    var wide = activeScape === "reef180";
+    var maxX = wide ? 7.2 : 5.6;
+    var maxZ = wide ? 2.3 : 2.5;
+    if (x == null || z == null){
+      x = (Math.random()-0.5) * 3.4;
+      z = 0.15 + Math.random() * 1.15;
+    }
+    x = Math.max(-maxX, Math.min(maxX, x));
+    z = Math.max(-maxZ, Math.min(maxZ, z));
+    feed = { x:x, y:2.05, z:z, t0: now, life: 8.2, seq: (feed ? feed.seq : 0) + 1 };
+    feedGroup.position.set(x, 0, z);
+    var ring = new THREE.Mesh(new THREE.RingGeometry(0.32, 0.55, 28), feedRingMat);
+    ring.rotation.x = -Math.PI/2;
+    ring.position.y = 0.05;
+    feedGroup.add(ring);
+    var i;
+    for (i=0;i<8;i++){
+      var flake = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 6), feedFlakeMat);
+      flake.scale.set(1, 0.45, 1);
+      flake.position.set((Math.random()-0.5)*0.7, 2.8 + Math.random()*1.3, (Math.random()-0.5)*0.5);
+      flake.userData.flake = true;
+      flake.userData.sink = 0.85 + Math.random()*0.55;
+      flake.userData.rest = 1.55 + Math.random()*0.7;
+      flake.userData.spin = Math.random()*6.28;
+      feedGroup.add(flake);
+    }
+    return { x: feed.x, y: feed.y, z: feed.z };
+  }
+  stageEl.addEventListener("dblclick", function(e){
+    if (onUiControl(e.target) || tankState.arranging) return;
+    var p = pointerPos(e);
+    var ray = new THREE.Raycaster();
+    ray.setFromCamera(new THREE.Vector2(p.x, p.y), camera);
+    var hit = new THREE.Vector3();
+    if (!ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -2.05), hit)) return;
+    if (!dropFishFood(hit.x, hit.z)){ toast("Cá vẫn đang ăn, đợi một chút nhé!"); return; }
+    toast("🍽️ Đã thả thức ăn. Cả bầy đang bơi lại!");
+    playFeed();
+  });
   buildPet(); buildDecos(); buildShopFish(); spawnFauna(); applyCamera();
   tankApi = {
     resume: function(){ running = true; resize(); applyTankLight(profile && profile.tankLight, profile && profile.tankLightsOff); },
@@ -2031,7 +2175,8 @@ function startTank(){
     },
     resetCamera: resetCamera,
     resize: resize,
-    setLight: applyTankLight
+    setLight: applyTankLight,
+    feed: dropFishFood
   };
 }
 function stopTank(){ if (tankApi) tankApi.pause(); stopDrops(); }
@@ -2370,6 +2515,15 @@ function setPractice(on){
 setPractice(practiceOn);
 $("practiceBtn").onclick = function(){ setPractice(!practiceOn); };
 $("fsPracticeBtn").onclick = function(){ setPractice(!practiceOn); };
+function feedFish(){
+  if (!$("scr-tank") || !$("scr-tank").classList.contains("on")) return;
+  if (!tankApi || !tankApi.feed){ toast("Hồ chưa sẵn sàng để cho ăn."); return; }
+  if (!tankApi.feed()){ toast("Cá vẫn đang ăn, đợi một chút nhé!"); return; }
+  toast("🍽️ Đã thả thức ăn. Cả bầy đang bơi lại!");
+  playFeed();
+}
+$("feedBtn").onclick = feedFish;
+$("fsFeedBtn").onclick = feedFish;
 function setArranging(on){
   tankState.arranging = on;
   $("tankStage").classList.toggle("arranging", !!on);
@@ -2479,7 +2633,8 @@ $("levelUpBtn").onclick = function(){
   if (tankApi) tankApi.rebuild();
   var extra = "";
   if (profile.giftPet==="shark" && profile.level===11) extra = " Hóa thành rồng vàng rồi!";
-  else if (profile.giftPet==="shark" || profile.giftPet==="crab") extra = " To và đậm màu hơn rồi!";
+  else if (profile.giftPet==="shark") extra = " To hơn rồi!";
+  else if (profile.giftPet==="crab") extra = " To và đậm màu hơn rồi!";
   var pay = DEMO ? "" : (" Đã trừ " + cost + " 💎");
   toast("🎉 " + petDisplayName(profile.giftPet, profile.level) + " lên Lv." + profile.level + "!" + extra + pay);
 };
@@ -3136,7 +3291,7 @@ function startEvo(){
   if (!profile) return;
   var pet = PETS[profile.giftPet];
   if (profile.giftPet==="shark"){
-    $("evoIntro").textContent = "🐟 Cá chép đang Lv." + profile.level + ". Lv.1–10 là cá chép, to dần và đậm màu dần. Từ Lv.11 hóa rồng vàng, tiếp tục to và đậm đến Lv.30.";
+    $("evoIntro").textContent = "🐢 Rùa biển đang Lv." + profile.level + ". Lv.1–5 là rùa con, Lv.6–10 là rùa trưởng thành và to dần. Từ Lv.11 hóa rồng vàng, tiếp tục to và đậm đến Lv.30.";
   } else {
     $("evoIntro").textContent = pet.emoji + " " + pet.label + " đang Lv." + profile.level + ". Cùng một dạng từ Lv.1 đến Lv.10, to dần và đậm màu dần. Lv.11–30 còn khóa.";
   }
@@ -3269,9 +3424,9 @@ function startEvo(){
             mixer = built.mixer;
           }).catch(function(){});
         } else if (profile.giftPet==="shark"){
-          gltfLoader2.loadAsync(ASSET+"carp-dragon-gold.glb").then(function(gltf){
+          gltfLoader2.loadAsync(ASSET+turtleAsset(lv)).then(function(gltf){
             if (token!==evoToken) return;
-            var built = makeSharkGroup(gltf, lv);
+            var built = makeTurtleGroup(gltf, lv);
             swap(built.group, 0.92);
             mixer = built.mixer;
           }).catch(function(){});
@@ -3322,6 +3477,15 @@ function softTone(ctx, dest, freq, t, dur, vol, type){
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   o.connect(g); g.connect(dest);
   o.start(t); o.stop(t + dur + 0.03);
+}
+function playFeed(){
+  if (!soundOn) return;
+  var ctx = audioContext();
+  if (!ctx) return;
+  var t = ctx.currentTime;
+  [494, 659, 784].forEach(function(freq, i){
+    softTone(ctx, ctx.destination, freq, t + i * 0.06, 0.14, 0.03, "sine");
+  });
 }
 function playPickup(kind){
   if (!soundOn) return;
