@@ -856,7 +856,7 @@ var REAL_DECO = {
   neontetra:{ url:ASSET+"swim-neon.glb", size:0.575, mode:"swim", centerY:true, makeMat:function(){ return new THREE.MeshStandardMaterial({ map:loadTex(ASSET+"neon-diffuse.png",true), normalMap:loadTex(ASSET+"neon-normal.jpg",false), normalScale:new THREE.Vector2(0.6,0.6), roughness:0.5, metalness:0.05, alphaTest:0.3, side:THREE.DoubleSide }); } },
   bluejelly:{ url:ASSET+"blue-jellyfish/jellyfish.glb", size:1.85, mode:"swim", centerY:true, pulse:true, makeMat:function(){ var map=loadTex(ASSET+"blue-jellyfish/Jellyfish2.png",true); return new THREE.MeshStandardMaterial({ map:map, emissive:0x60a5fa, emissiveMap:map, emissiveIntensity:0.18, roughness:0.35, metalness:0.02, transparent:true, opacity:0.94, side:THREE.DoubleSide, depthWrite:false }); } },
   colorjelly:{ url:ASSET+"colorful-jellyfish/jellyfish.glb", size:1.85, mode:"swim", centerY:true, pulse:true, makeMat:function(){ var map=loadTex(ASSET+"colorful-jellyfish/Jellyfish1_albedo.jpeg",true); return new THREE.MeshStandardMaterial({ map:map, emissive:0xff7aa2, emissiveMap:map, emissiveIntensity:0.16, roughness:0.4, metalness:0.02, transparent:true, opacity:0.92, side:THREE.DoubleSide, depthWrite:false }); } },
-  aquaneon:{ url:ASSET+"fauna-neon-tetra.glb", size:1.15, mode:"swim", centerY:true, keepMat:true, swimClip:"Swim" },
+  aquaneon:{ url:ASSET+"fauna-neon-tetra.glb", size:0.575, mode:"swim", centerY:true, keepMat:true, swimClip:"Swim" },
   cherryshrimp:{ url:ASSET+"fauna-cherry-shrimp.glb", size:0.85, mode:"graze", keepMat:true, swimClip:"Graze" },
   applesnail:{ url:ASSET+"fauna-apple-snail.glb", size:1.45, mode:"crawl", keepMat:true, swimClip:"Crawl" },
   boat:    { url:ASSET+"decor-boat.glb", size:3.2, mode:"float", yaw:Math.PI/2, keepMat:true },
