@@ -87,18 +87,18 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 .practice-level label{white-space:nowrap}
 .practice-level input[type=range]{flex:1;min-width:48px;accent-color:#ffd23a}
 .practice-level .fall{white-space:nowrap}
-#typeHands{display:none;position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;pointer-events:none;width:min(720px,calc(100% - 16px));height:210px;background:rgba(8,28,38,.82);border-radius:20px;box-shadow:0 8px 22px rgba(0,0,0,.28);overflow:hidden}
+#typeHands{display:none;position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;pointer-events:none;width:min(720px,calc(100% - 16px));height:240px;background:rgba(8,28,38,.82);border-radius:20px;box-shadow:0 8px 22px rgba(0,0,0,.28);overflow:hidden}
 .stage.fs.practice #typeHands{display:block}
-.stage.fs.practice #tankHint{bottom:230px !important}
+.stage.fs.practice #tankHint{bottom:260px !important}
 .stage.fs.practice.arranging #typeHands{display:none}
 .stage.fs.practice.arranging #tankHint{bottom:6px !important}
-#typeHands canvas{width:100%;height:calc(100% - 30px);margin-top:30px;display:block}
-#typeHandLetters{position:absolute;left:8px;right:8px;top:6px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
-#typeHandLetters span{border-radius:999px;padding:1px 7px;font-size:15px;font-weight:900;line-height:18px;color:#12303f;box-shadow:0 0 0 2px #fff}
+#typeHands canvas{width:100%;height:calc(100% - 58px);margin-top:58px;display:block}
+#typeHandLetters{position:absolute;left:8px;right:8px;top:8px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+#typeHandLetters span{border-radius:999px;padding:2px 14px;font-size:30px;font-weight:900;line-height:36px;color:#12303f;box-shadow:0 0 0 2px #fff}
 .drop-key.fingered{border-radius:999px;padding:1px 5px;text-shadow:none;box-shadow:0 0 0 2px #fff}
 @media (max-width:720px),(max-height:560px){
-  #typeHands{height:156px;bottom:6px}
-  .stage.fs.practice #tankHint{bottom:172px !important}
+  #typeHands{height:184px;bottom:6px}
+  .stage.fs.practice #tankHint{bottom:202px !important}
 }
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px}
 .place-card{text-align:left;border:2px solid var(--line);background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
@@ -2353,7 +2353,7 @@ function ensureTypeHands(){
   }
   var raf = 0, last = 0, running = false;
   function resize(){
-    var w = mount.clientWidth, h = Math.max(2, mount.clientHeight - 30);
+    var w = mount.clientWidth, h = Math.max(2, mount.clientHeight - 58);
     if (w < 2 || h < 2) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
