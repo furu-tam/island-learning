@@ -124,7 +124,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 @keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.05)}}
 .rarity{display:inline-block;padding:5px 14px;border-radius:999px;font-weight:800}
 .drop{position:absolute;width:46px;height:46px;margin-left:-23px;border-radius:50%;border:none;background:rgba(255,255,255,.25);font-size:27px;z-index:5;padding:0;line-height:46px}
-.drop.gold,.drop.diamond{width:92px;height:92px;margin-left:-46px;background:transparent;line-height:0}
+.drop.gold,.drop.diamond{width:92px;height:92px;margin-left:-46px;background:transparent;border-radius:0;box-shadow:none;line-height:0}
 .drop-ico{display:block;width:92px;height:92px;pointer-events:none}
 .drop-key{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:900;line-height:1;color:#12303f;pointer-events:none;text-shadow:0 0 3px #fff,0 0 3px #fff,0 1px 0 #fff;z-index:1}
 .drop.gold .drop-key,.drop.diamond .drop-key{font-size:24px}
@@ -2622,12 +2622,6 @@ function renderDrop(d){
   var key = document.createElement("span");
   key.className = "drop-key";
   key.textContent = d.letter;
-  var fingerColor = FINGER_COLOR[FINGER_OF[d.letter]];
-  if (fingerColor){
-    key.classList.add("fingered");
-    key.style.background = fingerColor;
-    b.style.boxShadow = "0 0 0 3px " + fingerColor;
-  }
   b.appendChild(ico);
   b.appendChild(key);
   b.setAttribute("aria-label", (d.kind==="gold" ? "Nhặt xu vàng" : "Nhặt kim cương") + ", phím " + d.letter);
