@@ -715,8 +715,9 @@ function refreshWallets(){
     var vanPassed = profile.quizPassed.filter(function(k){ return k.indexOf("van:")===0; }).length;
     var vanMiss = (profile.vanMissed||[]).length;
     $("vanCardDesc").textContent = "2 dàn ý · 2 bài mẫu · 20 câu · " + vanPassed + "/2 bài đã qua" + (vanMiss ? " · còn " + vanMiss + " câu sai" : "");
-    var examDone = ["toan6", "tinhoc6"].filter(function(id){ return profile.quizPassed.indexOf("exam:" + id)>=0; }).length;
-    $("examCardDesc").textContent = "Toán 6 · Tin học 6" + (examDone ? " · đã qua " + examDone + "/2" : "");
+    var examIds = profile.grade===1 ? ["toan1"] : ["toan6", "tinhoc6"];
+    var examDone = examIds.filter(function(id){ return profile.quizPassed.indexOf("exam:" + id)>=0; }).length;
+    $("examCardDesc").textContent = (profile.grade===1 ? "Toán 1 · tư duy" : "Toán 6 · Tin học 6") + (examDone ? " · đã qua " + examDone + "/" + examIds.length : "");
     var maxLv = petLevelMax(profile.giftPet);
     $("evoCardDesc").textContent = profile.giftPet==="shark"
       ? (petEmoji(profile.giftPet, profile.level) + " đang Lv." + profile.level + " · Lv.1–10 rùa biển · Lv.11–30 rồng")
@@ -3090,7 +3091,30 @@ var QUIZ_TIN = { id:"tinhoc6", title:"Tin học lớp 6", minutes: 45, pass: 12,
       guide: "<h4>Đáp án gợi ý · 1,0 điểm</h4><p>a) Hai lợi ích, mỗi ý 0,25 điểm. Ví dụ: tìm tài liệu học nhanh; học trực tuyến và trao đổi bài với thầy cô, bạn bè; chia sẻ tài liệu, dùng chung máy in.</p><p>b) Hai việc nên làm, mỗi ý 0,25 điểm. Ví dụ: không chia sẻ mật khẩu, địa chỉ nhà, số điện thoại, ảnh cá nhân; không mở liên kết lạ và không tải phần mềm không rõ nguồn; kiểm chứng thông tin và hỏi người lớn khi gặp nội dung xấu.</p>" }
   ]
 };
-var QUIZ_EXAMS = { toan6: QUIZ_EXAM, tinhoc6: QUIZ_TIN };
+/* Toán lớp 1 — Phó Bản tư duy logic, 12 câu, 15 phút. */
+var QUIZ_TOAN1 = { id:"toan1", title:"Toán lớp 1 · Tư duy", minutes: 15, pass: 10, reward: 10,
+  study: [
+    "Nhìn quy luật của dãy số: mỗi số tăng hoặc giảm một lượng cố định.",
+    "Số liền trước là bớt 1. Số liền sau là thêm 1.",
+    "Gộp hai nhóm thì cộng. Cho đi hoặc bay mất thì trừ.",
+    "Đồ cùng nhóm thì cùng loại. Cái khác loại là đáp án lệch."
+  ],
+  questions: [
+    { text: "Dãy số: 2, 4, 6, 8. Số tiếp theo là số nào?", options: ["9", "10", "7", "12"], correct: 1, explanation: "Mỗi số sau lớn hơn số trước 2 đơn vị. 8 thêm 2 được 10." },
+    { text: "Có 5 con chim đậu trên cành. 2 con bay đi. Còn lại mấy con chim?", options: ["2", "3", "5", "7"], correct: 1, explanation: "Bay đi là bớt. 5 trừ 2 còn 3 con." },
+    { text: "Trong các số 3, 8, 5 và 1, số nào lớn nhất?", options: ["3", "5", "8", "1"], correct: 2, explanation: "8 lớn hơn 1, 3 và 5." },
+    { text: "Lan có 4 cái kẹo. Mẹ cho thêm 3 cái. Lan có tất cả mấy cái kẹo?", options: ["1", "7", "4", "12"], correct: 1, explanation: "Cho thêm là cộng. 4 cộng 3 bằng 7." },
+    { text: "Dãy số: 1, 3, 5, 7. Số tiếp theo là số nào?", options: ["8", "6", "9", "10"], correct: 2, explanation: "Đây là các số lẻ, mỗi lần thêm 2. 7 thêm 2 được 9." },
+    { text: "Trên bàn có 3 hình tròn và 2 hình vuông. Hỏi có tất cả mấy hình?", options: ["2", "3", "5", "6"], correct: 2, explanation: "Gộp hai nhóm: 3 cộng 2 bằng 5 hình." },
+    { text: "Số liền trước của 6 là số nào?", options: ["5", "6", "7", "4"], correct: 0, explanation: "Số liền trước là số nhỏ hơn đúng 1. 6 bớt 1 được 5." },
+    { text: "Bé có 8 quả bóng, cho bạn 3 quả. Bé còn mấy quả bóng?", options: ["11", "5", "8", "3"], correct: 1, explanation: "Cho bạn là bớt đi. 8 trừ 3 còn 5 quả." },
+    { text: "Dãy số: 10, 8, 6, 4. Số tiếp theo là số nào?", options: ["2", "3", "5", "0"], correct: 0, explanation: "Mỗi số sau nhỏ hơn số trước 2 đơn vị. 4 bớt 2 còn 2." },
+    { text: "Từ nào KHÔNG cùng nhóm với những từ kia: táo, chuối, xoài, xe đạp?", options: ["táo", "chuối", "xoài", "xe đạp"], correct: 3, explanation: "Táo, chuối và xoài là trái cây. Xe đạp không phải trái cây." },
+    { text: "Hôm qua là thứ Hai. Hôm nay là thứ mấy?", options: ["Chủ nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư"], correct: 2, explanation: "Sau thứ Hai là thứ Ba." },
+    { text: "Mỗi giỏ có 3 quả cam. Có 2 giỏ như thế. Tất cả có mấy quả cam?", options: ["5", "6", "3", "2"], correct: 1, explanation: "Hai giỏ, mỗi giỏ 3 quả: 3 cộng 3 bằng 6 quả." }
+  ]
+};
+var QUIZ_EXAMS = { toan6: QUIZ_EXAM, tinhoc6: QUIZ_TIN, toan1: QUIZ_TOAN1 };
 
 /* ============================== Quiz ============================== */
 var quizCtx = null;
@@ -3184,8 +3208,11 @@ function openQuizHome(){
     }).join("");
   } else if (quizMode==="exam"){
     $("quizTitle").textContent = "🏯 Phó Bản";
-    $("quizIntro").textContent = "Chọn một bài thi. Làm hết giờ thì bài tự nộp. Trắc nghiệm được chấm ngay. Phần tự luận em tự đối chiếu đáp án, điểm kim cương chỉ tính phần trắc nghiệm.";
-    $("topicList").innerHTML = ["toan6", "tinhoc6"].map(function(id){
+    $("quizIntro").textContent = profile.grade===1
+      ? "Bài tư duy logic cho lớp 1. Nghe câu hỏi, rồi chọn một đáp án. Làm trong 15 phút. Đúng từ 10/12 là qua."
+      : "Chọn một bài thi. Làm hết giờ thì bài tự nộp. Trắc nghiệm được chấm ngay. Phần tự luận em tự đối chiếu đáp án, điểm kim cương chỉ tính phần trắc nghiệm.";
+    var examIds = profile.grade===1 ? ["toan1"] : ["toan6", "tinhoc6"];
+    $("topicList").innerHTML = examIds.map(function(id){
       var spec = QUIZ_EXAMS[id];
       var ekey = "exam:" + id;
       var ePassed = profile.quizPassed.indexOf(ekey)>=0;
@@ -3193,8 +3220,11 @@ function openQuizHome(){
       var study = (spec.study||[]).length ? '<div class="van-box"><h4>Ôn nhanh trước khi làm</h4><ul>' + spec.study.map(function(line){ return "<li>" + line + "</li>"; }).join("") + "</ul></div>" : "";
       var detail = id==="tinhoc6"
         ? "14 câu trắc nghiệm · 3 câu tự luận · 45 phút · Đúng từ 12/14 là qua"
-        : "20 câu · 30 phút · Đúng từ 16/20 là qua";
-      return '<div class="topic"><b style="font-size:18px">' + (id==="tinhoc6" ? "💻 " : "⏱️ ") + spec.title + '</b><div class="mut">' +
+        : (id==="toan1"
+          ? "12 câu tư duy · 15 phút · Đúng từ 10/12 là qua"
+          : "20 câu · 30 phút · Đúng từ 16/20 là qua");
+      var icon = id==="tinhoc6" ? "💻 " : (id==="toan1" ? "🧩 " : "⏱️ ");
+      return '<div class="topic"><b style="font-size:18px">' + icon + spec.title + '</b><div class="mut">' +
         (ePassed ? "Đã qua." : "Chưa qua.") + (eBest!=null ? " Kỷ lục " + eBest + "%." : "") + " " + detail +
         '</div>' + study + '<div class="lvrow"><button class="lvbtn' + (ePassed?" passed":"") + '" data-exam="' + id + '">' +
         (ePassed ? "✅ Làm lại bài thi" : "▶️ Bắt đầu bài thi") +
@@ -3339,17 +3369,111 @@ function startExam(id){
   startExamClock();
   renderQuestion();
 }
-function speak(text){
+/* iPad từ iPadOS 13 gửi userAgent kiểu máy Mac. Gen 9 vẫn dính lỗi SpeechSynthesis của WebKit. */
+var appleTouch = /iPad|iPhone|iPod/.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+var speakGen = 0;
+var viVoice = null;
+var ttsClip = null;
+function refreshViVoice(){
+  if (!window.speechSynthesis) return null;
+  var voices = speechSynthesis.getVoices() || [];
+  var vi = voices.filter(function(v){
+    return (v.lang || "").replace(/_/g, "-").toLowerCase().indexOf("vi") === 0;
+  });
+  vi.sort(function(a, b){
+    function rank(v){
+      if (/linh/i.test(v.name || "")) return 0;
+      if (v.localService) return 1;
+      return 2;
+    }
+    return rank(a) - rank(b);
+  });
+  viVoice = vi[0] || null;
+  return viVoice;
+}
+if (window.speechSynthesis){
+  refreshViVoice();
+  speechSynthesis.addEventListener("voiceschanged", refreshViVoice);
+}
+function prepareSpeakText(text){
+  return String(text || "")
+    .replace(/🍎/g, " quả táo ")
+    .replace(/[🎉✅💎🪙🔊]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+function speakGoogle(spoken, gen){
+  if (gen !== speakGen || !spoken) return;
   try {
-    if (!window.speechSynthesis) return;
-    speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text.replace(/🍎/g, " quả táo "));
-    u.lang = "vi-VN"; u.rate = 0.95;
-    var voices = speechSynthesis.getVoices();
-    var vn = voices.find(function(v){ return v.lang && v.lang.toLowerCase().indexOf("vi")===0; });
-    if (vn) u.voice = vn;
+    if (ttsClip){ ttsClip.pause(); ttsClip.src = ""; ttsClip = null; }
+    var url = "https://translate.google.com/translate_tts?ie=UTF-8&tl=vi&client=tw-ob&q=" + encodeURIComponent(spoken.slice(0, 180));
+    ttsClip = new Audio(url);
+    var play = ttsClip.play();
+    if (play && play.catch) play.catch(function(){});
+  } catch (e) {}
+}
+function speakNow(spoken, gen){
+  if (gen !== speakGen || !window.speechSynthesis) return;
+  var synth = speechSynthesis;
+  var voice = viVoice || refreshViVoice();
+  if (appleTouch && !voice){ speakGoogle(spoken, gen); return; }
+  var u = new SpeechSynthesisUtterance(spoken);
+  u.lang = (voice && voice.lang) || "vi-VN";
+  u.rate = appleTouch ? 1 : 0.9;
+  u.pitch = 1;
+  u.volume = 1;
+  if (voice) u.voice = voice;
+  u.onerror = function(ev){
+    if (gen !== speakGen) return;
+    var err = ev && ev.error;
+    if (err === "canceled" || err === "interrupted") return;
+    speakGoogle(spoken, gen);
+  };
+  try {
+    synth.speak(u);
+    if (appleTouch && synth.paused) synth.resume();
+  } catch (e) {
+    speakGoogle(spoken, gen);
+  }
+}
+function speak(text){
+  var spoken = prepareSpeakText(text);
+  if (!spoken || !window.speechSynthesis) return;
+  var gen = ++speakGen;
+  var synth = speechSynthesis;
+  if (navigator.audioSession){
+    try { navigator.audioSession.type = "playback"; } catch (e) {}
+  }
+  var voicesReady = (synth.getVoices() || []).length > 0;
+  var voice = refreshViVoice();
+  try { if (synth.speaking || synth.pending) synth.cancel(); } catch (e) {}
+  if (appleTouch && voicesReady && !voice){ speakGoogle(spoken, gen); return; }
+  if (!appleTouch){ speakNow(spoken, gen); return; }
+  /* cancel() cùng lượt với speak() trên iPad làm máy đọc lại câu cũ hoặc nuốt câu mới. */
+  setTimeout(function(){ speakNow(spoken, gen); }, 80);
+}
+var speechPrimed = false;
+function unlockAppleSpeech(){
+  if (!appleTouch || !window.speechSynthesis || speechPrimed) return;
+  speechPrimed = true;
+  refreshViVoice();
+  if (navigator.audioSession){
+    try { navigator.audioSession.type = "playback"; } catch (e) {}
+  }
+  try {
+    var u = new SpeechSynthesisUtterance(" ");
+    u.volume = 0;
+    u.rate = 1;
+    u.lang = (viVoice && viVoice.lang) || "vi-VN";
+    if (viVoice) u.voice = viVoice;
+    speechSynthesis.resume();
     speechSynthesis.speak(u);
-  } catch(e){}
+  } catch (e) {}
+}
+function quizIsBig(){
+  if (!profile || profile.grade !== 1) return false;
+  if (quizMode === "math") return true;
+  return !!(quizCtx && quizCtx.exam && quizCtx.exam.id === "toan1");
 }
 function qMetaText(){
   var ctx = quizCtx, q = ctx.questions[ctx.idx];
@@ -3362,7 +3486,7 @@ function renderQuestion(){
   var ctx = quizCtx; if (!ctx) return;
   var q = ctx.questions[ctx.idx];
   ctx.answered = false;
-  var big = quizMode==="math" && profile.grade===1;
+  var big = quizIsBig();
   $("qProg").style.width = ((ctx.idx)/ctx.questions.length*100) + "%";
   if (quizMode!=="exam") $("qTimer").style.display = "none";
   $("qMeta").textContent = qMetaText();
@@ -3431,7 +3555,7 @@ function answer(i, btn){
   var ctx = quizCtx; if (!ctx || ctx.answered) return;
   ctx.answered = true;
   var q = ctx.questions[ctx.idx];
-  var big = quizMode==="math" && profile.grade===1;
+  var big = quizIsBig();
   var buttons = $("qOpts").querySelectorAll(".opt");
   buttons.forEach(function(b, j){
     b.disabled = true;
@@ -3912,6 +4036,7 @@ document.addEventListener("visibilitychange", function(){
   else if (soundOn && $("scr-tank") && $("scr-tank").classList.contains("on")) startTankMusic();
 });
 document.addEventListener("pointerdown", function(){
+  unlockAppleSpeech();
   if (soundOn && $("scr-tank") && $("scr-tank").classList.contains("on")) startTankMusic();
 });
 
