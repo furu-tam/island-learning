@@ -157,6 +157,12 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 .opt.right{border-color:var(--good);background:rgba(22,163,74,.15)}
 .opt.wrong{border-color:var(--bad);background:rgba(220,38,38,.12)}
 .opt.out{opacity:.38}
+.qjump{display:none;gap:6px;flex-wrap:wrap;margin:8px 0}
+.qjump button{min-width:36px;height:36px;padding:0 8px;border-radius:10px;border:2px solid var(--line);background:var(--card);font-weight:800;color:var(--ink)}
+.qjump button.now{box-shadow:0 0 0 2px var(--accent)}
+.qjump button.ok{background:rgba(22,163,74,.18);border-color:var(--good)}
+.qjump button.bad{background:rgba(220,38,38,.12);border-color:var(--bad)}
+.qnav{margin-top:14px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 .feedback{margin-top:14px;font-size:17px;border-radius:14px;padding:12px 14px;display:none}
 .feedback.on{display:block}
 .feedback.good{background:rgba(22,163,74,.13)}
@@ -367,6 +373,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <div class="progress"><i id="qProg"></i></div>
     <p class="mut" id="qTimer" style="display:none;margin:8px 0 0;font-weight:800"></p>
     <p class="mut" id="qMeta" style="margin:8px 0"></p>
+    <div class="qjump" id="qJump"></div>
     <div class="card">
       <div style="display:flex;gap:8px;align-items:flex-start">
         <div class="qtext" id="qText" style="flex:1"></div>
@@ -380,8 +387,10 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
       <textarea id="qEssay" style="display:none" placeholder="Viết ý của em vào đây, rồi bấm Xem đáp án để tự chấm."></textarea>
       <div id="qGuide" class="van-box" style="display:none;text-align:left"></div>
       <div class="feedback" id="qFeed"></div>
-      <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">
+      <div class="qnav">
         <button class="btn ghost small" id="qQuit">Thoát</button>
+        <button class="btn ghost small" id="qPrev" style="display:none">⬅️ Trước</button>
+        <button class="btn ghost small" id="qSubmit" style="display:none">Nộp bài</button>
         <button class="btn" id="qNext" style="display:none">Câu tiếp theo ➡️</button>
       </div>
     </div>
@@ -391,7 +400,10 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <h2 id="resTitle">Qua bài rồi!</h2>
     <p id="resText"></p>
     <p id="resReward" style="font-weight:900;font-size:19px"></p>
-    <button class="btn" id="resBack">Về danh sách chủ đề</button>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button class="btn" id="resReview" style="display:none">Xem lại bài làm</button>
+      <button class="btn ghost" id="resBack">Về danh sách chủ đề</button>
+    </div>
   </div>
 </section>
 
@@ -3159,6 +3171,7 @@ var QUIZ_EXAMS = { toan6: QUIZ_EXAM, tinhoc6: QUIZ_TIN, toan1: QUIZ_TOAN1, toan6
 
 /* ============================== Quiz ============================== */
 var quizCtx = null;
+var quizPaper = null;
 var quizMode = "math";
 var examTimer = null;
 function stopExamTimer(){ if (examTimer){ clearInterval(examTimer); examTimer = null; } }
@@ -3215,6 +3228,7 @@ function openQuizHome(){
   $("quizHome").style.display = "block";
   $("quizPlay").style.display = "none";
   $("quizResult").style.display = "none";
+  $("resReview").style.display = "none";
   $("qTimer").style.display = "none";
   refreshWallets();
   if (quizMode==="van"){
@@ -3402,7 +3416,7 @@ function startExam(id){
       id: "", part: "", text: q.text,
       options: order.map(function(i){ return q.options[i]; }),
       correct: order.indexOf(q.correct),
-      explanation: q.explanation, hints: null, drop: [], hintUsed: 0, points: 10
+      explanation: q.explanation, hints: null, drop: [], hintUsed: 0, points: 10, picked: null
     };
   });
   quizCtx = { topic: spec.id, level: 1, questions: prepared, idx: 0, correct: 0, score: 0, answered: false, wrongStreak: 0, review: false, exam: spec, essays: spec.essays || [], essayMode: false, essaySeen: false, endsAt: Date.now() + spec.minutes*60*1000, timedOut: false };
@@ -3519,10 +3533,126 @@ function quizIsBig(){
   if (quizMode === "math") return true;
   return !!(quizCtx && quizCtx.exam && quizCtx.exam.id === "toan1");
 }
+function examPos(){
+  var ctx = quizCtx;
+  if (!ctx) return { pos:0, total:0 };
+  var mc = ctx.questions.length;
+  var es = (ctx.essays || []).length;
+  return { pos: ctx.essayMode ? mc + ctx.idx : ctx.idx, total: mc + es, mc: mc };
+}
+function saveEssayDraft(){
+  var ctx = quizCtx;
+  if (!ctx || !ctx.essayMode || ctx.lookback) return;
+  var q = ctx.essays[ctx.idx];
+  if (!q) return;
+  q.draft = $("qEssay").value;
+  if (ctx.essaySeen) q.seen = true;
+}
+function paintJump(){
+  var el = $("qJump");
+  var ctx = quizCtx;
+  if (!el) return;
+  if (!ctx || quizMode!=="exam"){ el.style.display = "none"; el.innerHTML = ""; return; }
+  el.style.display = "flex";
+  var here = examPos().pos;
+  var html = ctx.questions.map(function(q, i){
+    var cls = i===here ? "now " : "";
+    if (q.picked==null) cls += "blank";
+    else cls += q.picked===q.correct ? "ok" : "bad";
+    return '<button type="button" class="' + cls + '" data-jump="' + i + '">' + (i+1) + '</button>';
+  }).join("");
+  (ctx.essays||[]).forEach(function(q, i){
+    var at = ctx.questions.length + i;
+    var cls = at===here ? "now " : "";
+    cls += (q.draft || q.seen) ? "ok" : "blank";
+    html += '<button type="button" class="' + cls + '" data-jump="' + at + '">T' + (i+1) + '</button>';
+  });
+  el.innerHTML = html;
+  el.querySelectorAll("[data-jump]").forEach(function(b){
+    b.onclick = function(){ openExamPos(parseInt(b.getAttribute("data-jump"), 10)); };
+  });
+}
+function syncExamNav(){
+  var ctx = quizCtx;
+  var exam = !!(ctx && quizMode==="exam");
+  $("qPrev").style.display = exam ? "inline-block" : "none";
+  $("qSubmit").style.display = (exam && !ctx.lookback) ? "inline-block" : "none";
+  if (!exam){ $("qJump").style.display = "none"; $("qQuit").textContent = "Thoát"; return; }
+  var at = examPos();
+  $("qPrev").disabled = at.pos<=0;
+  $("qQuit").textContent = ctx.lookback ? "Về kết quả" : "Thoát";
+  if (!ctx.submitArmed) $("qSubmit").textContent = "Nộp bài";
+  $("qNext").style.display = "inline-block";
+  $("qNext").disabled = false;
+  if (ctx.lookback){
+    $("qNext").textContent = at.pos+1>=at.total ? "Hết bài" : "Câu sau ➡️";
+    $("qNext").disabled = at.pos+1>=at.total;
+    return;
+  }
+  if (ctx.essayMode && !ctx.essaySeen){ $("qNext").textContent = "Xem đáp án"; return; }
+  $("qNext").textContent = at.pos+1>=at.total ? "Hết câu" : "Câu sau ➡️";
+}
+function openExamPos(pos){
+  var ctx = quizCtx;
+  if (!ctx || quizMode!=="exam") return;
+  saveEssayDraft();
+  var mc = ctx.questions.length;
+  var total = mc + (ctx.essays||[]).length;
+  if (pos<0 || pos>=total) return;
+  if (pos < mc){ ctx.essayMode = false; ctx.idx = pos; renderQuestion(); }
+  else { ctx.essayMode = true; ctx.idx = pos - mc; renderEssay(); }
+}
+function stepExam(dir){
+  var ctx = quizCtx;
+  if (!ctx || quizMode!=="exam") return;
+  if (ctx.essayMode && !ctx.essaySeen && !ctx.lookback && dir>0){
+    ctx.essaySeen = true;
+    ctx.essays[ctx.idx].seen = true;
+    $("qGuide").style.display = "block";
+    $("qGuide").innerHTML = ctx.essays[ctx.idx].guide;
+    syncExamNav();
+    paintJump();
+    return;
+  }
+  var at = examPos();
+  var next = at.pos + dir;
+  if (next<0) return;
+  if (next>=at.total){
+    if (!ctx.lookback) toast("Hết câu rồi. Bấm Nộp bài khi muốn chấm.");
+    return;
+  }
+  openExamPos(next);
+}
+function lockPick(q){
+  var ctx = quizCtx;
+  var picked = q.picked;
+  var buttons = $("qOpts").querySelectorAll(".opt");
+  buttons.forEach(function(b, j){
+    b.disabled = true;
+    if (j===q.correct) b.classList.add("right");
+    else if (picked!=null && j===picked) b.classList.add("wrong");
+  });
+  var feed = $("qFeed");
+  if (picked==null){
+    feed.className = "feedback on bad";
+    feed.innerHTML = "<b>Em chưa chọn.</b> Đáp án đúng là: <b>" + q.options[q.correct] + "</b>. " + (q.explanation||"");
+  } else if (picked===q.correct){
+    feed.className = "feedback on good";
+    feed.innerHTML = "<b>✅ Đáp án em chọn là đúng.</b> " + (q.explanation||"");
+  } else {
+    feed.className = "feedback on bad";
+    feed.innerHTML = "<b>Em chọn:</b> " + q.options[picked] + ".<br>Đáp án đúng là: <b>" + q.options[q.correct] + "</b>. " + (q.explanation||"");
+  }
+  ctx.answered = true;
+}
 function qMetaText(){
   var ctx = quizCtx, q = ctx.questions[ctx.idx];
+  if (ctx.lookback) return "Xem lại câu " + (ctx.idx+1) + " / " + ctx.questions.length;
+  if (quizMode==="exam" && ctx.exam){
+    var done = ctx.questions.filter(function(item){ return item.picked!=null; }).length;
+    return "Câu " + (ctx.idx+1) + " / " + ctx.questions.length + " · Đã làm " + done + " · Cần " + ctx.exam.pass + "/" + ctx.questions.length + " để qua";
+  }
   var s = "Câu " + (ctx.idx+1) + " / " + ctx.questions.length + " · Đúng: " + ctx.correct;
-  if (quizMode==="exam" && ctx.exam) s += " · Cần " + ctx.exam.pass + "/" + ctx.questions.length + " để qua";
   if (quizMode==="van") s += " · Phần " + q.part + " · Điểm câu này: " + q.points;
   return s;
 }
@@ -3540,6 +3670,7 @@ function renderQuestion(){
   var feed = $("qFeed"); feed.className = "feedback"; feed.textContent = "";
   $("qNext").style.display = "none";
   hideEssayBox();
+  if (!(quizCtx && quizMode==="exam")) { $("qPrev").style.display = "none"; $("qSubmit").style.display = "none"; $("qJump").style.display = "none"; }
   var hintRow = $("hintRow"), hintBtn = $("hintBtn"), hintBox = $("hintBox");
   if (quizMode==="van" && q.hints){
     q.hintUsed = 0; q.points = 10;
@@ -3559,7 +3690,9 @@ function renderQuestion(){
     b.onclick = function(){ answer(i, b); };
     opts.appendChild(b);
   });
-  if (big) speak(q.text);
+  if (quizMode==="exam" && (q.picked!=null || ctx.lookback)) lockPick(q);
+  if (quizMode==="exam"){ paintJump(); syncExamNav(); }
+  if (big && q.picked==null && !ctx.lookback) speak(q.text);
 }
 function showHint(){
   var ctx = quizCtx; if (!ctx || ctx.answered) return;
@@ -3596,9 +3729,11 @@ function rememberVan(q, ok){
   saveProfile(false);
 }
 function answer(i, btn){
-  var ctx = quizCtx; if (!ctx || ctx.answered) return;
-  ctx.answered = true;
+  var ctx = quizCtx; if (!ctx || ctx.answered || ctx.lookback) return;
   var q = ctx.questions[ctx.idx];
+  if (q.picked!=null) return;
+  ctx.answered = true;
+  if (quizMode==="exam") q.picked = i;
   var big = quizIsBig();
   var buttons = $("qOpts").querySelectorAll(".opt");
   buttons.forEach(function(b, j){
@@ -3626,6 +3761,7 @@ function answer(i, btn){
     rememberVan(q, false);
   }
   $("qMeta").textContent = qMetaText();
+  if (quizMode==="exam"){ paintJump(); syncExamNav(); return; }
   $("qNext").style.display = "inline-block";
   var lastMc = ctx.idx+1 >= ctx.questions.length;
   var moreEssay = lastMc && ctx.essays && ctx.essays.length;
@@ -3637,7 +3773,9 @@ function renderEssay(){
   ctx.essaySeen = false;
   var total = ctx.questions.length + ctx.essays.length;
   $("qProg").style.width = ((ctx.questions.length + ctx.idx)/total*100) + "%";
-  $("qMeta").textContent = "Tự luận " + (ctx.idx+1) + " / " + ctx.essays.length + " · Viết ý của em, rồi xem đáp án để tự chấm. Phần này không tính vào kim cương.";
+  $("qMeta").textContent = ctx.lookback
+    ? ("Xem lại tự luận " + (ctx.idx+1) + " / " + ctx.essays.length)
+    : ("Tự luận " + (ctx.idx+1) + " / " + ctx.essays.length + " · Viết ý của em, rồi xem đáp án để tự chấm. Phần này không tính vào kim cương.");
   $("qText").textContent = q.text;
   $("qText").classList.remove("big");
   $("speakBtn").style.display = "none";
@@ -3646,14 +3784,32 @@ function renderEssay(){
   $("qFeed").className = "feedback";
   $("qFeed").textContent = "";
   $("qEssay").style.display = "block";
-  $("qEssay").value = "";
-  $("qGuide").style.display = "none";
-  $("qGuide").innerHTML = "";
+  $("qEssay").value = q.draft || "";
+  $("qEssay").readOnly = !!ctx.lookback;
+  ctx.essaySeen = !!q.seen || !!ctx.lookback;
+  $("qGuide").style.display = ctx.essaySeen ? "block" : "none";
+  $("qGuide").innerHTML = ctx.essaySeen ? q.guide : "";
   $("qNext").style.display = "inline-block";
-  $("qNext").textContent = "Xem đáp án";
+  $("qNext").textContent = ctx.essaySeen ? "Câu sau ➡️" : "Xem đáp án";
+  if (quizMode==="exam"){ paintJump(); syncExamNav(); }
 }
+$("qPrev").onclick = function(){ stepExam(-1); };
+$("qSubmit").onclick = function(){
+  var ctx = quizCtx;
+  if (!ctx || ctx.lookback || quizMode!=="exam") return;
+  var left = ctx.questions.filter(function(q){ return q.picked==null; }).length;
+  if (left && !ctx.submitArmed){
+    ctx.submitArmed = true;
+    $("qSubmit").textContent = "Nộp dù còn " + left + " câu";
+    toast("Còn " + left + " câu chưa chọn. Bấm nộp lần nữa nếu em muốn chấm luôn.");
+    return;
+  }
+  saveEssayDraft();
+  finishQuiz();
+};
 $("qNext").onclick = function(){
   var ctx = quizCtx; if (!ctx) return;
+  if (quizMode==="exam"){ stepExam(1); return; }
   if (ctx.essayMode && !ctx.essaySeen){
     ctx.essaySeen = true;
     $("qGuide").style.display = "block";
@@ -3677,10 +3833,45 @@ $("qNext").onclick = function(){
   }
   renderQuestion();
 };
-$("qQuit").onclick = function(){ stopExamTimer(); if (quizMode==="van") saveProfile(true); quizCtx = null; openQuizHome(); };
+$("qQuit").onclick = function(){
+  if (quizCtx && quizCtx.lookback){
+    quizCtx = null;
+    $("quizPlay").style.display = "none";
+    $("quizResult").style.display = "block";
+    return;
+  }
+  stopExamTimer();
+  if (quizMode==="van") saveProfile(true);
+  quizCtx = null;
+  openQuizHome();
+};
+var swipeX = null;
+$("quizPlay").addEventListener("touchstart", function(e){
+  if (!quizCtx || quizMode!=="exam" || !e.changedTouches) return;
+  swipeX = e.changedTouches[0].clientX;
+}, { passive: true });
+$("quizPlay").addEventListener("touchend", function(e){
+  if (swipeX==null || !quizCtx || quizMode!=="exam" || !e.changedTouches) return;
+  var dx = e.changedTouches[0].clientX - swipeX;
+  swipeX = null;
+  if (Math.abs(dx) < 70) return;
+  stepExam(dx < 0 ? 1 : -1);
+}, { passive: true });
 function finishQuiz(){
   stopExamTimer();
   var ctx = quizCtx; if (!ctx) return;
+  if (quizMode==="exam" && !ctx.lookback){
+    ctx.correct = ctx.questions.filter(function(q){ return q.picked===q.correct; }).length;
+    quizPaper = {
+      title: ctx.exam ? ctx.exam.title : "Bài làm",
+      questions: ctx.questions.map(function(q){
+        return { text:q.text, options:q.options.slice(), correct:q.correct, explanation:q.explanation||"", picked:q.picked };
+      }),
+      essays: (ctx.essays||[]).map(function(q){
+        return { text:q.text, guide:q.guide, draft:q.draft||"", seen:true };
+      })
+    };
+  }
   quizCtx = null;
   var total = ctx.questions.length;
   var percent = Math.round(ctx.correct/total*100);
@@ -3696,6 +3887,7 @@ function finishQuiz(){
     $("resTitle").textContent = left ? "Ôn xong một lượt" : "Hết câu sai rồi!";
     $("resText").textContent = "Bạn đúng " + ctx.correct + "/" + total + " câu." + (left ? " Còn " + left + " câu sai, lần sau ôn đúng các câu đó trước." : " Giờ viết lại đoạn văn 15 phút theo dàn ý nhé, đừng nhìn văn mẫu.");
     $("resReward").textContent = "";
+    $("resReview").style.display = "none";
     refreshWallets();
     return;
   }
@@ -3748,8 +3940,29 @@ function finishQuiz(){
     $("resText").textContent = "Bạn đúng " + ctx.correct + "/" + total + " câu (" + percent + "%). " + (passed ? "Level tiếp theo đã mở." : "Cần đúng từ 80% trở lên mới qua bài, chơi lại nào!");
     $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua bài!") : "Đã nhận thưởng level này rồi, chơi lại không cộng trùng nhé.") : "";
   }
+  $("resReview").style.display = (exam && quizPaper) ? "inline-block" : "none";
   refreshWallets();
 }
+function openLookback(){
+  if (!quizPaper) return;
+  quizCtx = {
+    lookback: true,
+    exam: { title: quizPaper.title, pass: 0 },
+    questions: quizPaper.questions,
+    essays: quizPaper.essays || [],
+    idx: 0,
+    correct: 0,
+    essayMode: false,
+    essaySeen: true,
+    review: false
+  };
+  $("quizResult").style.display = "none";
+  $("quizHome").style.display = "none";
+  $("quizPlay").style.display = "block";
+  $("qTimer").style.display = "none";
+  renderQuestion();
+}
+$("resReview").onclick = openLookback;
 $("resBack").onclick = function(){ openQuizHome(); };
 
 /* ============================== Evolution house ============================== */
