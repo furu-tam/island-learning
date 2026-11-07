@@ -238,7 +238,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
     <button class="place-card" data-place="math"><div class="emo">🔢</div><div class="nm">Toán học</div><div class="ds" id="mathCardDesc">Quiz Toán · 66 câu</div></button>
     <button class="place-card" data-place="english"><div class="emo">🔤</div><div class="nm">Tiếng Anh</div><div class="ds">Sắp có bài học</div></button>
     <button class="place-card" data-place="it"><div class="emo">📖</div><div class="nm">Ngữ văn</div><div class="ds" id="vanCardDesc">2 dàn ý · 2 bài mẫu · 20 câu</div></button>
-    <button class="place-card" data-place="exam"><div class="emo">🏯</div><div class="nm">Phó Bản</div><div class="ds" id="examCardDesc">Toán 6 · Tin học 6</div></button>
+    <button class="place-card" data-place="exam"><div class="emo">🏯</div><div class="nm">Phó Bản</div><div class="ds" id="examCardDesc">Giữa kì Toán 6</div></button>
     <button class="place-card" data-place="evo"><div class="emo">🌳</div><div class="nm">Tiến hóa</div><div class="ds" id="evoCardDesc">Xem dạng thú · mở đến Lv.10</div></button>
   </div>
 </section>
@@ -715,9 +715,9 @@ function refreshWallets(){
     var vanPassed = profile.quizPassed.filter(function(k){ return k.indexOf("van:")===0; }).length;
     var vanMiss = (profile.vanMissed||[]).length;
     $("vanCardDesc").textContent = "2 dàn ý · 2 bài mẫu · 20 câu · " + vanPassed + "/2 bài đã qua" + (vanMiss ? " · còn " + vanMiss + " câu sai" : "");
-    var examIds = profile.grade===1 ? ["toan1"] : ["toan6", "tinhoc6"];
+    var examIds = profile.grade===1 ? ["toan1"] : ["toan6gk", "toan6", "tinhoc6"];
     var examDone = examIds.filter(function(id){ return profile.quizPassed.indexOf("exam:" + id)>=0; }).length;
-    $("examCardDesc").textContent = (profile.grade===1 ? "Toán 1 · tư duy" : "Toán 6 · Tin học 6") + (examDone ? " · đã qua " + examDone + "/" + examIds.length : "");
+    $("examCardDesc").textContent = (profile.grade===1 ? "Toán 1 · tư duy" : "Giữa kì Toán 6") + (examDone ? " · đã qua " + examDone + "/" + examIds.length : "");
     var maxLv = petLevelMax(profile.giftPet);
     $("evoCardDesc").textContent = profile.giftPet==="shark"
       ? (petEmoji(profile.giftPet, profile.level) + " đang Lv." + profile.level + " · Lv.1–10 rùa biển · Lv.11–30 rồng")
@@ -3114,7 +3114,48 @@ var QUIZ_TOAN1 = { id:"toan1", title:"Toán lớp 1 · Tư duy", minutes: 15, pa
     { text: "Mỗi giỏ có 3 quả cam. Có 2 giỏ như thế. Tất cả có mấy quả cam?", options: ["5", "6", "3", "2"], correct: 1, explanation: "Hai giỏ, mỗi giỏ 3 quả: 3 cộng 3 bằng 6 quả." }
   ]
 };
-var QUIZ_EXAMS = { toan6: QUIZ_EXAM, tinhoc6: QUIZ_TIN, toan1: QUIZ_TOAN1 };
+/* Toán 6 giữa kì 1: 30 câu, 45 phút, đúng từ 24/30. Lần đầu qua được 1000 kim cương và 1000 xu. */
+var QUIZ_GIUAKI = { id:"toan6gk", title:"Toán 6 · Giữa kì 1", minutes: 45, pass: 24, reward: 1000, rewardGold: 1000,
+  study: [
+    "N* là số tự nhiên khác 0. Lớn hơn và nhỏ hơn thì không lấy hai đầu mút.",
+    "Nhân cùng cơ số thì cộng số mũ. Chia cùng cơ số thì trừ số mũ. Mọi số khác 0 mũ 0 bằng 1.",
+    "Chia hết cho 2: tận cùng chẵn. Chia hết cho 5: tận cùng 0 hoặc 5. Chia hết cho cả 2 và 5: tận cùng 0. Chia hết cho 3: tổng chữ số chia hết cho 3.",
+    "Rào xung quanh là chu vi. Lát nền là diện tích. Đổi 50 cm = 0,5 m trước khi tính mét vuông."
+  ],
+  questions: [
+    { text: "Tập hợp nào sau đây chỉ tập hợp N*?", options: ["{0; 1; 2; 3; 5; ...}", "{1; 2; 3; 4}", "{0; 1; 2; 3; 4; 5}", "{1; 2; 3; 4; ...}"], correct: 3, explanation: "N* là các số tự nhiên khác 0 và viết tiếp không dừng." },
+    { text: "Tập hợp A các số tự nhiên lớn hơn 3 và nhỏ hơn 7 là:", options: ["{3; 4; 5; 6; 7}", "{4; 5; 6; 7}", "{3; 4; 5; 6}", "{4; 5; 6}"], correct: 3, explanation: "Lớn hơn 3 và nhỏ hơn 7 thì không lấy 3 và không lấy 7." },
+    { text: "Tập hợp M = {x thuộc N* | x ≤ 3} gồm các phần tử:", options: ["{0; 1; 2; 3; 4}", "{1; 2; 3; 4}", "{0; 1; 2; 3}", "{1; 2; 3}"], correct: 3, explanation: "N* không có 0. x nhỏ hơn hoặc bằng 3 nên lấy 1, 2, 3." },
+    { text: "Kết quả của 2^3 là:", options: ["2", "4", "6", "8"], correct: 3, explanation: "2^3 = 2 × 2 × 2 = 8, không phải 2 × 3 = 6." },
+    { text: "Chỉ ra khẳng định sai:", options: ["2^3 × 2^2 = 2^5", "2^4 × 2 = 2^5", "2^6 : 2 = 2^5", "2^3 × 2^2 = 2^6"], correct: 3, explanation: "Nhân cùng cơ số thì cộng số mũ: 3 + 2 = 5, không phải 6." },
+    { text: "Trong các số sau, số nào chia hết cho 3?", options: ["133", "256", "345", "166"], correct: 2, explanation: "3 + 4 + 5 = 12, 12 chia hết cho 3." },
+    { text: "Trong các số 1904, 2895, 2890, 2786, số chia hết cho 5 mà không chia hết cho 2 là:", options: ["1904", "2895", "2890", "2786"], correct: 1, explanation: "Chia hết cho 5 thì tận cùng 0 hoặc 5. Không chia hết cho 2 thì tận cùng phải là 5." },
+    { text: "Cho ba số tự nhiên liên tiếp tăng dần a, 99, b. Hai số a và b là:", options: ["a = 88; b = 1", "a = 98; b = 101", "a = 100; b = 98", "a = 98; b = 100"], correct: 3, explanation: "Số liền trước 99 là 98, số liền sau 99 là 100." },
+    { text: "Thay y bằng chữ số thích hợp để số A = 591y chia hết cho cả 2 và 5.", options: ["y = 0", "y = 2", "y = 4", "y = 5"], correct: 0, explanation: "Chia hết cho cả 2 và 5 thì chữ số tận cùng phải là 0." },
+    { text: "Trong các số sau, số nào là bội của 12?", options: ["6", "1", "4", "0"], correct: 3, explanation: "0 chia hết cho mọi số khác 0, nên 0 là bội của 12." },
+    { text: "Tam giác ABC đều có cạnh 5 cm. Khẳng định nào đúng?", options: ["AB = 4 cm", "AC > AB", "BC = 5 cm", "AB < BC"], correct: 2, explanation: "Tam giác đều có ba cạnh bằng nhau, nên BC = AB = AC = 5 cm." },
+    { text: "Hình A là tam giác, hình B là chữ nhật, hình C là hình vuông, hình D là hình tròn. Hình nào là hình vuông?", options: ["Hình A", "Hình C", "Hình D", "Hình B"], correct: 1, explanation: "Hình vuông có 4 cạnh bằng nhau và 4 góc vuông. Đó là hình C." },
+    { text: "Hình A là hình thang, hình B là ngũ giác, hình C là lục giác, hình D là tam giác vuông. Hình nào là hình lục giác đều?", options: ["Hình C", "Hình D", "Hình B", "Hình A"], correct: 0, explanation: "Lục giác đều có 6 cạnh bằng nhau. Đó là hình C." },
+    { text: "Diện tích hình vuông cạnh 7 cm là:", options: ["49 cm2", "14 dm2", "14 cm2", "49 dm2"], correct: 0, explanation: "7 × 7 = 49 cm2. Chu vi là 4 × 7 = 28 cm, không phải diện tích." },
+    { text: "Hình A là hình thoi, hình B là hình vuông, hình C là tam giác đều, hình D là lục giác đều. Hình nào là tam giác đều?", options: ["Hình A", "Hình B", "Hình C", "Hình D"], correct: 2, explanation: "Tam giác đều có 3 cạnh bằng nhau. Đó là hình C." },
+    { text: "Trong hình chữ nhật, phát biểu nào sai?", options: ["Bốn cạnh bằng nhau", "Hai đường chéo bằng nhau", "Hai cạnh đối bằng nhau", "Bốn góc vuông"], correct: 0, explanation: "Bốn cạnh bằng nhau là tính chất của hình vuông. Hình chữ nhật chỉ có các cạnh đối bằng nhau." },
+    { text: "Một lục giác đều lớn được chia thành 6 hình thang cân xung quanh 1 lục giác đều nhỏ ở giữa. Có bao nhiêu hình thang cân và bao nhiêu lục giác đều?", options: ["6 hình thang cân, 1 hình lục giác đều", "5 hình thang cân, 2 hình lục giác đều", "6 hình thang cân, 2 hình lục giác đều", "6 hình thang cân, 3 hình lục giác đều"], correct: 2, explanation: "Có 6 hình thang cân. Lục giác đều gồm hình nhỏ ở giữa và hình lớn bên ngoài, tổng 2 hình." },
+    { text: "Khu vườn hình chữ nhật dài 15 m, rộng 7 m. Cần bao nhiêu mét dây để rào xung quanh?", options: ["22 m", "210 m", "44 m", "105 m"], correct: 2, explanation: "Rào xung quanh là chu vi: 2 × (15 + 7) = 44 m. 15 × 7 = 105 là diện tích." },
+    { text: "Lục giác đều ABCDEF có tâm O, nối O với các đỉnh. Có bao nhiêu tam giác đều trong hình?", options: ["4", "5", "7", "6"], correct: 3, explanation: "Mỗi tam giác lấy một cạnh của lục giác và hai bán kính qua tâm. Đếm được 6 tam giác đều." },
+    { text: "Hình 1 là hình bình hành, hình 2 là chữ nhật, hình 3 là hình thang, hình 4 là hình thoi. Hình nào là hình thoi?", options: ["Hình 1", "Hình 4", "Hình 3", "Hình 2"], correct: 1, explanation: "Hình thoi có 4 cạnh bằng nhau. Đó là hình 4." },
+    { text: "Tính hợp lí: 29 + 132 + 237 + 868 + 763 = ?", options: ["2029", "1929", "2129", "2000"], correct: 0, explanation: "(237 + 763) + (132 + 868) + 29 = 1000 + 1000 + 29 = 2029." },
+    { text: "Tính: 120 : 2^2 − 5^8 : 5^6 + 7^0 = ?", options: ["6", "4", "30", "5"], correct: 0, explanation: "120 : 4 − 5^2 + 1 = 30 − 25 + 1 = 6. Lũy thừa trước, nhân chia trước, cộng trừ sau." },
+    { text: "Tìm x, biết x + 124 = 150.", options: ["26", "24", "274", "150"], correct: 0, explanation: "x = 150 − 124 = 26." },
+    { text: "Tìm x, biết 178 − 3x = 5^2.", options: ["51", "53", "49", "153"], correct: 0, explanation: "5^2 = 25. 3x = 178 − 25 = 153. x = 51." },
+    { text: "Một tàu hỏa cần chở 900 khách. Mỗi toa chứa được 88 khách. Cần ít nhất bao nhiêu toa?", options: ["10 toa", "11 toa", "12 toa", "9 toa"], correct: 1, explanation: "900 : 88 = 10 dư 20. Còn 20 khách nên cần thêm 1 toa, tổng 11 toa." },
+    { text: "Số trứng nhập về là 126, 246, 354 và 46 quả. Xếp hết vào các vỉ, mỗi vỉ 3 quả, được không?", options: ["Được, vừa đủ", "Không được, còn dư 1 quả", "Không được, còn dư 2 quả", "Không được, còn dư 3 quả"], correct: 1, explanation: "Tổng 772 quả. 772 : 3 = 257 dư 1, nên còn dư 1 quả." },
+    { text: "An mua 5 cây bút giá 4000 đồng một cây, 1 quyển sách 60000 đồng và 15 quyển tập giá 8000 đồng một quyển. An mang 190000 đồng. An thiếu bao nhiêu?", options: ["An thừa 10000 đồng", "An thiếu 10000 đồng", "An vừa đủ tiền", "An thiếu 20000 đồng"], correct: 1, explanation: "Tiền bút 20000, sách 60000, tập 120000. Tổng 200000 đồng, thiếu 10000 đồng." },
+    { text: "Mỗi ngày mẹ cho Nam 20000 đồng ăn sáng, Nam ăn hết 15000 đồng, tiền dư bỏ ống heo. Sau 30 ngày Nam đã đủ mua món đồ chơi 120000 đồng chưa?", options: ["Chưa đủ, còn thiếu 30000 đồng", "Đủ, thừa 30000 đồng", "Vừa đủ", "Chưa đủ, còn thiếu 15000 đồng"], correct: 1, explanation: "Mỗi ngày dư 5000 đồng. 30 ngày dư 150000 đồng, nhiều hơn 120000 nên thừa 30000 đồng." },
+    { text: "Nền nhà hình chữ nhật dài 7 m, rộng 5 m. Lát bằng gạch vuông cạnh 50 cm thì cần bao nhiêu viên?", options: ["140 viên", "70 viên", "35 viên", "175 viên"], correct: 0, explanation: "Nền 35 m2. Đổi 50 cm = 0,5 m, một viên 0,25 m2. 35 : 0,25 = 140 viên." },
+    { text: "Sân khấu hình thang cân đáy lớn 30 m, đáy bé 20 m, cạnh bên 18 m. Lắp đèn xung quanh, 250000 đồng một mét. Chi phí là bao nhiêu?", options: ["21500000 đồng", "15000000 đồng", "25000000 đồng", "86000000 đồng"], correct: 0, explanation: "Chu vi sân khấu là 30 + 20 + 18 + 18 = 86 m. 86 × 250000 = 21500000 đồng." }
+  ]
+};
+var QUIZ_EXAMS = { toan6: QUIZ_EXAM, tinhoc6: QUIZ_TIN, toan1: QUIZ_TOAN1, toan6gk: QUIZ_GIUAKI };
 
 /* ============================== Quiz ============================== */
 var quizCtx = null;
@@ -3211,7 +3252,7 @@ function openQuizHome(){
     $("quizIntro").textContent = profile.grade===1
       ? "Bài tư duy logic cho lớp 1. Nghe câu hỏi, rồi chọn một đáp án. Làm trong 15 phút. Đúng từ 10/12 là qua."
       : "Chọn một bài thi. Làm hết giờ thì bài tự nộp. Trắc nghiệm được chấm ngay. Phần tự luận em tự đối chiếu đáp án, điểm kim cương chỉ tính phần trắc nghiệm.";
-    var examIds = profile.grade===1 ? ["toan1"] : ["toan6", "tinhoc6"];
+    var examIds = profile.grade===1 ? ["toan1"] : ["toan6gk", "toan6", "tinhoc6"];
     $("topicList").innerHTML = examIds.map(function(id){
       var spec = QUIZ_EXAMS[id];
       var ekey = "exam:" + id;
@@ -3222,13 +3263,16 @@ function openQuizHome(){
         ? "14 câu trắc nghiệm · 3 câu tự luận · 45 phút · Đúng từ 12/14 là qua"
         : (id==="toan1"
           ? "12 câu tư duy · 15 phút · Đúng từ 10/12 là qua"
-          : "20 câu · 30 phút · Đúng từ 16/20 là qua");
-      var icon = id==="tinhoc6" ? "💻 " : (id==="toan1" ? "🧩 " : "⏱️ ");
+          : (id==="toan6gk"
+            ? "30 câu · 45 phút · Đúng từ 24/30 là qua"
+            : "20 câu · 30 phút · Đúng từ 16/20 là qua"));
+      var icon = id==="tinhoc6" ? "💻 " : (id==="toan1" ? "🧩 " : (id==="toan6gk" ? "📝 " : "⏱️ "));
+      var prize = spec.reward + " 💎" + (spec.rewardGold ? (" và " + spec.rewardGold + " 🪙") : "");
       return '<div class="topic"><b style="font-size:18px">' + icon + spec.title + '</b><div class="mut">' +
         (ePassed ? "Đã qua." : "Chưa qua.") + (eBest!=null ? " Kỷ lục " + eBest + "%." : "") + " " + detail +
         '</div>' + study + '<div class="lvrow"><button class="lvbtn' + (ePassed?" passed":"") + '" data-exam="' + id + '">' +
         (ePassed ? "✅ Làm lại bài thi" : "▶️ Bắt đầu bài thi") +
-        '<br><span class="mut">Thưởng ' + spec.reward + ' 💎 lần đầu</span></button></div></div>';
+        '<br><span class="mut">Thưởng ' + prize + ' lần đầu</span></button></div></div>';
     }).join("");
     $("topicList").querySelectorAll("[data-exam]").forEach(function(b){
       b.onclick = function(){ startExam(b.getAttribute("data-exam")); };
@@ -3659,11 +3703,14 @@ function finishQuiz(){
   var passed = exam ? ctx.correct >= spec.pass : ctx.correct/total >= 0.8;
   var key = quizKey(ctx.topic, ctx.level);
   var reward = 0;
+  var rewardGold = 0;
   if (passed){
     if (profile.quizPassed.indexOf(key)<0){
       profile.quizPassed.push(key);
       reward = exam ? spec.reward : (QUIZ_REWARDS[ctx.level] || 0);
+      rewardGold = exam ? (spec.rewardGold || 0) : 0;
       profile.diamonds += reward;
+      profile.gold = (Number(profile.gold) || 0) + rewardGold;
     }
     if (!exam && (profile.quizBest[key]==null || percent > profile.quizBest[key])) profile.quizBest[key] = percent;
   }
@@ -3689,7 +3736,14 @@ function finishQuiz(){
       (ctx.timedOut ? ", hết " + spec.minutes + " phút." : (", làm trong " + formatLeft(spent) + ".")) +
       (passed ? " Bài đã qua." : (" Cần đúng từ " + spec.pass + "/" + total + " mới qua.")) +
       (spec.essays && spec.essays.length ? " Ba câu tự luận, mỗi câu 1 điểm, em tự chấm theo đáp án. Phần đó không cộng kim cương." : "");
-    $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua bài này!") : "Đã nhận thưởng bài này rồi, làm lại không cộng trùng nhé.") : "";
+    var prizeText = "";
+    if (reward>0 || rewardGold>0){
+      var bits = [];
+      if (reward>0) bits.push("+" + reward + " 💎");
+      if (rewardGold>0) bits.push("+" + rewardGold + " 🪙");
+      prizeText = bits.join(" và ") + " THƯỞNG lần đầu qua bài này!";
+    } else prizeText = "Đã nhận thưởng bài này rồi, làm lại không cộng trùng nhé.";
+    $("resReward").textContent = passed ? prizeText : "";
   } else {
     $("resText").textContent = "Bạn đúng " + ctx.correct + "/" + total + " câu (" + percent + "%). " + (passed ? "Level tiếp theo đã mở." : "Cần đúng từ 80% trở lên mới qua bài, chơi lại nào!");
     $("resReward").textContent = passed ? (reward>0 ? ("+" + reward + " 💎 THƯỞNG lần đầu qua bài!") : "Đã nhận thưởng level này rồi, chơi lại không cộng trùng nhé.") : "";
