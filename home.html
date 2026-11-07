@@ -162,6 +162,8 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 .qjump button.now{box-shadow:0 0 0 2px var(--accent)}
 .qjump button.ok{background:rgba(22,163,74,.18);border-color:var(--good)}
 .qjump button.bad{background:rgba(220,38,38,.12);border-color:var(--bad)}
+.qjump button.done{background:rgba(14,155,181,.16);border-color:var(--accent)}
+.opt.picked{border-color:var(--accent);background:rgba(14,155,181,.14)}
 .qnav{margin-top:14px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 .feedback{margin-top:14px;font-size:17px;border-radius:14px;padding:12px 14px;display:none}
 .feedback.on{display:block}
@@ -3743,6 +3745,7 @@ function paintJump(){
   var html = ctx.questions.map(function(q, i){
     var cls = i===here ? "now " : "";
     if (q.picked==null) cls += "blank";
+    else if (!ctx.lookback) cls += "done";
     else cls += q.picked===q.correct ? "ok" : "bad";
     return '<button type="button" class="' + cls + '" data-jump="' + i + '">' + (i+1) + '</button>';
   }).join("");
@@ -3807,6 +3810,11 @@ function stepExam(dir){
     return;
   }
   openExamPos(next);
+}
+function markPicked(q){
+  $("qOpts").querySelectorAll(".opt").forEach(function(b, j){
+    b.classList.toggle("picked", j===q.picked);
+  });
 }
 function lockPick(q){
   var ctx = quizCtx;
@@ -3876,7 +3884,8 @@ function renderQuestion(){
     b.onclick = function(){ answer(i, b); };
     opts.appendChild(b);
   });
-  if (quizMode==="exam" && (q.picked!=null || ctx.lookback)) lockPick(q);
+  if (quizMode==="exam" && ctx.lookback) lockPick(q);
+  else if (quizMode==="exam" && q.picked!=null) markPicked(q);
   if (quizMode==="exam"){ paintJump(); syncExamNav(); }
   if (big && q.picked==null && !ctx.lookback) speak(q.text);
 }
@@ -3915,11 +3924,18 @@ function rememberVan(q, ok){
   saveProfile(false);
 }
 function answer(i, btn){
-  var ctx = quizCtx; if (!ctx || ctx.answered || ctx.lookback) return;
+  var ctx = quizCtx; if (!ctx || ctx.lookback) return;
   var q = ctx.questions[ctx.idx];
-  if (q.picked!=null) return;
+  if (quizMode==="exam"){
+    /* Chế độ kiểm tra: chỉ lưu đáp án, được đổi trước khi nộp. Đúng sai xem ở phần Xem lại bài làm. */
+    q.picked = i;
+    markPicked(q);
+    $("qMeta").textContent = qMetaText();
+    paintJump(); syncExamNav();
+    return;
+  }
+  if (ctx.answered || q.picked!=null) return;
   ctx.answered = true;
-  if (quizMode==="exam") q.picked = i;
   var big = quizIsBig();
   var buttons = $("qOpts").querySelectorAll(".opt");
   buttons.forEach(function(b, j){
