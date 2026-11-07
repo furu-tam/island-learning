@@ -176,6 +176,7 @@ input[type=text]{width:100%;font-size:20px;padding:13px 16px;border-radius:14px;
 .gk-qnum{font-weight:800;font-size:18px;line-height:1;color:var(--gon);border-radius:10px;padding:8px 10px 6px;background:var(--l1)}
 .gkf[data-l="2"] .gk-qnum{background:var(--l2)} .gkf[data-l="3"] .gk-qnum{background:var(--l3)}
 .gk-lv{font-weight:700;font-size:14px;color:var(--gm)}
+.gk-link{margin-left:auto;font-weight:800;font-size:14px;color:var(--gb);text-decoration:none;border:1.5px solid var(--gb);border-radius:999px;padding:3px 10px;background:var(--gc)}
 .gk-body{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:16px;align-items:start}
 @media (max-width:720px){.gk-body{grid-template-columns:minmax(0,1fr)}}
 .gk-flow{display:flex;flex-direction:column;align-items:stretch;max-width:520px}
@@ -3178,7 +3179,7 @@ var QUIZ_TOAN1 = { id:"toan1", title:"Toán lớp 1 · Tư duy", minutes: 15, pa
   ]
 };
 /* Toán 6 giữa kì 1: 30 câu, 45 phút, đúng từ 24/30. Lần đầu qua được 1000 kim cương và 1000 xu. */
-var QUIZ_GIUAKI = { id:"toan6gk", title:"Toán 6 · Giữa kì 1", minutes: 45, pass: 24, reward: 1000, rewardGold: 1000, keepOrder: true,
+var QUIZ_GIUAKI = { id:"toan6gk", title:"Toán 6 · Giữa kì 1", minutes: 45, pass: 24, reward: 1000, rewardGold: 1000, keepOrder: true, reviewUrl: "on-tap-toan6-giuaki.html",
   study: [
     "N* là số tự nhiên khác 0. Lớn hơn và nhỏ hơn thì không lấy hai đầu mút.",
     "Nhân cùng cơ số thì cộng số mũ. Chia cùng cơ số thì trừ số mũ. Mọi số khác 0 mũ 0 bằng 1.",
@@ -3325,7 +3326,7 @@ function gkFlow(q, openAll){
     return '<div class="gk-arrow" data-i="' + i + '"></div><div class="gk-node step" data-i="' + i + '"><div class="gk-badge">B' + (i+1) + '</div><div><div class="t">' + s[0] + '</div><div class="d">' + s[1] + '</div></div></div>';
   }).join("");
   var html = '<div class="gkf" data-l="' + x.l + '" data-total="' + total + '">' +
-    '<div class="gk-top"><span class="gk-qnum">Câu ' + (q.src+1) + '</span><span class="gk-lv">' + GK_LV[x.l] + '</span></div>' +
+    '<div class="gk-top"><span class="gk-qnum">Câu ' + (q.src+1) + '</span><span class="gk-lv">' + GK_LV[x.l] + '</span><a class="gk-link" href="' + QUIZ_GIUAKI.reviewUrl + '#c' + (q.src+1) + '" target="_blank" rel="noopener">📘 Ôn tập câu này</a></div>' +
     '<div class="gk-body"><div><div class="gk-flow">' +
     '<div class="gk-node start"><div class="gk-lbl">Đề hỏi gì?</div><div>' + q.text + '</div></div>' + steps +
     '<div class="gk-arrow" data-i="' + total + '"></div><div class="gk-node end" data-i="' + total + '"><div class="gk-lbl">Đáp án</div><div class="ans">' + x.a + '</div>' + (x.check ? '<div class="check">' + x.check + '</div>' : '') + '</div>' +
@@ -3455,7 +3456,8 @@ function openQuizHome(){
       var ekey = "exam:" + id;
       var ePassed = profile.quizPassed.indexOf(ekey)>=0;
       var eBest = profile.quizBest[ekey];
-      var study = (spec.study||[]).length ? '<div class="van-box"><h4>Ôn nhanh trước khi làm</h4><ul>' + spec.study.map(function(line){ return "<li>" + line + "</li>"; }).join("") + "</ul></div>" : "";
+      var study = (spec.study||[]).length ? '<div class="van-box"><h4>Ôn nhanh trước khi làm</h4><ul>' + spec.study.map(function(line){ return "<li>" + line + "</li>"; }).join("") + "</ul>" +
+        (spec.reviewUrl ? '<a class="btn small ghost" href="' + spec.reviewUrl + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;text-decoration:none">📘 Ôn tập: sơ đồ giải 30 câu</a>' : "") + "</div>" : "";
       var detail = id==="tinhoc6"
         ? "14 câu trắc nghiệm · 3 câu tự luận · 45 phút · Đúng từ 12/14 là qua"
         : (id==="toan1"

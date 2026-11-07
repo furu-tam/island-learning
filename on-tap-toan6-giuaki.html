@@ -1,0 +1,453 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Sơ đồ giải Toán 6 giữa kì 1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Be+Vietnam+Pro:wght@400;500;600&display=swap">
+<style>
+/* Layout: trang vở ô ly, mỗi câu là một thẻ có sơ đồ dọc B1 → B2 → B3 → Đáp án, cạnh đó là ô "Bẫy hay gặp" */
+:root{
+  --paper:#f3f7fb; --grid:#dfe8f2; --card:#ffffff; --ink:#1d2b45; --muted:#5b6a83;
+  --line:#c7d3e3; --blue:#2f6bd8; --blue-soft:#e4eeff;
+  --green:#1f8a55; --green-soft:#e2f5ea; --red:#c8432b; --red-soft:#fdeae5;
+  --yellow:#ffe27a; --l1:#2f9e6e; --l2:#2f6bd8; --l3:#b5541f;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#121a27; --grid:#1a2536; --card:#18233a; --ink:#e8eef8; --muted:#9fb0c9;
+  --line:#2c3b56; --blue:#7aa6ff; --blue-soft:#1f2f52;
+  --green:#5fd39a; --green-soft:#173a2b; --red:#ff8c73; --red-soft:#3d2120;
+  --yellow:#6b5a12; --l1:#5fd39a; --l2:#7aa6ff; --l3:#f0a06a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121a27; --grid:#1a2536; --card:#18233a; --ink:#e8eef8; --muted:#9fb0c9;
+  --line:#2c3b56; --blue:#7aa6ff; --blue-soft:#1f2f52;
+  --green:#5fd39a; --green-soft:#173a2b; --red:#ff8c73; --red-soft:#3d2120;
+  --yellow:#6b5a12; --l1:#5fd39a; --l2:#7aa6ff; --l3:#f0a06a; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px}
+.wrap{max-width:980px;margin:0 auto;padding-block:28px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,5vw,40px);line-height:1.1;margin:0 0 6px;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 18px;max-width:62ch}
+.howto{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;color:var(--muted);margin-bottom:20px}
+.howto b{font-family:var(--display);color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:0 8px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding-block:10px;border-bottom:1.5px solid var(--line);margin-bottom:20px;display:flex;flex-direction:column;gap:10px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;cursor:pointer}
+.tab{font-family:var(--display);font-weight:700;font-size:15px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:4px 14px}
+.tab[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.toggle{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:14px;font-weight:600}
+.toggle input{width:18px;height:18px;accent-color:var(--blue)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.chip{flex:0 0 auto;width:34px;height:34px;border-radius:8px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-family:var(--display);font-weight:700;font-size:15px;display:grid;place-items:center;text-decoration:none}
+.chip[data-l="1"]{border-bottom:3px solid var(--l1)} .chip[data-l="2"]{border-bottom:3px solid var(--l2)} .chip[data-l="3"]{border-bottom:3px solid var(--l3)}
+.chip:hover{background:var(--blue-soft)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+.level-head{font-family:var(--display);font-weight:800;font-size:24px;margin:36px 0 12px;display:flex;gap:10px;align-items:baseline}
+.level-head small{font-family:var(--body);font-weight:500;font-size:14px;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:22px}
+
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:18px;scroll-margin-top:150px}
+.card-top{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+.qnum{flex:0 0 auto;font-family:var(--display);font-weight:800;font-size:20px;line-height:1;color:#fff;border-radius:10px;padding:9px 10px 7px;min-width:52px;text-align:center}
+.card[data-l="1"] .qnum{background:var(--l1)} .card[data-l="2"] .qnum{background:var(--l2)} .card[data-l="3"] .qnum{background:var(--l3)}
+:root[data-theme="dark"] .qnum{color:#0f1622}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .qnum{color:#0f1622}}
+.qtext{min-width:0}
+.qtext p{margin:0;font-weight:500}
+.qtext .opts{margin-top:4px;font-size:14px;color:var(--muted)}
+
+.figs{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.fig{margin:0;width:112px;background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:8px 8px 6px;text-align:center}
+.fig.big{width:min(300px,100%)}
+.fig svg{display:block;width:100%;height:auto;overflow:visible}
+.fig figcaption{font-family:var(--display);font-weight:700;font-size:15px;margin-top:4px}
+.fig.big figcaption{font-family:var(--body);font-weight:500;font-size:14px;color:var(--muted)}
+.fig .s{fill:none;stroke:var(--ink);stroke-width:2.4;stroke-linejoin:round}
+.fig .s.thin{stroke-width:1.4;stroke-dasharray:4 3}
+.fig .f{fill:var(--ink)}
+.fig .g{fill:var(--muted);stroke:none}
+.fig text{fill:var(--ink);font-family:var(--display);font-weight:700;font-size:11px}
+.fig .dim text{fill:var(--blue);font-family:var(--body);font-weight:600;font-size:9px}
+.body{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start}
+@media (max-width:720px){.body{grid-template-columns:minmax(0,1fr)}}
+
+/* Sơ đồ dọc */
+.flow{display:flex;flex-direction:column;align-items:stretch;max-width:520px}
+.node{border:2px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--card);position:relative}
+.node.start{background:var(--blue-soft);border-color:var(--blue);border-style:dashed}
+.node.start .lbl{color:var(--blue)}
+.node.step{display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;align-items:start}
+.badge{font-family:var(--display);font-weight:800;font-size:17px;width:40px;height:40px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;line-height:1}
+.node .t{font-weight:600}
+.node .d{font-size:15px;color:var(--muted);margin-top:2px}
+.node .d mark{background:var(--yellow);color:var(--ink);padding:0 3px;border-radius:3px}
+.calc{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink)}
+.node.end{background:var(--green-soft);border-color:var(--green)}
+.node.end .lbl{color:var(--green)}
+.lbl{font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.end .ans{font-family:var(--display);font-weight:800;font-size:20px;line-height:1.25}
+.arrow{height:30px;display:flex;justify-content:center;position:relative}
+.arrow::before{content:"";width:3px;background:var(--line);height:22px}
+.arrow::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);border:8px solid transparent;border-top:9px solid var(--line);border-bottom:0}
+.check{margin-top:6px;font-size:14px;color:var(--green);font-weight:600}
+
+.trap{background:var(--red-soft);border:2px solid var(--red);border-radius:12px;padding:12px 14px}
+.trap .lbl{color:var(--red);display:block;margin-bottom:6px}
+.trap ul{margin:0;padding-left:18px;font-size:15px;display:flex;flex-direction:column;gap:6px}
+.tip{margin-top:12px;background:var(--blue-soft);border-radius:12px;padding:12px 14px;font-size:15px}
+.tip .lbl{color:var(--blue);display:block;margin-bottom:4px}
+
+.hint-btn{margin-top:12px;font-family:var(--display);font-weight:700;font-size:16px;border:2px solid var(--blue);background:var(--blue);color:#fff;border-radius:10px;padding:6px 16px}
+:root[data-theme="dark"] .hint-btn{color:#0f1622}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hint-btn{color:#0f1622}}
+.hint-btn.reset{background:transparent;color:var(--blue)}
+.hidden-step{display:none!important}
+@media (prefers-reduced-motion:no-preference){.reveal{animation:pop .28s ease-out}@keyframes pop{from{opacity:.2;transform:translateY(-6px)}to{opacity:1;transform:none}}}
+</style>
+
+<div class="wrap">
+  <h1>Sơ đồ giải từng bước · Toán 6 giữa kì 1</h1>
+  <p class="sub">30 câu trong đề thi thử, mỗi câu một sơ đồ đi từ trên xuống. Khi bé làm sai, mở đúng câu đó, cho bé đi lần lượt từng ô, xong mới xem ô đáp án. Ô đỏ bên cạnh ghi những chỗ bé hay nhầm.</p>
+  <div class="howto"><b>Đề hỏi gì?</b>→<b>B1</b>→<b>B2</b>→<b>B3</b>→<b>Đáp án</b></div>
+
+  <div class="bar">
+    <div class="row">
+      <button class="tab" data-f="all" aria-pressed="true">Tất cả</button>
+      <button class="tab" data-f="1" aria-pressed="false">Level 1 · Dễ</button>
+      <button class="tab" data-f="2" aria-pressed="false">Level 2 · Hình</button>
+      <button class="tab" data-f="3" aria-pressed="false">Level 3 · Vận dụng</button>
+      <label class="toggle" for="hintMode"><input type="checkbox" id="hintMode"> Che bước, mở dần</label>
+    </div>
+    <nav class="chips" id="chips" aria-label="Đi tới câu"></nav>
+  </div>
+
+  <main id="out"></main>
+</div>
+
+<script>
+const LV = {1:["Level 1: Dễ","tập hợp, số tự nhiên, lũy thừa, chia hết"],2:["Level 2: Trung bình","hình học, chu vi, diện tích, đếm hình"],3:["Level 3: Vận dụng","tính hợp lí, tìm x, bài toán thực tế"]};
+// steps: [việc cần làm, cách làm / phép tính]
+const Q = [
+{n:1,l:1,q:"Tập hợp nào sau đây chỉ tập hợp N*?",o:"A. {0;1;2;3;5;...} · B. {1;2;3;4} · C. {0;1;2;3;4;5} · D. {1;2;3;4;...}",
+ s:[["Nhớ N* là gì","N* là số tự nhiên <mark>khác 0</mark>, nên bắt đầu từ 1."],
+    ["Loại đáp án có số 0","A và C có số 0 → loại."],
+    ["Xem có dấu “...” không","Số tự nhiên không có số cuối cùng, nên phải viết “...”. B dừng ở 4 → loại."]],
+ a:"D. {1; 2; 3; 4; ...}",
+ t:["Chọn A: nhầm N (có 0) với N* (không có 0).","Chọn B: quên dấu “...” ở cuối."]},
+{n:2,l:1,q:"Tập hợp A các số tự nhiên lớn hơn 3 và nhỏ hơn 7 là?",o:"A. {3;4;5;6;7} · B. {4;5;6;7} · C. {3;4;5;6} · D. {4;5;6}",
+ s:[["Gạch chân 2 điều kiện","“lớn hơn 3” và “nhỏ hơn 7”."],
+    ["Tìm số bắt đầu","Lớn hơn 3 thì <mark>không lấy 3</mark> → bắt đầu từ 4."],
+    ["Tìm số kết thúc","Nhỏ hơn 7 thì <mark>không lấy 7</mark> → dừng ở 6."],
+    ["Viết tập hợp","<span class='calc'>A = {4; 5; 6}</span>"]],
+ a:"D. A = {4; 5; 6}",
+ t:["Nhầm “lớn hơn” với “lớn hơn hoặc bằng”, nên lấy cả 3 hoặc 7."]},
+{n:3,l:1,q:"Tập hợp M = {x ∈ N* | x ≤ 3} gồm các phần tử?",o:"A. {0;1;2;3;4} · B. {1;2;3;4} · C. {0;1;2;3} · D. {1;2;3}",
+ s:[["Đọc chữ N*","N* không có 0 → bắt đầu từ 1."],
+    ["Đọc dấu ≤","≤ là “nhỏ hơn <mark>hoặc bằng</mark>” → được lấy 3."],
+    ["Liệt kê","<span class='calc'>1, 2, 3</span>"]],
+ a:"D. {1; 2; 3}",
+ t:["Chọn C: quên N* không có 0.","Chọn B: lấy thêm 4, đọc sai dấu ≤."]},
+{n:4,l:1,q:"Kết quả của 2³ là?",o:"A. 2 · B. 4 · C. 6 · D. 8",
+ s:[["Đọc lũy thừa","2³: cơ số là 2, số mũ là 3."],
+    ["Số mũ = số lần nhân","Viết 2 ra <mark>3 lần</mark> rồi nhân: <span class='calc'>2 × 2 × 2</span>"],
+    ["Nhân lần lượt","<span class='calc'>2 × 2 = 4, rồi 4 × 2 = 8</span>"]],
+ a:"D. 8",
+ t:["Chọn C: lấy 2 × 3 = 6. Lũy thừa là nhân cơ số với chính nó, không phải nhân với số mũ."]},
+{n:5,l:1,q:"Chỉ ra khẳng định SAI.",o:"A. 2³·2² = 2⁵ · B. 2⁴·2 = 2⁵ · C. 2⁶:2 = 2⁵ · D. 2³·2² = 2⁶",
+ s:[["Nhớ 2 quy tắc","Nhân cùng cơ số → <mark>cộng</mark> số mũ. Chia cùng cơ số → <mark>trừ</mark> số mũ. Nhớ: 2 = 2¹."],
+    ["Kiểm tra từng câu","A: 3+2 = 5 ✓ · B: 4+1 = 5 ✓ · C: 6−1 = 5 ✓ · D: 3+2 = 5, không phải 6 ✗"],
+    ["Đọc lại đề","Đề hỏi câu <mark>SAI</mark> → chọn câu có dấu ✗."]],
+ a:"D. 2³ · 2² = 2⁶",
+ t:["Quên đề hỏi câu sai, chọn câu đúng đầu tiên.","Quên 2 = 2¹ nên thấy B, C lạ."]},
+{n:6,l:1,q:"Số nào chia hết cho 3?",o:"A. 133 · B. 256 · C. 345 · D. 166",
+ s:[["Nhớ dấu hiệu chia hết cho 3","<mark>Tổng các chữ số</mark> chia hết cho 3."],
+    ["Cộng chữ số từng số","<span class='calc'>133 → 7 · 256 → 13 · 345 → 12 · 166 → 13</span>"],
+    ["Tìm tổng chia hết cho 3","12 : 3 = 4 ✓"]],
+ a:"C. 345",
+ t:["Nhìn chữ số tận cùng như khi xét chia hết cho 2, 5. Với 3 và 9 phải cộng các chữ số."]},
+{n:7,l:1,q:"Trong 1904; 2895; 2890; 2786, số chia hết cho 5 mà không chia hết cho 2 là?",o:"A. 1904 · B. 2895 · C. 2890 · D. 2786",
+ s:[["Lọc lần 1: chia hết cho 5","Tận cùng 0 hoặc 5 → còn <span class='calc'>2895, 2890</span>"],
+    ["Lọc lần 2: KHÔNG chia hết cho 2","Tận cùng phải là số lẻ → bỏ 2890 (tận cùng 0)."],
+    ["Còn lại","<span class='calc'>2895</span>"]],
+ a:"B. 2895",
+ t:["Chọn C (2890): mới làm điều kiện thứ nhất, quên chữ “không chia hết cho 2”."]},
+{n:8,l:1,q:"Ba số tự nhiên liên tiếp tăng dần a; 99; b. Tìm a, b.",o:"A. a=88; b=1 · B. a=98; b=101 · C. a=100; b=98 · D. a=98; b=100",
+ s:[["Hiểu “liên tiếp tăng dần”","Số sau hơn số trước đúng 1 đơn vị."],
+    ["Tìm a (đứng trước 99)","<span class='calc'>a = 99 − 1 = 98</span>"],
+    ["Tìm b (đứng sau 99)","<span class='calc'>b = 99 + 1 = 100</span>"]],
+ a:"D. a = 98; b = 100",
+ t:["Chọn C: đảo ngược a và b, quên dãy đang tăng dần.","Chọn B: cộng nhầm 99 + 2."]},
+{n:9,l:1,q:"Thay y để 591y chia hết cho cả 2 và 5.",o:"A. y = 0 · B. y = 2 · C. y = 4 · D. y = 5",
+ s:[["Chia hết cho 2","Tận cùng: 0, 2, 4, 6, 8"],
+    ["Chia hết cho 5","Tận cùng: 0, 5"],
+    ["Tìm số có ở cả hai nhóm","Chỉ có <mark>0</mark> → y = 0"]],
+ a:"A. y = 0",
+ t:["Chọn D: số 5915 chỉ chia hết cho 5.","Chọn B hoặc C: chỉ chia hết cho 2. Đề cần cả hai."]},
+{n:10,l:1,q:"Số nào là bội của 12?",o:"A. 6 · B. 1 · C. 4 · D. 0",
+ s:[["Nhớ “bội” là gì","Bội của 12 là số <mark>chia hết cho 12</mark>: 12 × 0, 12 × 1, 12 × 2, ..."],
+    ["Thử 6, 1, 4","Đều nhỏ hơn 12 và khác 0 → không chia hết cho 12."],
+    ["Thử 0","<span class='calc'>12 × 0 = 0</span> → 0 là bội của 12."]],
+ a:"D. 0",
+ t:["Nhầm “bội” với “ước”: 6, 4, 1 là ước của 12, không phải bội.","Mẹo nhớ: bội thì to ra (nhân lên), ước thì nhỏ đi (chia ra). Riêng 0 là bội của mọi số khác 0."]},
+
+{n:11,l:2,q:"Tam giác ABC đều cạnh 5 cm. Khẳng định nào đúng?",o:"A. AB = 4 cm · B. AC > AB · C. BC = 5 cm · D. AB < BC",
+ s:[["Nhớ tam giác đều","3 cạnh <mark>bằng nhau</mark>."],
+    ["Viết ra cả 3 cạnh","<span class='calc'>AB = BC = CA = 5 cm</span>"],
+    ["Kiểm tra từng câu","A: 4 cm ✗ · B: “lớn hơn” ✗ · C: 5 cm ✓ · D: “nhỏ hơn” ✗"]],
+ a:"C. BC = 5 cm",
+ t:["Thấy dấu > hoặc < là loại ngay, vì các cạnh bằng nhau."]},
+{n:12,l:2,q:"Hình nào là hình vuông? (Hình A: tam giác, B: chữ nhật, C: vuông, D: tròn)",o:"A. Hình A · B. Hình C · C. Hình D · D. Hình B",
+ s:[["Nhớ dấu hiệu hình vuông","4 cạnh bằng nhau và 4 góc vuông."],
+    ["Loại hình không có 4 cạnh","Tam giác (3 cạnh), hình tròn (không có cạnh) → loại."],
+    ["So chữ nhật và vuông","Chữ nhật có 4 góc vuông nhưng cạnh dài, cạnh ngắn khác nhau → loại. Còn <mark>Hình C</mark>."],
+    ["Tìm chữ đáp án ghi “Hình C”","Hình C nằm ở <span class='calc'>đáp án B</span>."]],
+ a:"B. Hình C",
+ t:["Bẫy lớn: tên hình (Hình C) khác chữ đáp án (B). Bé thấy “C” là bấm C ngay.","Nhầm hình chữ nhật với hình vuông."]},
+{n:13,l:2,q:"Hình nào là lục giác đều? (Hình A: thang, B: ngũ giác, C: lục giác, D: tam giác vuông)",o:"A. Hình C · B. Hình D · C. Hình B · D. Hình A",
+ s:[["Hiểu chữ “lục”","Lục = 6 → lục giác có <mark>6 cạnh</mark>. (Ngũ = 5, tứ = 4, tam = 3)"],
+    ["Đếm cạnh từng hình","Thang 4 · Ngũ giác 5 · Lục giác 6 · Tam giác vuông 3"],
+    ["Tìm chữ đáp án ghi “Hình C”","Hình C nằm ở <span class='calc'>đáp án A</span>."]],
+ a:"A. Hình C",
+ t:["Nhầm ngũ giác (5 cạnh) với lục giác (6 cạnh).","Thấy “Hình C” mà bấm đáp án C."]},
+{n:14,l:2,q:"Diện tích hình vuông cạnh 7 cm là?",o:"A. 49 cm² · B. 14 dm² · C. 14 cm² · D. 49 dm²",
+ s:[["Đề hỏi diện tích hay chu vi?","Diện tích → dùng <mark>cạnh × cạnh</mark>."],
+    ["Tính","<span class='calc'>7 × 7 = 49</span>"],
+    ["Ghi đơn vị","Cạnh đo bằng cm → diện tích là <span class='calc'>cm²</span>"]],
+ a:"A. 49 cm²",
+ t:["Ra 14: lấy 7 + 7 hoặc 7 × 2.","Ra 28: tính chu vi 4 × 7.","Chọn D: đúng số nhưng sai đơn vị dm²."]},
+{n:15,l:2,q:"Hình nào là tam giác đều? (Hình A: thoi, B: vuông, C: tam giác đều, D: lục giác đều)",o:"A. Hình A · B. Hình B · C. Hình C · D. Hình D",
+ s:[["Tìm hình có 3 cạnh","Thoi 4, vuông 4, lục giác 6 → loại. Còn Hình C."],
+    ["Kiểm tra “đều”","3 cạnh bằng nhau ✓"],
+    ["Tìm chữ đáp án","Hình C nằm ở <span class='calc'>đáp án C</span>."]],
+ a:"C. Hình C",
+ t:["Thấy chữ “đều” ở lục giác đều nên chọn D. Phải có 3 cạnh mới là tam giác."]},
+{n:16,l:2,q:"Trong hình chữ nhật, phát biểu nào SAI?",o:"A. Bốn cạnh bằng nhau · B. Hai đường chéo bằng nhau · C. Hai cạnh đối bằng nhau · D. Bốn góc vuông",
+ s:[["Kể tính chất hình chữ nhật","4 góc vuông · cạnh đối bằng nhau · 2 đường chéo bằng nhau."],
+    ["So từng câu","B ✓ · C ✓ · D ✓ · A “bốn cạnh bằng nhau” là của <mark>hình vuông</mark> ✗"],
+    ["Đọc lại đề","Đề hỏi câu SAI → chọn A."]],
+ a:"A. Bốn cạnh bằng nhau",
+ t:["Quên đề hỏi câu sai.","Nhầm tính chất hình vuông với hình chữ nhật."]},
+{n:17,l:2,q:"Lục giác đều lớn chia thành 6 hình thang cân quanh 1 lục giác đều nhỏ. Đếm số hình thang cân, số lục giác đều.",o:"A. 6 và 1 · B. 5 và 2 · C. 6 và 2 · D. 6 và 3",
+ s:[["Đếm hình thang cân","Đi vòng quanh, chấm từng hình: <span class='calc'>6</span>"],
+    ["Đếm lục giác nhỏ ở giữa","<span class='calc'>1</span>"],
+    ["Đừng quên hình to bên ngoài","Cả hình lớn cũng là lục giác đều → <span class='calc'>1 + 1 = 2</span>"]],
+ a:"C. 6 hình thang cân, 2 hình lục giác đều",
+ t:["Chọn A: quên hình lục giác lớn bao ngoài. Khi đếm hình, luôn hỏi: “Cả hình to có phải là một hình không?”"]},
+{n:18,l:2,q:"Rào quanh vườn hình chữ nhật 15 m × 7 m cần bao nhiêu mét dây?",o:"A. 22 m · B. 210 m · C. 44 m · D. 105 m",
+ s:[["Đề hỏi chu vi hay diện tích?","“Rào quanh, bao quanh” → đi vòng ngoài → <mark>chu vi</mark>."],
+    ["Nhớ công thức","Chu vi hình chữ nhật = (dài + rộng) × 2"],
+    ["Cộng trong ngoặc trước","<span class='calc'>15 + 7 = 22</span>"],
+    ["Nhân 2","<span class='calc'>22 × 2 = 44 m</span>"]],
+ a:"C. 44 m",
+ t:["Chọn A (22): quên nhân 2.","Chọn D (105): tính diện tích 15 × 7.","Chọn B (210): diện tích rồi nhân 2."]},
+{n:19,l:2,q:"Lục giác đều ABCDEF tâm O, nối O với các đỉnh. Có bao nhiêu tam giác đều?",o:"A. 4 · B. 5 · C. 7 · D. 6",
+ s:[["Vẽ hình ra giấy","Nối O với A, B, C, D, E, F."],
+    ["Xem một tam giác","Tam giác OAB có OA = OB = AB → là tam giác đều."],
+    ["Đếm theo cạnh lục giác","Mỗi cạnh lục giác cho 1 tam giác: OAB, OBC, OCD, ODE, OEF, OFA → <span class='calc'>6</span>"]],
+ a:"D. 6",
+ t:["Đếm sót khi đếm lung tung. Đi theo thứ tự A → B → C → ... và đánh dấu từng tam giác đã đếm."]},
+{n:20,l:2,q:"Hình nào là hình thoi? (Hình 1: bình hành, 2: chữ nhật, 3: thang, 4: thoi)",o:"A. Hình 1 · B. Hình 4 · C. Hình 3 · D. Hình 2",
+ s:[["Nhớ hình thoi","<mark>4 cạnh bằng nhau</mark> (góc không cần vuông)."],
+    ["Loại các hình khác","Bình hành, chữ nhật: chỉ cạnh đối bằng nhau. Thang: không đủ. → còn Hình 4."],
+    ["Tìm chữ đáp án ghi “Hình 4”","Nằm ở <span class='calc'>đáp án B</span>."]],
+ a:"B. Hình 4",
+ t:["Nhầm hình bình hành với hình thoi vì cả hai đều nghiêng."]},
+
+{n:21,l:3,q:"Tính hợp lí: 29 + 132 + 237 + 868 + 763",o:"A. 2029 · B. 1929 · C. 2129 · D. 2000",
+ s:[["Tìm cặp “tròn số”","Xem chữ số hàng đơn vị cộng ra 10: <span class='calc'>7 + 3</span> và <span class='calc'>2 + 8</span>"],
+    ["Ghép cặp","<span class='calc'>(237 + 763) + (132 + 868) + 29</span>"],
+    ["Tính từng cặp","<span class='calc'>1000 + 1000 + 29</span>"],
+    ["Cộng lại","<span class='calc'>2029</span>"]],
+ a:"A. 2029",
+ t:["Cộng lần lượt từ trái sang phải dễ nhầm, ra 1929 hoặc 2129.","Chọn D: quên cộng số 29 ở đầu."]},
+{n:22,l:3,q:"Tính: 120 : 2² − 5⁸ : 5⁶ + 7⁰",o:"A. 6 · B. 4 · C. 30 · D. 5",
+ s:[["Nhớ thứ tự","<mark>Lũy thừa</mark> → nhân chia → cộng trừ."],
+    ["Tính lũy thừa","<span class='calc'>2² = 4 · 5⁸ : 5⁶ = 5² = 25 · 7⁰ = 1</span>"],
+    ["Nhân chia","<span class='calc'>120 : 4 = 30</span>"],
+    ["Cộng trừ từ trái sang phải","<span class='calc'>30 − 25 + 1 = 5 + 1 = 6</span>"]],
+ a:"A. 6",
+ t:["Chọn D (5): nghĩ 7⁰ = 0. Mọi số khác 0 mũ 0 đều bằng 1.","Chọn B (4): làm 25 + 1 trước rồi mới trừ."]},
+{n:23,l:3,q:"Tìm x: x + 124 = 150",o:"A. 26 · B. 24 · C. 274 · D. 150",
+ s:[["x là gì trong phép tính?","x là <mark>số hạng</mark> chưa biết."],
+    ["Nhớ quy tắc","Số hạng = tổng − số hạng kia"],
+    ["Tính","<span class='calc'>x = 150 − 124 = 26</span>"]],
+ a:"A. 26",
+ check:"Thử lại: 26 + 124 = 150 ✓",
+ t:["Chọn C (274): lấy 150 + 124. Muốn tìm số hạng thì phải trừ."]},
+{n:24,l:3,q:"Tìm x: 178 − 3x = 5²",o:"A. 51 · B. 53 · C. 49 · D. 153",
+ s:[["Tính lũy thừa trước","<span class='calc'>5² = 25</span> → 178 − 3x = 25"],
+    ["Coi 3x là số trừ","Số trừ = số bị trừ − hiệu: <span class='calc'>3x = 178 − 25 = 153</span>"],
+    ["Tìm x","<span class='calc'>x = 153 : 3 = 51</span>"]],
+ a:"A. 51",
+ check:"Thử lại: 178 − 3 × 51 = 178 − 153 = 25 ✓",
+ t:["Chọn D (153): mới tìm ra 3x, quên chia 3.","Tính 5² = 10 (lấy 5 × 2)."]},
+{n:25,l:3,q:"900 khách, mỗi toa chở 88 khách. Cần ít nhất bao nhiêu toa?",o:"A. 10 · B. 11 · C. 12 · D. 9",
+ s:[["Làm phép chia","<span class='calc'>900 : 88</span>"],
+    ["Tìm thương và số dư","<span class='calc'>88 × 10 = 880</span>, còn dư <span class='calc'>900 − 880 = 20</span> khách"],
+    ["Xử lí số dư","20 khách còn lại vẫn cần <mark>thêm 1 toa</mark> → <span class='calc'>10 + 1 = 11</span>"]],
+ a:"B. 11 toa",
+ t:["Chọn A (10): bỏ quên 20 khách dư. Câu hỏi “ít nhất bao nhiêu để chở hết” thì có dư là phải thêm 1."]},
+{n:26,l:3,q:"Trứng nhập về: 126; 246; 354; 46 quả. Xếp vào vỉ 3 quả có vừa hết không?",o:"A. Được, vừa đủ · B. Dư 1 quả · C. Dư 2 quả · D. Dư 3 quả",
+ s:[["Cộng tổng số trứng","<span class='calc'>126 + 246 = 372 → +354 = 726 → +46 = 772</span>"],
+    ["Kiểm tra chia hết cho 3","<span class='calc'>7 + 7 + 2 = 16</span> → 16 không chia hết cho 3 → không vừa đủ"],
+    ["Tìm số dư","<span class='calc'>3 × 257 = 771</span> → <span class='calc'>772 − 771 = 1</span>"]],
+ a:"B. Không được, còn dư 1 quả",
+ t:["Cộng sai tổng ở bước 1, nên đặt tính cột cho chắc.","Chọn D: số dư không bao giờ bằng hoặc lớn hơn số chia (3)."]},
+{n:27,l:3,q:"5 bút × 4000đ, 1 sách 60000đ, 15 tập × 8000đ. An có 190000đ. An thiếu bao nhiêu?",o:"A. Thừa 10000đ · B. Thiếu 10000đ · C. Vừa đủ · D. Thiếu 20000đ",
+ s:[["Tiền bút","<span class='calc'>5 × 4000 = 20 000</span>"],
+    ["Tiền sách","<span class='calc'>60 000</span>"],
+    ["Tiền tập","<span class='calc'>15 × 8000 = 120 000</span>"],
+    ["Cộng tổng","<span class='calc'>20 000 + 60 000 + 120 000 = 200 000</span>"],
+    ["So với tiền mang theo","200 000 &gt; 190 000 → thiếu <span class='calc'>200 000 − 190 000 = 10 000</span>"]],
+ a:"B. An thiếu 10 000 đồng",
+ t:["Chọn A: trừ ngược chiều nên tưởng là thừa. Tiền phải trả lớn hơn tiền có → thiếu.","Quên nhân số lượng, chỉ cộng giá 1 món."]},
+{n:28,l:3,q:"Mỗi ngày được 20000đ, ăn 15000đ, dư bỏ ống heo. Sau 30 ngày đủ mua đồ chơi 120000đ chưa?",o:"A. Thiếu 30000đ · B. Đủ, thừa 30000đ · C. Vừa đủ · D. Thiếu 15000đ",
+ s:[["Mỗi ngày dư bao nhiêu?","<span class='calc'>20 000 − 15 000 = 5 000</span>"],
+    ["30 ngày dư bao nhiêu?","<span class='calc'>5 000 × 30 = 150 000</span>"],
+    ["So với giá đồ chơi","150 000 &gt; 120 000 → đủ, thừa <span class='calc'>150 000 − 120 000 = 30 000</span>"]],
+ a:"B. Đủ, thừa 30 000 đồng",
+ t:["Lấy 15 000 × 30 (tiền ăn) thay vì tiền dư.","Chọn A: so sánh ngược chiều."]},
+{n:29,l:3,q:"Nền nhà 7 m × 5 m, lát gạch vuông cạnh 50 cm. Cần bao nhiêu viên?",o:"A. 140 · B. 70 · C. 35 · D. 175",
+ s:[["Đổi cùng đơn vị","<mark>Bước quan trọng nhất!</mark> <span class='calc'>7 m = 700 cm · 5 m = 500 cm</span>"],
+    ["Chiều dài xếp được mấy viên?","<span class='calc'>700 : 50 = 14</span> viên"],
+    ["Chiều rộng xếp được mấy viên?","<span class='calc'>500 : 50 = 10</span> viên"],
+    ["Nhân số hàng với số cột","<span class='calc'>14 × 10 = 140</span> viên"]],
+ a:"A. 140 viên",
+ tip:"Cách khác: diện tích nền 35 m², 1 viên 0,5 × 0,5 = 0,25 m², 35 : 0,25 = 140 viên.",
+ t:["Chọn C (35): mới tính diện tích nền, quên chia cho diện tích viên gạch.","Chọn B (70): lấy 35 : 0,5, quên viên gạch là hình vuông 0,5 × 0,5.","Không đổi đơn vị m và cm nên ra số rất lạ."]},
+{n:30,l:3,q:"Đất 100 m × 60 m có sân khấu hình thang cân: đáy lớn 30 m, đáy bé 20 m, cạnh bên 18 m. Lắp đèn quanh sân khấu, 250000đ/m. Tính chi phí.",o:"A. 21 500 000đ · B. 15 000 000đ · C. 25 000 000đ · D. 86 000 000đ",
+ s:[["Gạch bỏ thông tin thừa","Đề hỏi sân khấu → mảnh đất 100 m × 60 m <mark>không dùng</mark>."],
+    ["“Xung quanh” → chu vi","Hình thang cân có <mark>2 cạnh bên bằng nhau</mark>: <span class='calc'>30 + 20 + 18 + 18 = 86 m</span>"],
+    ["Nhân với giá 1 mét","<span class='calc'>86 × 250 000 = 21 500 000</span> đồng"]],
+ a:"A. 21 500 000 đồng",
+ t:["Chỉ cộng 1 cạnh bên (68 m), quên hình thang cân có 2 cạnh bên.","Tính chu vi mảnh đất thay vì sân khấu.","Chọn D: viết 86 rồi thêm số 0 bừa, nhân sai."]}
+];
+
+// Hình vẽ theo đề cương (vẽ lại bằng SVG)
+const poly = (p,c='s') => `<polygon class="${c}" points="${p}"/>`;
+const txt = (x,y,t,a='middle') => `<text x="${x}" y="${y}" text-anchor="${a}">${t}</text>`;
+const SH = {
+  tri:   poly('50,8 88,74 12,74'),
+  triG:  poly('50,8 88,74 12,74','g'),
+  rect:  `<rect class="s" x="6" y="22" width="88" height="40"/>`,
+  rectF: `<rect class="f" x="6" y="22" width="88" height="40"/>`,
+  sq:    `<rect class="s" x="20" y="10" width="60" height="60"/>`,
+  circF: `<circle class="f" cx="50" cy="40" r="32"/>`,
+  trap:  poly('30,12 70,12 92,70 8,70'),
+  pent:  poly('50,8 81,31 69,68 31,68 19,31'),
+  hex:   poly('86,40 68,71 32,71 14,40 32,9 68,9'),
+  rtri:  poly('22,8 22,72 82,72') + `<polyline class="s thin" points="22,62 32,62 32,72"/>`,
+  rhom:  poly('50,4 80,40 50,76 20,40'),
+  para:  poly('28,18 96,18 72,62 4,62'),
+  trap2: poly('34,16 66,16 90,66 10,66')
+};
+const figs = (items, vb='0 0 100 80') => `<div class="figs">${items.map(([cap,svg])=>
+  `<figure class="fig"><svg viewBox="${vb}" role="img" aria-label="${cap||'Hình vẽ'}">${svg}</svg>${cap?`<figcaption>${cap}</figcaption>`:''}</figure>`).join('')}</div>`;
+const big = (svg, vb, cap) => `<div class="figs"><figure class="fig big"><svg viewBox="${vb}" role="img" aria-label="${cap}">${svg}</svg><figcaption>${cap}</figcaption></figure></div>`;
+
+const FIG = {
+  11: big(SH.tri + txt(50,4,'A') + txt(6,80,'B','end') + txt(94,80,'C','start') +
+          `<g class="dim">${txt(26,40,'5 cm','end')}${txt(74,40,'5 cm','start')}${txt(50,86,'5 cm')}</g>`,
+          '-30 -8 160 98','Tam giác đều ABC, mỗi cạnh 5 cm'),
+  12: figs([['Hình A',SH.triG],['Hình B',SH.rectF],['Hình C',SH.sq],['Hình D',SH.circF]]),
+  13: figs([['Hình A',SH.trap],['Hình B',SH.pent],['Hình C',SH.hex],['Hình D',SH.rtri]]),
+  14: big(SH.sq + `<g class="dim">${txt(50,82,'7 cm')}${txt(86,44,'7 cm','start')}</g>`,'0 0 120 88','Hình vuông cạnh 7 cm'),
+  15: figs([['Hình A',SH.rhom],['Hình B',SH.sq],['Hình C',SH.tri],['Hình D',SH.hex]]),
+  17: big(poly('88,42 69,74.9 31,74.9 12,42 31,9.1 69,9.1') + poly('68,42 59,57.6 41,57.6 32,42 41,26.4 59,26.4') +
+          `<path class="s" d="M88,42L68,42M69,74.9L59,57.6M31,74.9L41,57.6M12,42L32,42M31,9.1L41,26.4M69,9.1L59,26.4"/>`,
+          '0 0 100 84','Lục giác đều lớn, bên trong có lục giác đều nhỏ'),
+  18: big(`<rect class="s" x="10" y="14" width="120" height="56"/>` + `<g class="dim">${txt(70,84,'15 m')}${txt(136,46,'7 m','start')}</g>`,
+          '0 0 160 92','Khu vườn hình chữ nhật 15 m × 7 m'),
+  19: big(poly('96,50 78,81.2 42,81.2 24,50 42,18.8 78,18.8') +
+          `<path class="s" d="M60,50L96,50M60,50L78,81.2M60,50L42,81.2M60,50L24,50M60,50L42,18.8M60,50L78,18.8"/><circle class="f" cx="60" cy="50" r="2.2"/>` +
+          txt(38,13,'A') + txt(82,13,'B') + txt(103,54,'C','start') + txt(82,94,'D') + txt(38,94,'E') + txt(17,54,'F','end') + txt(64,46,'O','start'),
+          '0 0 120 100','Lục giác đều ABCDEF, tâm O'),
+  20: figs([['Hình 1',SH.para],['Hình 2',SH.rect],['Hình 3',SH.trap],['Hình 4',poly('40,18 90,18 60,58 10,58')]]),
+  30: big(`<rect class="s thin" x="4" y="4" width="152" height="92"/>` + poly('62,30 98,30 116,72 44,72') +
+          `<g class="dim">${txt(80,25,'20 m')}${txt(80,86,'30 m')}${txt(48,52,'18 m','end')}${txt(112,52,'18 m','start')}${txt(150,16,'100 m × 60 m','end')}</g>`,
+          '0 0 160 100','Sân khấu hình thang cân trong mảnh đất')
+};
+
+const out = document.getElementById('out');
+const chips = document.getElementById('chips');
+let filter = 'all', hintMode = false;
+
+function card(x){
+  const steps = x.s.map((s,i)=>`
+    <div class="arrow" data-i="${i}"></div>
+    <div class="node step" data-i="${i}"><div class="badge">B${i+1}</div><div><div class="t">${s[0]}</div><div class="d">${s[1]}</div></div></div>`).join('');
+  const last = x.s.length;
+  return `<article class="card" id="c${x.n}" data-l="${x.l}" data-total="${last}">
+    <div class="card-top"><div class="qnum">Câu ${x.n}</div><div class="qtext"><p>${x.q}</p><div class="opts">${x.o}</div>${FIG[x.n]||''}</div></div>
+    <div class="body">
+      <div>
+        <div class="flow">
+          <div class="node start"><div class="lbl">Đề hỏi gì?</div><div>${x.q}</div></div>
+          ${steps}
+          <div class="arrow" data-i="${last}"></div>
+          <div class="node end" data-i="${last}"><div class="lbl">Đáp án</div><div class="ans">${x.a}</div>${x.check?`<div class="check">${x.check}</div>`:''}</div>
+        </div>
+        <button class="hint-btn" type="button" id="btn${x.n}" hidden>Xem B1 ▾</button>
+      </div>
+      <aside>
+        <div class="trap"><span class="lbl">Bẫy hay gặp</span><ul>${x.t.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+        ${x.tip?`<div class="tip"><span class="lbl">Mẹo</span>${x.tip}</div>`:''}
+      </aside>
+    </div>
+  </article>`;
+}
+
+function render(){
+  let html='';
+  [1,2,3].forEach(l=>{
+    if(filter!=='all' && +filter!==l) return;
+    html += `<h2 class="level-head">${LV[l][0]} <small>${LV[l][1]}</small></h2><div class="list">`;
+    html += Q.filter(x=>x.l===l).map(card).join('') + '</div>';
+  });
+  out.innerHTML = html;
+  chips.innerHTML = Q.filter(x=>filter==='all'||x.l===+filter).map(x=>`<a class="chip" data-l="${x.l}" href="#c${x.n}">${x.n}</a>`).join('');
+  document.querySelectorAll('.card').forEach(c=>setShown(c, hintMode?0:Infinity));
+}
+
+function setShown(c, k){
+  const total = +c.dataset.total; // bước 0..total-1 là B1.., total là đáp án
+  c.dataset.shown = k;
+  c.querySelectorAll('[data-i]').forEach(el=>{
+    const hide = +el.dataset.i >= k;
+    el.classList.toggle('hidden-step', hide);
+  });
+  const btn = c.querySelector('.hint-btn');
+  if(!hintMode){ btn.hidden = true; return; }
+  btn.hidden = false;
+  if(k < total){ btn.textContent = `Xem B${k+1} ▾`; btn.classList.remove('reset'); }
+  else if(k === total){ btn.textContent = 'Xem đáp án ▾'; btn.classList.remove('reset'); }
+  else { btn.textContent = 'Che lại, làm lại từ đầu'; btn.classList.add('reset'); }
+}
+
+out.addEventListener('click', e=>{
+  const btn = e.target.closest('.hint-btn'); if(!btn) return;
+  const c = btn.closest('.card'); const k = +c.dataset.shown; const total = +c.dataset.total;
+  if(k > total){ setShown(c,0); return; }
+  setShown(c,k+1);
+  c.querySelectorAll(`[data-i="${k}"]`).forEach(el=>{el.classList.remove('reveal'); void el.offsetWidth; el.classList.add('reveal');});
+});
+
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+  filter = b.dataset.f;
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-pressed', t===b));
+  render();
+}));
+document.getElementById('hintMode').addEventListener('change', e=>{ hintMode = e.target.checked; render(); });
+
+render();
+if(location.hash){ const el=document.querySelector(location.hash.replace(/[^#\w-]/g,'')); if(el) el.scrollIntoView(); }
+</script>
+
+</body></html>
