@@ -118,6 +118,10 @@ button{font:inherit;cursor:pointer}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hint-btn{color:#0f1622}}
 .hint-btn.reset{background:transparent;color:var(--blue)}
 .hidden-step{display:none!important}
+.more{display:flex;justify-content:center;margin-top:36px}
+.more a{font-family:var(--display);font-weight:800;font-size:18px;text-decoration:none;border:2px solid var(--blue);background:var(--blue);color:#fff;border-radius:12px;padding:12px 22px}
+:root[data-theme="dark"] .more a{color:#0f1622}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .more a{color:#0f1622}}
 @media (prefers-reduced-motion:no-preference){.reveal{animation:pop .28s ease-out}@keyframes pop{from{opacity:.2;transform:translateY(-6px)}to{opacity:1;transform:none}}}
 </style>
 
@@ -141,6 +145,7 @@ button{font:inherit;cursor:pointer}
   </div>
 
   <main id="out"></main>
+  <p class="more"><a href="https://tuhoc-online.com/">Tìm hiểu nhiều đề hơn</a></p>
 </div>
 
 <script>
