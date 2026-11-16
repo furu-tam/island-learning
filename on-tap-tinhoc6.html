@@ -1,0 +1,303 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Sơ đồ giải Tin học 6 giữa kì 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Be+Vietnam+Pro:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#f3f7fb; --grid:#dfe8f2; --card:#ffffff; --ink:#1d2b45; --muted:#5b6a83;
+  --line:#c7d3e3; --blue:#2f6bd8; --blue-soft:#e4eeff;
+  --green:#1f8a55; --green-soft:#e2f5ea; --red:#c8432b; --red-soft:#fdeae5;
+  --yellow:#ffe27a; --l1:#2f9e6e; --l2:#2f6bd8; --l3:#b5541f; --l4:#0f7f8c; --l5:#7a4cc2; --l6:#c23a6b;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#121a27; --grid:#1a2536; --card:#18233a; --ink:#e8eef8; --muted:#9fb0c9;
+  --line:#2c3b56; --blue:#7aa6ff; --blue-soft:#1f2f52;
+  --green:#5fd39a; --green-soft:#173a2b; --red:#ff8c73; --red-soft:#3d2120;
+  --yellow:#6b5a12; --l1:#5fd39a; --l2:#7aa6ff; --l3:#f0a06a; --l4:#5cc8d4; --l5:#b79bff; --l6:#ff8fb4; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121a27; --grid:#1a2536; --card:#18233a; --ink:#e8eef8; --muted:#9fb0c9;
+  --line:#2c3b56; --blue:#7aa6ff; --blue-soft:#1f2f52;
+  --green:#5fd39a; --green-soft:#173a2b; --red:#ff8c73; --red-soft:#3d2120;
+  --yellow:#6b5a12; --l1:#5fd39a; --l2:#7aa6ff; --l3:#f0a06a; --l4:#5cc8d4; --l5:#b79bff; --l6:#ff8fb4; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px}
+.wrap{max-width:980px;margin:0 auto;padding-block:28px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,5vw,40px);line-height:1.1;margin:0 0 6px;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 18px;max-width:62ch}
+.howto{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;color:var(--muted);margin-bottom:20px}
+.howto b{font-family:var(--display);color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:0 8px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding-block:10px;border-bottom:1.5px solid var(--line);margin-bottom:20px;display:flex;flex-direction:column;gap:10px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;cursor:pointer}
+.tab{font-family:var(--display);font-weight:700;font-size:15px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:4px 14px}
+.tab[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.toggle{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:14px;font-weight:600}
+.toggle input{width:18px;height:18px;accent-color:var(--blue)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.chip{flex:0 0 auto;min-width:34px;height:34px;padding:0 6px;border-radius:8px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-family:var(--display);font-weight:700;font-size:14px;display:grid;place-items:center;text-decoration:none}
+.chip[data-l="1"]{border-bottom:3px solid var(--l1)} .chip[data-l="2"]{border-bottom:3px solid var(--l2)} .chip[data-l="3"]{border-bottom:3px solid var(--l3)}
+.chip[data-l="4"]{border-bottom:3px solid var(--l4)} .chip[data-l="5"]{border-bottom:3px solid var(--l5)} .chip[data-l="6"]{border-bottom:3px solid var(--l6)}
+.chip:hover{background:var(--blue-soft)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.level-head{font-family:var(--display);font-weight:800;font-size:24px;margin:36px 0 12px;display:flex;gap:10px;align-items:baseline}
+.level-head small{font-family:var(--body);font-weight:500;font-size:14px;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:22px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:18px;scroll-margin-top:150px}
+.card-top{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+.qnum{flex:0 0 auto;font-family:var(--display);font-weight:800;font-size:20px;line-height:1;color:#fff;border-radius:10px;padding:9px 10px 7px;min-width:52px;text-align:center;white-space:nowrap}
+.card[data-l="1"] .qnum{background:var(--l1)} .card[data-l="2"] .qnum{background:var(--l2)} .card[data-l="3"] .qnum{background:var(--l3)}
+.card[data-l="4"] .qnum{background:var(--l4)} .card[data-l="5"] .qnum{background:var(--l5)} .card[data-l="6"] .qnum{background:var(--l6)}
+:root[data-theme="dark"] .qnum{color:#0f1622}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .qnum{color:#0f1622}}
+.qtext{min-width:0}
+.qtext p{margin:0;font-weight:500}
+.qtext .opts{margin-top:4px;font-size:14px;color:var(--muted)}
+.end .ans.sm{font-family:var(--body);font-weight:600;font-size:16px;line-height:1.5;overflow-wrap:anywhere}
+.body{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start}
+@media (max-width:720px){.body{grid-template-columns:minmax(0,1fr)}}
+.flow{display:flex;flex-direction:column;align-items:stretch;max-width:520px}
+.node{border:2px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--card);position:relative}
+.node.start{background:var(--blue-soft);border-color:var(--blue);border-style:dashed}
+.node.start .lbl{color:var(--blue)}
+.node.step{display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;align-items:start}
+.badge{font-family:var(--display);font-weight:800;font-size:17px;width:40px;height:40px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;line-height:1}
+.node .t{font-weight:600}
+.node .d{font-size:15px;color:var(--muted);margin-top:2px}
+.node .d mark{background:var(--yellow);color:var(--ink);padding:0 3px;border-radius:3px}
+.calc{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink)}
+.node.end{background:var(--green-soft);border-color:var(--green)}
+.node.end .lbl{color:var(--green)}
+.lbl{font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.end .ans{font-family:var(--display);font-weight:800;font-size:20px;line-height:1.25}
+.arrow{height:30px;display:flex;justify-content:center;position:relative}
+.arrow::before{content:"";width:3px;background:var(--line);height:22px}
+.arrow::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);border:8px solid transparent;border-top:9px solid var(--line);border-bottom:0}
+.trap{background:var(--red-soft);border:2px solid var(--red);border-radius:12px;padding:12px 14px}
+.trap .lbl{color:var(--red);display:block;margin-bottom:6px}
+.trap ul{margin:0;padding-left:18px;font-size:15px;display:flex;flex-direction:column;gap:6px}
+.tip{margin-top:12px;background:var(--blue-soft);border-radius:12px;padding:12px 14px;font-size:15px}
+.tip .lbl{color:var(--blue);display:block;margin-bottom:4px}
+.hint-btn{margin-top:12px;font-family:var(--display);font-weight:700;font-size:16px;border:2px solid var(--blue);background:var(--blue);color:#fff;border-radius:10px;padding:6px 16px}
+:root[data-theme="dark"] .hint-btn{color:#0f1622}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hint-btn{color:#0f1622}}
+.hint-btn.reset{background:transparent;color:var(--blue)}
+.hidden-step{display:none!important}
+.more{display:flex;justify-content:center;margin-top:36px}
+.more a{font-family:var(--display);font-weight:800;font-size:18px;text-decoration:none;border:2px solid var(--blue);background:var(--blue);color:#fff;border-radius:12px;padding:12px 22px}
+:root[data-theme="dark"] .more a{color:#0f1622}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .more a{color:#0f1622}}
+@media (prefers-reduced-motion:no-preference){.reveal{animation:pop .28s ease-out}@keyframes pop{from{opacity:.2;transform:translateY(-6px)}to{opacity:1;transform:none}}}
+</style>
+
+<div class="wrap">
+  <h1>Sơ đồ giải từng bước · Tin học 6 giữa kì 1</h1>
+  <p class="sub">14 câu trắc nghiệm và 3 câu tự luận: thông tin và dữ liệu, xử lí thông tin, bit và byte, mạng máy tính, Internet và an toàn. Mỗi bài một sơ đồ đi từ trên xuống. Khi bé làm sai, mở đúng câu đó, cho bé đi lần lượt từng ô, xong mới xem ô đáp án. Ô đỏ bên cạnh ghi những chỗ bé hay nhầm.</p>
+  <div class="howto"><b>Đề hỏi gì?</b>→<b>B1</b>→<b>B2</b>→<b>B3</b>→<b>Đáp án</b></div>
+
+  <div class="bar">
+    <div class="row">
+      <button class="tab" data-f="all" aria-pressed="true">Tất cả</button>
+      <button class="tab" data-f="1" aria-pressed="false">Thông tin</button>
+      <button class="tab" data-f="2" aria-pressed="false">Xử lí</button>
+      <button class="tab" data-f="3" aria-pressed="false">Bit, byte</button>
+      <button class="tab" data-f="4" aria-pressed="false">Mạng, Internet</button>
+      <button class="tab" data-f="5" aria-pressed="false">An toàn</button>
+      <button class="tab" data-f="6" aria-pressed="false">Tự luận</button>
+      <label class="toggle" for="hintMode"><input type="checkbox" id="hintMode"> Che bước, mở dần</label>
+    </div>
+    <nav class="chips" id="chips" aria-label="Đi tới câu"></nav>
+  </div>
+
+  <main id="out"></main>
+  <p class="more"><a href="https://tuhoc-online.com/">Tìm hiểu nhiều đề hơn</a></p>
+</div>
+
+<script>
+const C = s => `<span class="calc">${s}</span>`;
+const LV = {
+  1:["Thông tin và dữ liệu","thông tin, dữ liệu, vật mang tin"],
+  2:["Xử lí thông tin","thu nhận, xử lí, lưu trữ, truyền"],
+  3:["Thông tin trong máy tính","bit, byte, đơn vị đo"],
+  4:["Mạng và Internet","LAN, thiết bị mạng, dịch vụ"],
+  5:["An toàn thông tin","mật khẩu, liên kết lạ, kiểm chứng"],
+  6:["Tự luận","phân biệt, đổi đơn vị, mạng và an toàn"]
+};
+const Q = [
+{n:1,l:1,q:"Thông tin là gì?",o:"A. Những gì đem lại hiểu biết cho con người về thế giới xung quanh và về chính mình. · B. Chỉ là các con số trong máy tính. · C. Chỉ là hình ảnh trên mạng Internet. · D. Là thiết bị lưu trữ như USB.",
+ s:[["Nhớ định nghĩa","Thông tin là những gì đem lại <mark>hiểu biết</mark> về thế giới và về chính mình."],
+    ["Loại những thứ chỉ là một phần","Con số trong máy là dữ liệu. Ảnh trên mạng chỉ là một dạng. USB là vật mang tin, không phải thông tin."]],
+ a:"A",
+ t:["Chọn D: nhầm thông tin với vật mang tin.","Chọn B: nhầm thông tin với dữ liệu."]},
+{n:2,l:1,q:"Đâu là ví dụ về dữ liệu?",o:"A. Tiếng chim hót ngoài sân trường. · B. Điểm kiểm tra đã được nhập vào máy tính để tính điểm trung bình. · C. Mùi thơm của hoa trong vườn. · D. Cảm giác vui khi được điểm tốt.",
+ s:[["Nhớ dữ liệu là gì","Dữ liệu là thông tin <mark>đã đưa vào máy tính</mark>, đã được mã hoá để máy xử lí."],
+    ["Tìm ý đã vào máy","Điểm kiểm tra đã nhập vào máy để tính điểm trung bình."],
+    ["Loại ý còn ở ngoài đời","Tiếng chim, mùi hoa, cảm giác vui chưa được mã hoá cho máy."]],
+ a:"B",
+ t:["Chọn A hoặc C: đó là thông tin ngoài đời, chưa phải dữ liệu."]},
+{n:3,l:1,q:"Vật nào sau đây KHÔNG phải là vật mang tin?",o:"A. Quyển sách. · B. USB. · C. Chiếc bàn học. · D. Đĩa CD.",
+ s:[["Đọc chữ KHÔNG","Đề hỏi vật <mark>không</mark> dùng để mang tin."],
+    ["Nhớ vật mang tin","Sách, USB, đĩa CD, thẻ nhớ, bảng, sóng âm, sóng điện từ."],
+    ["Tìm vật lệch","Chiếc bàn học chỉ để ngồi, không mang tin."]],
+ a:"C. Chiếc bàn học",
+ t:["Chọn A, B hoặc D: đó đều là vật mang tin. Đề hỏi cái KHÔNG phải."]},
+{n:4,l:2,q:"Hoạt động nào sau đây thuộc quá trình xử lí thông tin?",o:"A. Nghe thầy cô giảng bài. · B. Ngủ trưa. · C. Chơi đá bóng. · D. Ăn cơm trưa.",
+ s:[["Nhớ 4 hoạt động","Thu nhận, xử lí, lưu trữ, truyền."],
+    ["Xem hoạt động nào nhận thông tin","Nghe giảng là <mark>thu nhận</mark> thông tin."],
+    ["Loại việc sinh hoạt","Ngủ, chơi bóng, ăn cơm không xử lí thông tin."]],
+ a:"A. Nghe thầy cô giảng bài",
+ t:["Tưởng chỉ có tính toán mới là xử lí thông tin. Nghe giảng cũng là thu nhận thông tin."]},
+{n:5,l:2,q:"Thứ tự đúng của các hoạt động xử lí thông tin thường là:",o:"A. Lưu trữ - Thu nhận - Xử lí - Truyền. · B. Thu nhận - Xử lí - Lưu trữ - Truyền. · C. Truyền - Lưu trữ - Xử lí - Thu nhận. · D. Xử lí - Truyền - Thu nhận - Lưu trữ.",
+ s:[["Bắt đầu từ đâu","Phải <mark>gặp thông tin trước</mark>, tức là thu nhận."],
+    ["Rồi làm gì","Xử lí thông tin vừa nhận."],
+    ["Giữ lại và đưa đi","Lưu trữ, sau đó truyền cho người khác."]],
+ a:"B. Thu nhận - Xử lí - Lưu trữ - Truyền",
+ t:["Chọn A: để lưu trữ lên đầu, trong khi chưa thu nhận thì chưa có gì để lưu."]},
+{n:6,l:3,q:"Đơn vị nhỏ nhất dùng để lưu trữ thông tin trong máy tính là:",o:"A. Byte. · B. Bit. · C. KB. · D. MB.",
+ s:[["Nhớ đơn vị nhỏ nhất","Máy tính dùng dãy bit. Mỗi bit chỉ nhận <mark>0 hoặc 1</mark>."],
+    ["So với các đơn vị lớn hơn","1 byte = 8 bit. KB và MB còn lớn hơn byte."]],
+ a:"B. Bit",
+ t:["Chọn A: byte là đơn vị hay dùng, nhưng không phải đơn vị nhỏ nhất."]},
+{n:7,l:3,q:"1 byte bằng bao nhiêu bit?",o:"A. 2 bit. · B. 4 bit. · C. 8 bit. · D. 10 bit.",
+ s:[["Nhớ công thức","<span class='calc'>1 byte = 8 bit</span>"],
+    ["Đừng nhầm với số trạng thái","Bit có 2 giá trị 0 và 1, nhưng 1 byte không phải 2 bit."]],
+ a:"C. 8 bit",
+ t:["Chọn A: nhầm 2 trạng thái của bit với số bit trong 1 byte."]},
+{n:8,l:3,q:"1 KB bằng bao nhiêu byte?",o:"A. 100 byte. · B. 512 byte. · C. 1000 byte. · D. 1024 byte.",
+ s:[["Nhớ quy ước Tin học 6","<span class='calc'>1 KB = 1024 byte</span>"],
+    ["Không lấy số tròn thập phân","1000 byte không phải đáp án của chương trình lớp 6."]],
+ a:"D. 1024 byte",
+ t:["Chọn C: lấy 1000 vì nghĩ kilo là 1000. Trong Tin học 6, 1 KB = 1024 byte."]},
+{n:9,l:3,q:"Dãy nào sau đây là dãy bit?",o:"A. 12345. · B. 101010. · C. ABCDE. · D. 10,5.",
+ s:[["Nhớ bit chỉ có 2 kí hiệu","Dãy bit <mark>chỉ gồm 0 và 1</mark>."],
+    ["Kiểm tra từng dãy","101010 chỉ có 0 và 1. 12345 có 2, 3, 4, 5. ABCDE là chữ. 10,5 có dấu phẩy."]],
+ a:"B. 101010",
+ t:["Chọn A: thấy toàn chữ số nên tưởng là bit. Bit không nhận chữ số khác 0 và 1."]},
+{n:10,l:4,q:"Mạng máy tính là gì?",o:"A. Một chiếc máy tính thật mạnh. · B. Tập hợp các máy tính được kết nối với nhau để chia sẻ dữ liệu và dùng chung thiết bị. · C. Một trang web bán hàng. · D. Một phần mềm soạn thảo văn bản.",
+ s:[["Đếm số máy","Mạng là <mark>nhiều máy</mark> nối với nhau, không phải một máy mạnh."],
+    ["Nhớ mục đích","Chia sẻ dữ liệu và dùng chung thiết bị, như máy in."],
+    ["Loại phần mềm và trang web","Soạn thảo văn bản là phần mềm. Trang bán hàng là một dịch vụ, không phải định nghĩa mạng."]],
+ a:"B",
+ t:["Chọn A: tưởng máy mạnh là mạng. Một máy, dù mạnh, vẫn chưa phải mạng."]},
+{n:11,l:4,q:"Mạng LAN là mạng có phạm vi như thế nào?",o:"A. Toàn thế giới. · B. Một quốc gia. · C. Phạm vi hẹp như một phòng học, một trường học. · D. Ngoài vũ trụ.",
+ s:[["Nhớ tên","LAN là mạng <mark>cục bộ</mark>, phạm vi hẹp."],
+    ["Lấy ví dụ","Một phòng học, một trường học."],
+    ["Phân biệt WAN","Một nước hoặc cả thế giới là mạng diện rộng, WAN."]],
+ a:"C",
+ t:["Chọn A hoặc B: đó là phạm vi của WAN, không phải LAN."]},
+{n:12,l:4,q:"Thiết bị nào sau đây dùng để phát wifi, giúp máy tính kết nối mạng không dây?",o:"A. Máy in. · B. Loa. · C. Điểm truy cập không dây (Access Point). · D. Bàn phím.",
+ s:[["Đọc việc cần làm","Phát sóng <mark>wifi</mark>, kết nối không dây."],
+    ["Gọi đúng tên","Điểm truy cập không dây, hay Access Point."],
+    ["Loại thiết bị khác","Máy in, loa, bàn phím không phát wifi."]],
+ a:"C. Điểm truy cập không dây (Access Point)",
+ t:["Nhầm modem hoặc router với mọi thứ có dây. Câu này hỏi đúng thiết bị phát wifi."]},
+{n:13,l:4,q:"Internet là gì?",o:"A. Một trò chơi trên máy tính. · B. Mạng máy tính toàn cầu, kết nối hàng triệu máy tính trên khắp thế giới. · C. Một chiếc điện thoại thông minh. · D. Một phần mềm diệt virus.",
+ s:[["Nhớ phạm vi","Internet là mạng <mark>toàn cầu</mark>."],
+    ["Loại thiết bị và phần mềm","Điện thoại là thiết bị. Trò chơi và phần mềm diệt virus chỉ là chương trình."]],
+ a:"B",
+ t:["Chọn C: nhầm Internet với chiếc máy dùng để vào Internet."]},
+{n:14,l:5,q:"Việc làm nào sau đây là an toàn khi sử dụng Internet?",o:"A. Chia sẻ mật khẩu tài khoản cho bạn thân. · B. Đăng ảnh thẻ học sinh và địa chỉ nhà lên mạng xã hội. · C. Không mở liên kết lạ và không chia sẻ thông tin cá nhân, mật khẩu. · D. Tin ngay mọi thông tin đọc được trên mạng.",
+ s:[["Giữ bí mật","Không chia mật khẩu, ảnh thẻ, địa chỉ nhà, số điện thoại."],
+    ["Không bấm bừa","Không mở <mark>liên kết lạ</mark>."],
+    ["Không tin ngay","Thông tin trên mạng cần kiểm chứng, gặp nội dung xấu thì hỏi người lớn."]],
+ a:"C",
+ t:["Chọn A: bạn thân cũng không được biết mật khẩu.","Chọn D: tin ngay mọi thứ đọc trên mạng."]},
+{n:15,l:6,ch:"TL1",lb:"TL1",sm:1,q:"Phân biệt thông tin và dữ liệu. Cho 1 ví dụ về thông tin và 1 ví dụ về dữ liệu.",
+ s:[["Định nghĩa thông tin","Những gì đem lại hiểu biết về thế giới xung quanh và về chính mình. <mark>0,25 điểm</mark>"],
+    ["Định nghĩa dữ liệu","Thông tin đã được đưa vào máy tính. <mark>0,25 điểm</mark>"],
+    ["Ví dụ thông tin","Bảng điểm trên giấy, lời thầy cô giảng, tiếng chuông ra chơi. <mark>0,25 điểm</mark>"],
+    ["Ví dụ dữ liệu","Bảng điểm đã nhập máy, ảnh lưu trong USB, bài hát lưu trong điện thoại. <mark>0,25 điểm</mark>"]],
+ a:"Đủ 4 ý, mỗi ý 0,25 điểm",
+ tip:"Ví dụ khác vẫn được điểm nếu đúng bản chất: thông tin ở ngoài đời, dữ liệu đã vào máy.",
+ t:["Chỉ viết định nghĩa, quên ví dụ: mất 0,5 điểm.","Lấy tiếng chim hót làm ví dụ dữ liệu."]},
+{n:16,l:6,ch:"TL2",lb:"TL2",sm:1,q:"a) Đổi đơn vị: 2 KB = ...... byte; 3 MB = ...... KB. b) Vì sao máy tính chỉ xử lí được dãy bit 0 và 1?",
+ s:[["Đổi KB sang byte",C("2 × 1024 = 2048")+" byte. <mark>0,25 điểm</mark>"],
+    ["Đổi MB sang KB",C("3 × 1024 = 3072")+" KB. <mark>0,25 điểm</mark>"],
+    ["Giải thích bit","Mạch điện tử chỉ có 2 trạng thái <mark>đóng và mở</mark>, tương ứng 0 và 1. Mọi thông tin phải mã hoá thành dãy bit thì máy mới xử lí được. <mark>0,5 điểm</mark>"]],
+ a:"a) 2048 byte và 3072 KB · b) mạch chỉ có đóng/mở",
+ t:["Nhân với 1000: ra 2000 byte và 3000 KB. Tin học 6 dùng 1024.","Chỉ viết vì máy thích số 0 và 1, không nói mạch điện tử có 2 trạng thái."]},
+{n:17,l:6,ch:"TL3",lb:"TL3",sm:1,q:"a) Nêu 2 lợi ích của mạng máy tính và Internet đối với việc học. b) Nêu 2 việc nên làm để bảo vệ bản thân và thông tin cá nhân trên Internet.",
+ s:[["Hai lợi ích học tập","Tìm tài liệu nhanh. Học trực tuyến, trao đổi bài với thầy cô và bạn. Chia sẻ tài liệu, dùng chung máy in. Mỗi ý <mark>0,25 điểm</mark>."],
+    ["Hai việc an toàn","Không chia mật khẩu, địa chỉ, số điện thoại, ảnh cá nhân. Không mở liên kết lạ, không tải phần mềm không rõ nguồn. Kiểm chứng thông tin và hỏi người lớn khi gặp nội dung xấu. Mỗi ý <mark>0,25 điểm</mark>."]],
+ a:"a) 2 lợi ích học tập · b) 2 việc an toàn",
+ t:["Chỉ nêu lợi ích chơi game, không gắn với việc học.","Nêu việc nguy hiểm, như chia mật khẩu, thay vì việc nên làm."]}
+];
+
+const out = document.getElementById('out');
+const chips = document.getElementById('chips');
+let filter = 'all', hintMode = false;
+
+function card(x){
+  const steps = x.s.map((s,i)=>`
+    <div class="arrow" data-i="${i}"></div>
+    <div class="node step" data-i="${i}"><div class="badge">B${i+1}</div><div><div class="t">${s[0]}</div><div class="d">${s[1]}</div></div></div>`).join('');
+  const last = x.s.length;
+  return `<article class="card" id="c${x.n}" data-l="${x.l}" data-total="${last}">
+    <div class="card-top"><div class="qnum">${x.lb||('Câu '+x.n)}</div><div class="qtext"><p>${x.q}</p>${x.o?`<div class="opts">${x.o}</div>`:''}</div></div>
+    <div class="body">
+      <div>
+        <div class="flow">
+          <div class="node start"><div class="lbl">Đề hỏi gì?</div><div>${x.q}</div></div>
+          ${steps}
+          <div class="arrow" data-i="${last}"></div>
+          <div class="node end" data-i="${last}"><div class="lbl">Đáp án</div><div class="ans${x.sm?' sm':''}">${x.a}</div></div>
+        </div>
+        <button class="hint-btn" type="button" hidden>Xem B1 ▾</button>
+      </div>
+      <aside>
+        <div class="trap"><span class="lbl">Bẫy hay gặp</span><ul>${x.t.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+        ${x.tip?`<div class="tip"><span class="lbl">Mẹo</span>${x.tip}</div>`:''}
+      </aside>
+    </div>
+  </article>`;
+}
+
+function render(){
+  let html='';
+  [1,2,3,4,5,6].forEach(l=>{
+    if(filter!=='all' && +filter!==l) return;
+    const items = Q.filter(x=>x.l===l);
+    if(!items.length) return;
+    html += `<h2 class="level-head">${LV[l][0]} <small>${LV[l][1]}</small></h2><div class="list">`;
+    html += items.map(card).join('') + '</div>';
+  });
+  out.innerHTML = html;
+  chips.innerHTML = Q.filter(x=>filter==='all'||x.l===+filter).map(x=>`<a class="chip" data-l="${x.l}" href="#c${x.n}">${x.ch||x.n}</a>`).join('');
+  document.querySelectorAll('.card').forEach(c=>setShown(c, hintMode?0:Infinity));
+}
+
+function setShown(c, k){
+  const total = +c.dataset.total;
+  c.dataset.shown = k;
+  c.querySelectorAll('[data-i]').forEach(el=>el.classList.toggle('hidden-step', +el.dataset.i >= k));
+  const btn = c.querySelector('.hint-btn');
+  if(!btn) return;
+  if(!hintMode){ btn.hidden = true; return; }
+  btn.hidden = false;
+  if(k < total){ btn.textContent = `Xem B${k+1} ▾`; btn.classList.remove('reset'); }
+  else if(k === total){ btn.textContent = 'Xem đáp án ▾'; btn.classList.remove('reset'); }
+  else { btn.textContent = 'Che lại, làm lại từ đầu'; btn.classList.add('reset'); }
+}
+
+out.addEventListener('click', e=>{
+  const btn = e.target.closest('.hint-btn'); if(!btn) return;
+  const c = btn.closest('.card'); const k = +c.dataset.shown; const total = +c.dataset.total;
+  if(k > total){ setShown(c,0); return; }
+  setShown(c,k+1);
+  c.querySelectorAll(`[data-i="${k}"]`).forEach(el=>{el.classList.remove('reveal'); void el.offsetWidth; el.classList.add('reveal');});
+});
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+  filter = b.dataset.f;
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-pressed', t===b));
+  render();
+}));
+document.getElementById('hintMode').addEventListener('change', e=>{ hintMode = e.target.checked; render(); });
+render();
+if(location.hash){ const el=document.querySelector(location.hash.replace(/[^#\w-]/g,'')); if(el) el.scrollIntoView(); }
+</script>
+</body></html>
